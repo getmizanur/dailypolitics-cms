@@ -1,11 +1,11 @@
 const Form = require(
-    global.applicationPath('/library/mvc/form/form'));
+    global.applicationPath('/library/form/form'));
 const Text = require(
-    global.applicationPath('/library/mvc/form/element/text'));
+    global.applicationPath('/library/form/element/text'));
 const Password = require(
-    global.applicationPath('/library/mvc/form/element/password'));
+    global.applicationPath('/library/form/element/password'));
 const Submit = require(
-    global.applicationPath('/library/mvc/form/element/submit'));
+    global.applicationPath('/library/form/element/submit'));
 
 
 class LoginForm extends Form {

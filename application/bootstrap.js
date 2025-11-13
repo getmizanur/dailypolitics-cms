@@ -1,13 +1,11 @@
 const path = require('path');
 
-const Bootstrapper 
-    = require(global.applicationPath('/library/mvc/bootstrapper'));
-const ClassUtil 
-    = require(global.applicationPath('/library/mvc/util/classUtil'));
-const Registry 
-    = require(global.applicationPath('/library/mvc/registry'));
-
-const cookieSession = require('cookie-session');
+const Bootstrapper
+    = require(global.applicationPath('/library/bootstrapper'));
+const ClassUtil
+    = require(global.applicationPath('/library/util/classUtil'));
+const Registry
+    = require(global.applicationPath('/library/registry'));const cookieSession = require('cookie-session');
 const express = require('express');
 const nunjucks = require('nunjucks');
 const dotenv = require('dotenv');
@@ -175,7 +173,7 @@ class Bootstrap extends Bootstrapper {
         // register view helpers from configuration using ViewHelperManager
         const registry = super.getContainer();
         const appConfig = registry.get('application');
-        const ViewHelperManager = require(global.applicationPath('/library/mvc/view/viewHelperManager'));
+        const ViewHelperManager = require(global.applicationPath('/library/view/viewHelperManager'));
         
         const viewHelperManager = new ViewHelperManager();
         const applicationHelpers = appConfig.view_helpers?.invokables || {};

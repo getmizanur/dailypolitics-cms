@@ -1,9 +1,9 @@
 const Form = require(
-    global.applicationPath('/library/mvc/form/form'));
+    global.applicationPath('/library/form/form'));
 const Radio = require(
-    global.applicationPath('/library/mvc/form/element/radio'));
+    global.applicationPath('/library/form/element/radio'));
 const Submit = require(
-    global.applicationPath('/library/mvc/form/element/submit'));
+    global.applicationPath('/library/form/element/submit'));
 
 class IntroForm extends Form {
 	constructor(options = {}) {

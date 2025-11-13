@@ -11,48 +11,48 @@ class ViewHelperManager {
         // Framework-level helpers - protected from developer modification
         this.frameworkHelpers = {
             "form": {
-                "class": "/library/mvc/view/helper/form",
-                "params": []
+                "class": "/library/view/helper/form",
+                "options": {}
             },
             "formButton": {
-                "class": "/library/mvc/view/helper/formButton",
-                "params": ["element"]
+                "class": "/library/view/helper/formButton",
+                "options": {}
             },
             "formError": {
-                "class": "/library/mvc/view/helper/formError",
-                "params": ["element", "attributes = null"]
+                "class": "/library/view/helper/formError",
+                "options": {}
             },
             "formFile": {
-                "class": "/library/mvc/view/helper/formFile",
-                "params": ["element"]
+                "class": "/library/view/helper/formFile",
+                "options": {}
             },
             "formHidden": {
-                "class": "/library/mvc/view/helper/formHidden",
-                "params": ["element"]
+                "class": "/library/view/helper/formHidden",
+                "options": {}
             },
             "formLabel": {
-                "class": "/library/mvc/view/helper/formLabel",
-                "params": ["elementOrAttribs", "labelContent = null"]
+                "class": "/library/view/helper/formLabel",
+                "options": {}
             },
             "formPassword": {
-                "class": "/library/mvc/view/helper/formPassword",
-                "params": ["element"]
+                "class": "/library/view/helper/formPassword",
+                "options": {}
             },
             "formRadio": {
-                "class": "/library/mvc/view/helper/formRadio",
-                "params": ["element", "value = null"]
+                "class": "/library/view/helper/formRadio",
+                "options": {}
             },
             "formSubmit": {
-                "class": "/library/mvc/view/helper/formSubmit",
-                "params": ["element"]
+                "class": "/library/view/helper/formSubmit",
+                "options": {}
             },
             "formText": {
-                "class": "/library/mvc/view/helper/formText",
-                "params": ["element"]
+                "class": "/library/view/helper/formText",
+                "options": {}
             },
             "headTitle": {
-                "class": "/library/mvc/view/helper/headTitle",
-                "params": ["title = null", "routeName = null"]
+                "class": "/library/view/helper/headTitle",
+                "options": {}
             }
         };
     }

@@ -1,4 +1,4 @@
-const BasePlugin = require(global.applicationPath('/library/mvc/controller/basePlugin'));
+const BasePlugin = require(global.applicationPath('/library/controller/basePlugin'));
 
 class PageTitle extends BasePlugin {
 

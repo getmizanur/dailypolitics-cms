@@ -80,7 +80,7 @@ class AbstractService {
         }
 
         // Create cache instance
-        const Cache = require(global.applicationPath('/library/mvc/cache/cache'));
+        const Cache = require(global.applicationPath('/library/cache/cache'));
         this.cache[type] = Cache.factory(
             cacheConfig.frontend,
             cacheConfig.backend,

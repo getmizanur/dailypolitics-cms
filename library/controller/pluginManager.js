@@ -9,28 +9,28 @@ class PluginManager {
         // Framework plugins that should not be modified by developers
         this.frameworkPlugins = {
             "flashMessenger": {
-                "class": "/library/mvc/controller/plugin/flashMessenger",
-                "description": "Flash messaging system for user notifications"
+                "class": "/library/controller/plugin/flashMessenger",
+                "options": {}
             },
             "layout": {
-                "class": "/library/mvc/controller/plugin/layout",
-                "description": "Template and layout management"
+                "class": "/library/controller/plugin/layout",
+                "options": {}
             },
             "params": {
-                "class": "/library/mvc/controller/plugin/params",
-                "description": "Parameter handling utilities"
+                "class": "/library/controller/plugin/params",
+                "options": {}
             },
             "redirect": {
-                "class": "/library/mvc/controller/plugin/redirect",
-                "description": "HTTP redirect functionality"
+                "class": "/library/controller/plugin/redirect",
+                "options": {}
             },
             "url": {
-                "class": "/library/mvc/controller/plugin/url",
-                "description": "URL generation and routing utilities"
+                "class": "/library/controller/plugin/url",
+                "options": {}
             },
             "session": {
-                "class": "/library/mvc/controller/plugin/session",
-                "description": "Session management plugin"
+                "class": "/library/controller/plugin/session",
+                "options": {}
             }
         };
 

@@ -7,7 +7,7 @@ global.applicationPath = function(filePath) {
 //const Session = require(global.applicationPath('/library/mvc/session/session'));
 //Session.start();
 
-const Application = require(global.applicationPath('/library/mvc/application'));
+const Application = require(global.applicationPath('/library/application'));
 const app = (new Application())
     .bootstrap()
     .run();
