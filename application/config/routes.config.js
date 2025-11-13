@@ -1,0 +1,20 @@
+// Routes configuration for the application
+// This file defines all the URL routes and their corresponding modules, controllers, and actions
+
+module.exports = {
+    "routes": {
+        // Home page route
+        "adminIndexIndex": {
+            "route": "/admin",
+            "module": "admin",
+            "controller": "index",
+            "action": "index"
+        },
+        "blogIndexIndex": {
+            "route": "/",
+            "module": "blog",
+            "controller": "index",
+            "action": "index"
+        }
+    }
+};

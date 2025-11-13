@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Daily Politics">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Primary Meta Tags -->
+    <title>{% block pageTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}</title>
+    <meta name="title" content="{% block metaTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
+    <meta name="description" content="{% block metaDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="fb:app_id" content="1505589612955663" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="{{ request.url | default('http://localhost:8080') }}" />
+    <meta property="og:title" content="{% block ogTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}" />
+    <meta property="og:description" content="{% block ogDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}" />
+    <meta property="og:image" content="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png" />
+    <meta property="og:site_name" content="DailyPolitics" />
+    <meta property="article:publisher" content="https://www.dailypolitics.com" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:site" content="@DeyleePolitiks">
+    <meta name="twitter:creator" content="@DeyleePolitiks">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png">
+    <meta property="twitter:url" content="{{ request.url | default('http://localhost:8080') }}" />
+    <meta name="twitter:title" content="{% block twitterTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitterDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="/css/daily-politics.css" rel="stylesheet" />
+    
+    <!-- Icons and Favicons -->
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="canonical" href="{{ request.url | default('http://localhost:8080') }}">
+    <link rel="apple-touch-icon" href="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-fixed-top">
+        <div class="container">
+            <h1 class="navbar-brand">
+                <a href="/" class="isDisabled">Daily Politics</a>
+            </h1>
+            <button class="navbar-toggler custom-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://twitter.com/intent/tweet?url={{ request.url | default('http://localhost:8080') | urlencode }}&text=Daily%20Politics" target="_blank" rel="noopener noreferrer">
+                            <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_twitter_circle_294709.png" width="29" height="29" alt="twitter">
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.facebook.com/sharer/sharer.php?u={{ request.url | default('http://localhost:8080') | urlencode }}" target="_blank" rel="noopener noreferrer">
+                            <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_facebook_circle_294710.png" width="29" height="29" alt="facebook">
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/feed.xml">
+                            <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_social_style_1_rss_393284.png" alt="rss feed" width="29" height="29">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu Content Area -->
+    <div class="ng-view">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 text-right">
+                    <a href="/bookshop" class="btn nav-font-white">BOOKSHOP</a> | 
+                    <a href="/contact" class="btn nav-font-white">CONTACT-US</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Content Area -->
+    
+    {% block content %} 
+            
+
+    {% endblock %}
+    
+    <!-- Footer -->
+    <footer>
+        <!-- Scripts -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </footer>
+            <li class="nhsuk-footer__list-item">
+              <a class="nhsuk-footer__list-item-link" href="/">Home</a>
+            </li>
+            <li class="nhsuk-footer__list-item">
+              <a class="nhsuk-footer__list-item-link" href="/page-example">Example page</a>
+            </li>
+            <li class="nhsuk-footer__list-item">
+              <a class="nhsuk-footer__list-item-link" href="/clear-data">Clear</a>
+            </li>
+          </ul>
+          <p class="nhsuk-footer__copyright">&copy; Crown copyright</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

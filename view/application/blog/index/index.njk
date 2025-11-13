@@ -1,0 +1,39 @@
+{% extends 'layout/master.njk' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        {{ sidebar(posts) | safe }}
+
+        <div class="col-sm-8 dailypolitics-!-margin-bottom-8">
+            <div class="dailypolitics-correction card dailypolitics-!-margin-top-8 FeedUnit_[n]">
+                <div itemscope itemtype="https://schema.org/NewsArticle">
+                    <h2 class="dailypolitics-heading-xl green">
+                        <a href="/2020/07/21/pmq-boris-johnson-faced-questions-on-coronavirus-and-it-impacts-on-the-uk-economy.html">PMQ: Boris Johnson faced questions on Coronavirus and the impact on the UK economy</a>
+                    </h2>
+
+                    <div class="story-body">
+                        <figure class="media-landscape has-caption full-width lead">
+                            <span class="image-and-copyright-container">
+                                <img class="js-image-replace lazyload" alt="Boris Johnson and Sir Keir Starmer - Prime Minister: Engagements (15 Jul 2020)" src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/2020/07/11/BorisKeir.jpg">
+                            </span>
+                            <figcaption class="media-caption">
+                                <span class="media-caption__text">
+                                    Boris Johnson and Sir Keir Starmer - Prime Minister: Engagements (15 Jul 2020)
+                                </span>
+                            </figcaption>
+                        </figure>
+                    </div>
+
+                    <div class="dailypolitics-body">
+                        <div itemprop="articleBody">
+                            <p><strong>Questioned by Keir Starmer (Leader of Her Majesty's Official Opposition, Leader of the Labour Party)</strong></p>
+                            <p>Over the past few months, we have supported many of the economic measures announced by the Government, but the decision last week not to provide sector-specific support to those most at risk could end up costing thousands of jobs. One of the sectors, aviation, has already seen huge redundancies: BA has announced 12,000 redundancies; Virgin 3,000; and easyJet 1,900. If the Government's priority really is to protect jobs, why did the Chancellor not bring forward sector-specific deals that could have done precisely that?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
