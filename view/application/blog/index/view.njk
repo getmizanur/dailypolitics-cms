@@ -11,7 +11,7 @@
                     <div itemscope itemtype="https://schema.org/NewsArticle">
                         {# Apply presentation style CSS classes to the article header #}
                         <header class="{{ post.presentation_css_classes if post.presentation_css_classes else 'post-header header header--default' }}">
-                            <h1 class="dailypolitics-heading-xl" itemprop="headline">{{ post.title }}</h1>
+                            <h1 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'post-header header header--default' }}" itemprop="headline">{{ post.title }}</h1>
                         </header>
 
                         {% if post.hero_image_url %}
@@ -37,6 +37,7 @@
                             {% endif %}
                             <div itemprop="articleBody">
                                 {# Main article content would go here if available #}
+                                <p itemprop="article">{{ post.content }}</p>
                             </div>
                             {% if post.author_name or post.published_at %}
                             <p>
@@ -54,7 +55,6 @@
                         </div>
                     </div>
                 </div>
-                {% endfor %}
             {% else %}
                 <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">
                     <div class="card-body text-center">
