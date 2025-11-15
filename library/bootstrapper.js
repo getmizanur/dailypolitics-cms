@@ -138,7 +138,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         return returnValue; 
     }
 
-    dispatcher(req, res, next) {
+    async dispatcher(req, res, next) {
         let module, controller, action;
         
         // Handle 404 cases where req.route doesn't exist or custom 404 routing
@@ -237,9 +237,9 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
             request.setRouteName(req.routeName);
         }
 
-        //let params = Object.assign({}, req.body, req.query.params);
-        //request.setParams(params);
-        // setParams is replaced with setPost();
+        // Set route parameters (from Express req.params)
+        request.setParams(req.params || {});
+        // Set POST data
         request.setPost(req.body);
 
         front.setRequest(request);
@@ -249,7 +249,13 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
 
         let view;
         try {
-            view = front.dispatch();
+            const dispatchResult = front.dispatch();
+            // Handle async dispatch results
+            if (dispatchResult && typeof dispatchResult.then === 'function') {
+                view = await dispatchResult;
+            } else {
+                view = dispatchResult;
+            }
         } catch (error) {
             // Handle server errors with framework-level error handling
             console.error('Server error in dispatcher:', error);
@@ -299,9 +305,13 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         }else{
             if(view) {
                 // Check for custom status code from view model or request flags
-                const statusCode = view.getVariable('_status') || 
-                                 (req._is404 ? 404 : null) || 
-                                 (req._is500 ? 500 : null);
+                let statusCode = null;
+                if (view && typeof view.getVariable === 'function') {
+                    statusCode = view.getVariable('_status');
+                } else {
+                    console.error('Bootstrapper: view is not a proper ViewModel instance:', typeof view, view);
+                }
+                statusCode = statusCode || (req._is404 ? 404 : null) || (req._is500 ? 500 : null);
                 if (statusCode) {
                     res.status(statusCode);
                 }

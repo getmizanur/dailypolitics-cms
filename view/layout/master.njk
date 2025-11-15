@@ -40,9 +40,11 @@
     <link rel="apple-touch-icon" href="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png">
 </head>
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="sr-only sr-only-focusable" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:1000;background:#fff;color:#00703C;padding:8px 16px;border-radius:4px;outline:2px solid #FFD600;outline-offset:2px;" onfocus="this.style.left='0';this.style.width='auto';this.style.height='auto';this.style.overflow='visible';" onblur="this.style.left='-999px';this.style.width='1px';this.style.height='1px';this.style.overflow='hidden';">Skip to main content</a>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-fixed-top">
-        <div class="container">
+        <div class="container" style="padding-left: 0px; padding-right: 0px;">
             <h1 class="navbar-brand">
                 <a href="/" class="isDisabled">Daily Politics</a>
             </h1>
@@ -72,43 +74,38 @@
     </nav>
 
     <!-- Menu Content Area -->
-    <div class="ng-view">
+    <nav class="ng-view">
         <div class="container">
             <div class="row">
-                <div class="col-sm-12 text-right">
+                <div class="col-sm-12 text-right" style="padding-left: 0px;padding-right: 0px;">
                     <a href="/bookshop" class="btn nav-font-white">BOOKSHOP</a> | 
                     <a href="/contact" class="btn nav-font-white">CONTACT-US</a>
                 </div>
             </div>
         </div>
-    </div>
+    </nav>
 
-    <!-- Menu Content Area -->
-    
-    {% block content %} 
-            
-
-    {% endblock %}
+    <!-- Main Content Area -->
+    <main id="main-content" tabindex="-1">
+        {% block content %}
+        {% endblock %}
+    </main>
+   
     
     <!-- Footer -->
     <footer>
         <!-- Scripts -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    </footer>
-            <li class="nhsuk-footer__list-item">
-              <a class="nhsuk-footer__list-item-link" href="/">Home</a>
-            </li>
-            <li class="nhsuk-footer__list-item">
-              <a class="nhsuk-footer__list-item-link" href="/page-example">Example page</a>
-            </li>
-            <li class="nhsuk-footer__list-item">
-              <a class="nhsuk-footer__list-item-link" href="/clear-data">Clear</a>
-            </li>
-          </ul>
-          <p class="nhsuk-footer__copyright">&copy; Crown copyright</p>
-        </div>
-      </div>
-    </footer>
+            <footer class="footer mt-5 bg-light border-top">
+                <div class="container py-4">
+                    <ul class="list-inline mb-2">
+                        <li class="list-inline-item"><a href="/">Home</a></li>
+                        <li class="list-inline-item"><a href="/page-example">Example page</a></li>
+                        <li class="list-inline-item"><a href="/clear-data">Clear</a></li>
+                    </ul>
+                    <p class="text-muted small mb-0">&copy; Crown copyright</p>
+                </div>
+            </footer>
   </body>
 </html>

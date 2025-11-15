@@ -12,39 +12,39 @@ class ViewHelperManager {
         this.frameworkHelpers = {
             "form": {
                 "class": "/library/view/helper/form",
-                "options": {}
+                "params": []
             },
             "formButton": {
                 "class": "/library/view/helper/formButton",
-                "options": {}
+                "params": ["element"]
             },
             "formError": {
                 "class": "/library/view/helper/formError",
-                "options": {}
+                "params": ["element", "attributes = null"]
             },
             "formFile": {
                 "class": "/library/view/helper/formFile",
-                "options": {}
+                "params": ["element"]
             },
             "formHidden": {
                 "class": "/library/view/helper/formHidden",
-                "options": {}
+                "params": ["element"]
             },
             "formLabel": {
                 "class": "/library/view/helper/formLabel",
-                "options": {}
+                "params": ["elementOrAttribs", "labelContent = null"]
             },
             "formPassword": {
                 "class": "/library/view/helper/formPassword",
-                "options": {}
+                "params": ["element"]
             },
             "formRadio": {
                 "class": "/library/view/helper/formRadio",
-                "options": {}
+                "params": ["element", "value = null"]
             },
             "formSubmit": {
                 "class": "/library/view/helper/formSubmit",
-                "options": {}
+                "params": ["element"]
             },
             "formText": {
                 "class": "/library/view/helper/formText",
@@ -52,7 +52,7 @@ class ViewHelperManager {
             },
             "headTitle": {
                 "class": "/library/view/helper/headTitle",
-                "options": {}
+                "params": ["element"]
             }
         };
     }

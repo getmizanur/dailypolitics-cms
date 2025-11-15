@@ -1,4 +1,4 @@
-<project name="SkeletonApp" default="build" basedir="../">                      
+<project name="DAILYPOLITICS-CMS" default="build" basedir="../">                      
                                                                                  
     <target name="init">                                                         
        <property file="${basedir}/build/ant.properties" />                       

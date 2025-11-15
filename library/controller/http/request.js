@@ -166,6 +166,31 @@ class Request {
         return this.path;
     }
 
+    setParams(params) {
+        this.params = params;
+        return this;
+    }
+
+    getParam(key, defaultValue = null) {
+        if (!this.params || typeof this.params !== 'object') {
+            return key === null ? {} : defaultValue;
+        }
+        
+        if(this.params.hasOwnProperty(key)) {
+            return this.params[key]; 
+        }
+
+        if(key == null) {
+            return this.params;
+        }
+    
+        return defaultValue;
+    }
+
+    getParams() {
+        return this.params || {};
+    }
+
 	setDispatched(flag = true) {
 		this.dispatched = flag ? true : false;		
 

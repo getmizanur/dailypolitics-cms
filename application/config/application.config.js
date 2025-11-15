@@ -143,10 +143,69 @@ module.exports = {
          */
     },
     
+    // Database configuration with PostgreSQL
+    "database": {
+        "enabled": process.env.DATABASE_ENABLED !== 'false',
+        "adapter": process.env.DATABASE_ADAPTER || "postgresql",
+        "connection": {
+            "host": process.env.DATABASE_HOST || "localhost",
+            "port": parseInt(process.env.DATABASE_PORT) || 5432,
+            "username": process.env.DATABASE_USER || "postgres",
+            "password": process.env.DATABASE_PASSWORD || "",
+            "database": process.env.DATABASE_NAME || "dailypolitics_cms",
+            "ssl": process.env.DATABASE_SSL === 'true' || false,
+            "connectionTimeoutMillis": parseInt(process.env.DATABASE_CONNECTION_TIMEOUT) || 30000,
+            "idleTimeoutMillis": parseInt(process.env.DATABASE_IDLE_TIMEOUT) || 30000,
+            "max": parseInt(process.env.DATABASE_MAX_CONNECTIONS) || 20
+        },
+        "options": {
+            "useNullAsDefault": true,
+            "debug": process.env.DATABASE_DEBUG === 'true' || false,
+            "pool": {
+                "min": parseInt(process.env.DATABASE_POOL_MIN) || 2,
+                "max": parseInt(process.env.DATABASE_POOL_MAX) || 10
+            }
+        }
+        /*
+         * ALTERNATIVE DATABASE CONFIGURATIONS (for future reference):
+         * 
+         * MySQL Configuration:
+         * "adapter": "mysql",
+         * "connection": {
+         *     "host": process.env.DATABASE_HOST || "localhost",
+         *     "port": parseInt(process.env.DATABASE_PORT) || 3306,
+         *     "user": process.env.DATABASE_USER || "root",
+         *     "password": process.env.DATABASE_PASSWORD || "",
+         *     "database": process.env.DATABASE_NAME || "dailypolitics_cms",
+         *     "charset": process.env.DATABASE_CHARSET || "utf8mb4",
+         *     "timezone": process.env.DATABASE_TIMEZONE || "UTC"
+         * }
+         * 
+         * SQL Server Configuration:
+         * "adapter": "sqlserver",
+         * "connection": {
+         *     "server": process.env.DATABASE_HOST || "localhost",
+         *     "port": parseInt(process.env.DATABASE_PORT) || 1433,
+         *     "user": process.env.DATABASE_USER || "sa",
+         *     "password": process.env.DATABASE_PASSWORD || "",
+         *     "database": process.env.DATABASE_NAME || "dailypolitics_cms",
+         *     "encrypt": process.env.DATABASE_ENCRYPT === 'true' || true,
+         *     "trustServerCertificate": process.env.DATABASE_TRUST_CERT === 'true' || false
+         * }
+         * 
+         * SQLite Configuration:
+         * "adapter": "sqlite",
+         * "connection": {
+         *     "filename": process.env.DATABASE_PATH || global.applicationPath('/data/database.db')
+         * }
+         */
+    },
+    
     // Service Manager configuration
     "service_manager": {
         "invokables": {
-            "EmailService": "/application/service/verifyEmailService"
+            "EmailService": "/application/service/verifyEmailService",
+            "PostService": "/application/service/postService"
         }
     },
     
@@ -174,6 +233,10 @@ module.exports = {
             "sidebar": {
                 "class": "/application/helper/sidebarHelper",
                 "params": ["posts = null"]
+            },
+            "pages": {
+                "class": "/application/helper/paginationHelper",
+                "params": ["options = {}"]
             }
         }
         // Add your custom application helpers here

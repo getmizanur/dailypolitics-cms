@@ -165,6 +165,10 @@ class Bootstrap extends Bootstrapper {
             nocache: true
         });
 
+        // Add date filter
+        const dateFilter = require('nunjucks-date-filter');
+        env.addFilter('date', dateFilter);
+
         this.app.use((req, res, next) => {
             res.locals.masterTemplate = 'layout/master.njk'
             next();

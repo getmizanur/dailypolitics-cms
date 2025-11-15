@@ -6,14 +6,13 @@
         {{ sidebar(recentPosts) | safe }}
 
         <div class="col-sm-8 dailypolitics-!-margin-bottom-8">
-            {% if posts and posts.length > 0 %}
-                {% for post in posts %}
-                <div class="dailypolitics-correction card dailypolitics-!-margin-top-8 FeedUnit_[n]">
+            {% if post %}
+                <article class="dailypolitics-correction card dailypolitics-!-margin-top-8">
                     <div itemscope itemtype="https://schema.org/NewsArticle">
-                        {# Apply presentation style CSS classes to the header if available #}
-                        <h2 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'green' }}" itemprop="headline">
-                            <a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" target="_blank" rel="noopener noreferrer">{{ post.title }}</a>
-                        </h2>
+                        {# Apply presentation style CSS classes to the article header #}
+                        <header class="{{ post.presentation_css_classes if post.presentation_css_classes else 'post-header header header--default' }}">
+                            <h1 class="dailypolitics-heading-xl" itemprop="headline">{{ post.title }}</h1>
+                        </header>
 
                         {% if post.hero_image_url %}
                         <div class="story-body">
@@ -51,14 +50,11 @@
                                 {% endif %}
                             </p>
                             {% endif %}
-                            <p><a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" class="btn btn-primary green" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;" aria-label="Read more about {{ post.title }}" target="_blank" rel="noopener noreferrer">Read More</a></p>
+                            <p><a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" class="btn btn-primary" style="background-color: #00703C; border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;" aria-label="Read more about {{ post.title }}" target="_blank" rel="noopener noreferrer">Read More</a></p>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
-                {% if pages %}
-                    {{ pages(pagination) | safe }}
-                {% endif %}
             {% else %}
                 <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">
                     <div class="card-body text-center">

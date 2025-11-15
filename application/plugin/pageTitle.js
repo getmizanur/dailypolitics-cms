@@ -13,7 +13,16 @@ class PageTitle extends BasePlugin {
      * @returns {PageTitle} For method chaining
      */
     setTitle(title) {
-        this.getController().getView().setVariable('pageTitle', title);
+        try {
+            const view = this.getController().getView();
+            if (!view || typeof view.setVariable !== 'function') {
+                console.error('PageTitle.setTitle: view is not a proper ViewModel instance:', typeof view, view);
+                return this;
+            }
+            view.setVariable('pageTitle', title);
+        } catch (error) {
+            console.error('PageTitle.setTitle error:', error);
+        }
         return this;
     }
 
@@ -22,8 +31,18 @@ class PageTitle extends BasePlugin {
      * @returns {string} Current page title or default
      */
     getTitle() {
-        const pageTitle = this.getController().getView().getVariable('pageTitle');
-        return pageTitle || this.defaultTitle;
+        try {
+            const view = this.getController().getView();
+            if (!view || typeof view.getVariable !== 'function') {
+                console.error('PageTitle.getTitle: view is not a proper ViewModel instance:', typeof view, view);
+                return this.defaultTitle;
+            }
+            const pageTitle = view.getVariable('pageTitle');
+            return pageTitle || this.defaultTitle;
+        } catch (error) {
+            console.error('PageTitle.getTitle error:', error);
+            return this.defaultTitle;
+        }
     }
 
     /**
@@ -31,9 +50,17 @@ class PageTitle extends BasePlugin {
      * Called during post-dispatch to ensure a title is always available
      */
     initializePageTitle() {
-        const view = this.getController().getView();
-        if (!view.getVariable('pageTitle')) {
-            view.setVariable('pageTitle', this.defaultTitle);
+        try {
+            const view = this.getController().getView();
+            if (!view || typeof view.getVariable !== 'function') {
+                console.error('PageTitle.initializePageTitle: view is not a proper ViewModel instance:', typeof view, view);
+                return;
+            }
+            if (!view.getVariable('pageTitle')) {
+                view.setVariable('pageTitle', this.defaultTitle);
+            }
+        } catch (error) {
+            console.error('PageTitle.initializePageTitle error:', error);
         }
     }
 

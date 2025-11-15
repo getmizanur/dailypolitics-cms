@@ -98,6 +98,12 @@ class BaseController {
         return this.getRequest().getParams();
     }
 
+    getQuery(name, defaultValue = null) {
+        let value = this.getRequest().getQuery(name, defaultValue);
+
+        return value;
+    }
+
     returnResponse() {
         return this.returnResponse;
     }
@@ -121,7 +127,17 @@ class BaseController {
         if(this.getRequest().isDispatched()) {
             // Stop dispatch if there is a redirect hook
             //if(!this.getResponse().isRedirect()) {
-                view = this[this.getRequest().getActionName()]();
+                const actionResult = this[this.getRequest().getActionName()]();
+                // Handle async actions that return promises
+                if (actionResult && typeof actionResult.then === 'function') {
+                    // Return the promise so the bootstrapper can await it
+                    return actionResult.then(resolvedView => {
+                        this.postDispatch();
+                        return resolvedView;
+                    });
+                } else {
+                    view = actionResult;
+                }
             //}
 
             this.postDispatch();

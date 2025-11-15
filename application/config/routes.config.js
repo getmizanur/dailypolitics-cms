@@ -15,6 +15,12 @@ module.exports = {
             "module": "blog",
             "controller": "index",
             "action": "index"
+        },
+        "blogIndexView": {
+            "route": "/:category_slug/articles/:slug",
+            "module": "blog",
+            "controller": "index",
+            "action": "view"
         }
     }
 };

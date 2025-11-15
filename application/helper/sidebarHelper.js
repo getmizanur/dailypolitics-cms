@@ -15,7 +15,7 @@ class SidebarHelper extends AbstractHelper {
         const postsToRender = posts || defaultPosts;
 
         let html = `
-        <div class="col-sm-4 hidden-phone">
+        <div class="col-sm-4 hidden-phone" style="padding-left: 0px !important;">
             <div class="dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8">
                 <div class="card">
                     <h3 class="card-header">Recent Posts</h3>
@@ -24,7 +24,7 @@ class SidebarHelper extends AbstractHelper {
         postsToRender.forEach(post => {
             html += `
                         <li class="list-group-item clearfix odd">
-                            <a href="${post.url}">${post.title}</a>
+                            <a href="/${post.category_slug || 'general'}/articles/${post.slug || '#'}">${post.title}</a>
                         </li>`;
         });
 
