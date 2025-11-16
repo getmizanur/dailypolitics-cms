@@ -19,8 +19,9 @@ class SidebarHelper extends AbstractHelper {
             <div class="dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8">
                 <div class="card">
                     <h3 class="card-header">Recent Posts</h3>
-                    <ul class="list-group">`;
+                    <ul class="list-group" id="recent-posts-list">`;
 
+        // Render server-side posts as fallback
         postsToRender.forEach(post => {
             html += `
                         <li class="list-group-item clearfix odd">

@@ -7,59 +7,85 @@
 
         <div class="col-sm-8 dailypolitics-!-margin-bottom-8">
             {% if post %}
-                <article class="dailypolitics-correction card dailypolitics-!-margin-top-8">
-                    <div itemscope itemtype="https://schema.org/NewsArticle">
-                        {# Apply presentation style CSS classes to the article header #}
-                        <header class="{{ post.presentation_css_classes if post.presentation_css_classes else 'post-header header header--default' }}">
-                            <h1 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'post-header header header--default' }}" itemprop="headline">{{ post.title }}</h1>
-                        </header>
+                <article class="dailypolitics-correction card dailypolitics-!-margin-top-8 story-body" itemscope itemtype="https://schema.org/NewsArticle">
+                    {# Apply presentation style CSS classes to the article header #}
+                    <header>
+                        <h1 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'post-header header header--default' }}" itemprop="headline">{{ post.title }}</h1>
+                    </header>
 
-                        {% if post.hero_image_url %}
-                        <div class="story-body">
-                            <!--<figure class="media-landscape has-caption full-width lead">
-                                <span class="image-and-copyright-container">
-                                    <img class="js-image-replace lazyload" alt="{{ post.title }}" src="{{ post.hero_image_url }}" itemprop="image">
-                                </span>
-                                {% if post.hero_image_caption %}
-                                <figcaption class="media-caption">
-                                    <span class="media-caption__text">
-                                        {{ post.hero_image_caption }}
-                                    </span>
-                                </figcaption>
-                                {% endif %}
-                            </figure>-->
-                        </div>
+                    {# Hero image with proper schema markup #}
+                    {% if post.hero_image_url %}
+                    <figure class="media-landscape has-caption full-width lead" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+                        <span class="image-and-copyright-container">
+                            <img class="js-image-replace"
+                                 src="{{ post.hero_image_url }}"
+                                 alt="{{ post.hero_image_alt if post.hero_image_alt else post.title }}"
+                                 itemprop="url contentUrl">
+                        </span>
+                        {% if post.hero_image_caption %}
+                        <figcaption class="media-caption">
+                            <span class="media-caption__text" itemprop="caption">
+                                {{ post.hero_image_caption }}
+                            </span>
+                        </figcaption>
                         {% endif %}
+                        <meta itemprop="width" content="1200">
+                        <meta itemprop="height" content="630">
+                    </figure>
+                    {% endif %}
 
-                        <div class="dailypolitics-body">
-                            {% if post.excerpt %}
-                                <p itemprop="description">{{ post.excerpt }}</p>
+                    <section>
+                        {# Article metadata #}
+                        <div class="article-meta" style="padding: 16px;">
+                            {% if post.author_name %}
+                            <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+                                <strong style="font-weight: bold !important;">By <span itemprop="name">{{ post.author_name }}</span></strong>
+                            </span>
                             {% endif %}
-                            <div itemprop="articleBody">
-                                {# Main article content would go here if available #}
-                                <p itemprop="article">{{ post.content }}</p>
-                            </div>
-                            {% if post.author_name or post.published_at %}
-                            <p>
-                                {% if post.author_name %}
-                                <span itemprop="author" itemscope itemtype="https://schema.org/Person">
-                                    <strong>By <span itemprop="name">{{ post.author_name }}</span></strong>
-                                </span>
-                                {% endif %}
-                                {% if post.published_at %}
-                                - <time itemprop="datePublished" datetime="{{ post.published_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">{{ post.published_at | date('MMMM Do, YYYY') }}</time>
-                                {% endif %}
-                            </p>
+
+                            {% if post.published_at %}
+                            <time itemprop="datePublished" datetime="{{ post.published_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">
+                                - {{ post.published_at | date('MMMM Do, YYYY') }}
+                            </time>
                             {% endif %}
-                            <p><a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" class="btn btn-primary" style="background-color: #00703C; border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;" aria-label="Read more about {{ post.title }}" target="_blank" rel="noopener noreferrer">Read More</a></p>
                         </div>
-                    </div>
-                </div>
+
+                        {# Article body #}
+                        <div class="dailypolitics-body" style="padding: 16px;">
+                            {# Excerpt/description #}
+                            {% if post.excerpt %}
+                            <p class="article-excerpt" itemprop="description" style="padding-top: 0;">{{ post.excerpt }}</p>
+                            {% endif %}
+
+                            {# Main article content #}
+                            <div itemprop="articleBody">
+                                {{ post.content | safe }}
+                            </div>
+
+                            {# Hidden metadata for schema.org #}
+                            <meta itemprop="dateModified" content="{{ post.updated_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">
+                            {% if post.category_name %}
+                            <meta itemprop="articleSection" content="{{ post.category_name }}">
+                            {% endif %}
+                            <meta itemprop="inLanguage" content="en-GB">
+
+                            {# Publisher information (required by Google) #}
+                            <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization" hidden>
+                                <meta itemprop="name" content="Daily Politics">
+                                <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+                                    <meta itemprop="url" content="/images/logo.png">
+                                    <meta itemprop="width" content="600">
+                                    <meta itemprop="height" content="60">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </article>
             {% else %}
                 <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">
                     <div class="card-body text-center">
-                        <h3>No articles found</h3>
-                        <p>There are currently no published articles to display.</p>
+                        <h3>Article Not Found</h3>
+                        <p>The article you're looking for could not be found.</p>
                     </div>
                 </div>
             {% endif %}

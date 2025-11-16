@@ -9,6 +9,12 @@
     <title>{% block pageTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}</title>
     <meta name="title" content="{% block metaTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
     <meta name="description" content="{% block metaDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
+
+    <!-- Preload font files -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto&display=swap" rel="stylesheet">
     
     <!-- Open Graph / Facebook -->
     <meta property="fb:app_id" content="1505589612955663" />
@@ -32,7 +38,8 @@
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link href="/css/daily-politics.css" rel="stylesheet" />
+    <!--<link rel="stylesheet" href="/css/bootstrap.min.441.css" />-->
+    <link rel="preload" href="/css/daily-politics.css" as="style" onload="this.rel='stylesheet'" />
     
     <!-- Icons and Favicons -->
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
@@ -78,7 +85,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-12 text-right" style="padding-left: 0px;padding-right: 0px;">
-                    <a href="/bookshop" class="btn nav-font-white">BOOKSHOP</a> | 
+                    <!--<a href="/bookshop" class="btn nav-font-white">BOOKSHOP</a> |--> 
                     <a href="/contact" class="btn nav-font-white">CONTACT-US</a>
                 </div>
             </div>

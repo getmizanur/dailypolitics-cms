@@ -237,6 +237,10 @@ module.exports = {
             "pages": {
                 "class": "/application/helper/paginationHelper",
                 "params": ["options = {}"]
+            },
+            "truncate": {
+                "class": "/application/helper/truncateHelper",
+                "params": ["text", "wordLimit = 100", "ellipsis = '...'"]
             }
         }
         // Add your custom application helpers here

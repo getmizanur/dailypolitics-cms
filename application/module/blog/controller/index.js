@@ -72,7 +72,9 @@ class Index extends Controller {
             }
 
             // Get recent posts for sidebar, excluding current post
-            const recentPosts = await postService.getRecentPostsForSidebar(post.id);
+            // const recentPosts = await postService.getRecentPostsForSidebar(post.id);
+            // Get recent posts for sidebar
+            const recentPosts = await postService.getRecentPostsForSidebar();
 
             // Set view variables
             this.getView().setVariable('post', post);

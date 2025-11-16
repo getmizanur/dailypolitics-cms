@@ -8,7 +8,7 @@
         <div class="col-sm-8 dailypolitics-!-margin-bottom-8">
             {% if posts and posts.length > 0 %}
                 {% for post in posts %}
-                <div class="dailypolitics-correction card dailypolitics-!-margin-top-8 FeedUnit_[n]">
+                <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">
                     <div itemscope itemtype="https://schema.org/NewsArticle">
                         {# Apply presentation style CSS classes to the header if available #}
                         <h2 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'green' }}" itemprop="headline">
@@ -17,7 +17,7 @@
 
                         {% if post.hero_image_url %}
                         <div class="story-body">
-                            <!--<figure class="media-landscape has-caption full-width lead">
+                            <figure class="media-landscape has-caption full-width lead">
                                 <span class="image-and-copyright-container">
                                     <img class="js-image-replace lazyload" alt="{{ post.title }}" src="{{ post.hero_image_url }}" itemprop="image">
                                 </span>
@@ -28,30 +28,32 @@
                                     </span>
                                 </figcaption>
                                 {% endif %}
-                            </figure>-->
+                            </figure>
                         </div>
                         {% endif %}
 
                         <div class="dailypolitics-body">
-                            {% if post.excerpt %}
-                                <p itemprop="description">{{ post.excerpt }}</p>
-                            {% endif %}
-                            <div itemprop="articleBody">
-                                {# Main article content would go here if available #}
-                            </div>
-                            {% if post.author_name or post.published_at %}
-                            <p>
-                                {% if post.author_name %}
-                                <span itemprop="author" itemscope itemtype="https://schema.org/Person">
-                                    <strong>By <span itemprop="name">{{ post.author_name }}</span></strong>
-                                </span>
+                            <section>
+                                {% if post.excerpt %}
+                                    <p itemprop="description">{{ truncate(post.content) }}</p>
                                 {% endif %}
-                                {% if post.published_at %}
-                                - <time itemprop="datePublished" datetime="{{ post.published_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">{{ post.published_at | date('MMMM Do, YYYY') }}</time>
+                                <div itemprop="articleBody">
+                                    {# Main article content would go here if available #}
+                                </div>
+                                {% if post.author_name or post.published_at %}
+                                <p>
+                                    {% if post.author_name %}
+                                    <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+                                        <strong>By <span itemprop="name">{{ post.author_name }}</span></strong>
+                                    </span>
+                                    {% endif %}
+                                    {% if post.published_at %}
+                                    - <time itemprop="datePublished" datetime="{{ post.published_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">{{ post.published_at | date('MMMM Do, YYYY') }}</time>
+                                    {% endif %}
+                                </p>
                                 {% endif %}
-                            </p>
-                            {% endif %}
-                            <p><a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" class="btn btn-primary green" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;" aria-label="Read more about {{ post.title }}" target="_blank" rel="noopener noreferrer">Read More</a></p>
+                                <p><a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" class="btn btn-primary green" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;" aria-label="Read more about {{ post.title }}" target="_blank" rel="noopener noreferrer">Read More</a></p>
+                            </section>
                         </div>
                     </div>
                 </div>
