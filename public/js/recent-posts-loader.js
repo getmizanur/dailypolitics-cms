@@ -17,7 +17,7 @@
         }
 
         // Fetch the JSON file
-        fetch('/assets/json/recent-posts.json')
+        fetch('/api/recent-posts.json')
             .then(function(response) {
                 if (!response.ok) {
                     throw new Error('Failed to load recent posts: ' + response.status);

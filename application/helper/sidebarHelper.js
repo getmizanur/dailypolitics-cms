@@ -25,7 +25,7 @@ class SidebarHelper extends AbstractHelper {
         postsToRender.forEach(post => {
             html += `
                         <li class="list-group-item clearfix odd">
-                            <a href="/${post.category_slug || 'general'}/articles/${post.slug || '#'}">${post.title}</a>
+                            <a href="/${post.category_slug || 'general'}/articles/${post.slug || '#'}/index.html">${post.title}</a>
                         </li>`;
         });
 

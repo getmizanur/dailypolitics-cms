@@ -323,6 +323,74 @@ class PostService extends AbstractService {
     }
 
     /**
+     * Get the next article (older, published before current article)
+     * @param {string} currentPostPublishedAt - Current post's published_at timestamp
+     * @param {number} currentPostId - Current post's ID (to exclude it)
+     * @returns {Promise<Object|null>} Next article object or null
+     */
+    async getNextArticle(currentPostPublishedAt, currentPostId) {
+        try {
+            const select = await this.getSelectQuery();
+
+            select.from('posts')
+                  .joinLeft('categories', 'posts.category_id = categories.id')
+                  .columns([
+                      'posts.id',
+                      'posts.title',
+                      'posts.slug',
+                      'posts.published_at',
+                      'categories.slug as category_slug'
+                  ])
+                  .where('posts.status = ?', 'published')
+                  .where('posts.published_at < ?', currentPostPublishedAt)
+                  .where('posts.id != ?', currentPostId)
+                  .order('posts.published_at', 'DESC')
+                  .limit(1);
+
+            const result = await select.execute();
+            const rows = result.rows || result;
+            return rows.length > 0 ? rows[0] : null;
+        } catch (error) {
+            console.error('Error fetching next article:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get the previous article (newer, published after current article)
+     * @param {string} currentPostPublishedAt - Current post's published_at timestamp
+     * @param {number} currentPostId - Current post's ID (to exclude it)
+     * @returns {Promise<Object|null>} Previous article object or null
+     */
+    async getPreviousArticle(currentPostPublishedAt, currentPostId) {
+        try {
+            const select = await this.getSelectQuery();
+
+            select.from('posts')
+                  .joinLeft('categories', 'posts.category_id = categories.id')
+                  .columns([
+                      'posts.id',
+                      'posts.title',
+                      'posts.slug',
+                      'posts.published_at',
+                      'categories.slug as category_slug'
+                  ])
+                  .where('posts.status = ?', 'published')
+                  .where('posts.published_at > ?', currentPostPublishedAt)
+                  .where('posts.id != ?', currentPostId)
+                  .order('posts.published_at', 'ASC')
+                  .limit(1);
+
+            const result = await select.execute();
+            const rows = result.rows || result;
+            return rows.length > 0 ? rows[0] : null;
+        } catch (error) {
+            console.error('Error fetching previous article:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Close database connection
      * Call this when shutting down the application
      */

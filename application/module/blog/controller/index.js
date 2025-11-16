@@ -12,7 +12,7 @@ class Index extends Controller {
     async indexAction() {
         try {
             const postService = this.getServiceManager().get('PostService');
-            const page = parseInt(this.getQuery('page')) || 1;
+            const page = parseInt(this.getParam('page')) || 1;
             const limit = 2;
             const offset = (page - 1) * limit;
 
@@ -71,14 +71,18 @@ class Index extends Controller {
                 return this.notFoundAction();
             }
 
-            // Get recent posts for sidebar, excluding current post
-            // const recentPosts = await postService.getRecentPostsForSidebar(post.id);
-            // Get recent posts for sidebar
-            const recentPosts = await postService.getRecentPostsForSidebar();
+            // Get recent posts for sidebar, prev/next articles in parallel
+            const [recentPosts, nextArticle, prevArticle] = await Promise.all([
+                postService.getRecentPostsForSidebar(),
+                postService.getNextArticle(post.published_at, post.id),
+                postService.getPreviousArticle(post.published_at, post.id)
+            ]);
 
             // Set view variables
             this.getView().setVariable('post', post);
             this.getView().setVariable('recentPosts', recentPosts);
+            this.getView().setVariable('nextArticle', nextArticle);
+            this.getView().setVariable('prevArticle', prevArticle);
 
             // Set page title and meta description
             this.getPluginManager().get('pageTitle').setTitle(post.title + ' - Daily Politics');

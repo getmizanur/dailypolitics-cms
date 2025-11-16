@@ -11,13 +11,13 @@ module.exports = {
             "action": "index"
         },
         "blogIndexIndex": {
-            "route": "/",
+            "route": "/(page/:page/index.html)?",
             "module": "blog",
             "controller": "index",
             "action": "index"
         },
         "blogIndexView": {
-            "route": "/:category_slug/articles/:slug",
+            "route": "/:category_slug/articles/:slug/index.html",
             "module": "blog",
             "controller": "index",
             "action": "view"
