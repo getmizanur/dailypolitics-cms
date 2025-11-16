@@ -1,31 +1,31 @@
 const AbstractHelper = require(global.applicationPath('/library/view/helper/abstractHelper'));
 
+/**
+ * PaginationHelper - Renders NEWER POSTS / OLDER POSTS navigation
+ * Usage in template: {{ pages(pagination) | safe }}
+ */
 class PaginationHelper extends AbstractHelper {
     /**
-     * Renders pagination HTML
-     * Usage in template: {{ pagination(paginationData) | safe }}
+     * Renders pagination HTML with NEWER POSTS and OLDER POSTS buttons
      *
      * @param {Object} options - Pagination configuration
      * @param {number} options.currentPage - Current page number
      * @param {number} options.totalPages - Total number of pages
-     * @param {boolean} options.hasNext - Whether there is a next page
-     * @param {boolean} options.hasPrev - Whether there is a previous page
-     * @param {number} options.nextPage - Next page number
-     * @param {number} options.prevPage - Previous page number
+     * @param {boolean} options.hasNext - Whether there is a next page (older posts)
+     * @param {boolean} options.hasPrev - Whether there is a previous page (newer posts)
+     * @param {number} options.nextPage - Next page number (older posts)
+     * @param {number} options.prevPage - Previous page number (newer posts)
      * @param {string} options.baseUrl - Base URL for pagination links (default: current path)
-     * @param {number} options.maxVisible - Maximum number of page links to show (default: 5)
      * @returns {string} - HTML string for pagination
      */
     render(options = {}) {
         const {
-            currentPage = 1,
             totalPages = 1,
             hasNext = false,
             hasPrev = false,
             nextPage = 2,
             prevPage = 0,
-            baseUrl = '',
-            maxVisible = 4
+            baseUrl = ''
         } = options;
 
         // Don't render pagination if there's only one page or no pages
@@ -33,85 +33,35 @@ class PaginationHelper extends AbstractHelper {
             return '';
         }
 
-        // Calculate page range to display
-        const pageRange = this._calculatePageRange(currentPage, totalPages, maxVisible);
-
         let html = `
-        <nav aria-label="Page navigation" class="dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8">
-            <ul class="pagination justify-content-center">`;
+        <nav aria-label="Post navigation" class="dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8">
+            <ul class="pagination justify-content-between" style="display: flex;">`;
 
-        // Previous button
+        // NEWER POSTS button (previous page) - left side
         if (hasPrev) {
+            const newerUrl = prevPage === 1 ? baseUrl || '/' : `${baseUrl}?page=${prevPage}`;
             html += `
                 <li class="page-item">
-                    <a class="page-link" href="${baseUrl}?page=${prevPage}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo; Previous</span>
+                    <a class="btn btn-primary green" href="${newerUrl}" rel="prev" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
+                        ← NEWER POSTS
                     </a>
                 </li>`;
         } else {
-            html += `
-                <li class="page-item disabled">
-                    <span class="page-link" aria-label="Previous">
-                        <span aria-hidden="true">&laquo; Previous</span>
-                    </span>
-                </li>`;
+            // Empty spacer when on first page
+            html += `<li class="page-item" style="visibility: hidden;"><span class="btn">← NEWER POSTS</span></li>`;
         }
 
-        // First page + ellipsis if needed
-        if (pageRange.showFirstEllipsis) {
-            html += `
-                <li class="page-item">
-                    <a class="page-link" href="${baseUrl}?page=1">1</a>
-                </li>
-                <li class="page-item disabled">
-                    <span class="page-link">...</span>
-                </li>`;
-        }
-
-        // Page numbers
-        pageRange.pages.forEach(page => {
-            if (page === currentPage) {
-                html += `
-                <li class="page-item active" aria-current="page">
-                    <span class="page-link">
-                        ${page}
-                        <span class="sr-only">(current)</span>
-                    </span>
-                </li>`;
-            } else {
-                html += `
-                <li class="page-item">
-                    <a class="page-link" href="${baseUrl}?page=${page}">${page}</a>
-                </li>`;
-            }
-        });
-
-        // Last page + ellipsis if needed
-        if (pageRange.showLastEllipsis) {
-            html += `
-                <li class="page-item disabled">
-                    <span class="page-link">...</span>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="${baseUrl}?page=${totalPages}">${totalPages}</a>
-                </li>`;
-        }
-
-        // Next button
+        // OLDER POSTS button (next page) - right side
         if (hasNext) {
             html += `
                 <li class="page-item">
-                    <a class="page-link" href="${baseUrl}?page=${nextPage}" aria-label="Next">
-                        <span aria-hidden="true">Next &raquo;</span>
+                    <a class="btn btn-primary green" href="${baseUrl}?page=${nextPage}" rel="next" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
+                        OLDER POSTS →
                     </a>
                 </li>`;
         } else {
-            html += `
-                <li class="page-item disabled">
-                    <span class="page-link" aria-label="Next">
-                        <span aria-hidden="true">Next &raquo;</span>
-                    </span>
-                </li>`;
+            // Empty spacer when on last page
+            html += `<li class="page-item" style="visibility: hidden;"><span class="btn">OLDER POSTS →</span></li>`;
         }
 
         html += `
@@ -119,59 +69,6 @@ class PaginationHelper extends AbstractHelper {
         </nav>`;
 
         return html;
-    }
-
-    /**
-     * Calculate which page numbers to display
-     * @private
-     */
-    _calculatePageRange(currentPage, totalPages, maxVisible) {
-        const pages = [];
-        let showFirstEllipsis = false;
-        let showLastEllipsis = false;
-
-        // If total pages is less than max visible, show all
-        if (totalPages <= maxVisible) {
-            for (let i = 1; i <= totalPages; i++) {
-                pages.push(i);
-            }
-            return { pages, showFirstEllipsis, showLastEllipsis };
-        }
-
-        // Calculate the range around current page
-        const halfVisible = Math.floor(maxVisible / 2);
-        let startPage = Math.max(1, currentPage - halfVisible);
-        let endPage = Math.min(totalPages, currentPage + halfVisible);
-
-        // Adjust if we're near the beginning
-        if (currentPage <= halfVisible + 1) {
-            startPage = 1;
-            endPage = Math.min(maxVisible, totalPages);
-        }
-        // Adjust if we're near the end
-        else if (currentPage >= totalPages - halfVisible) {
-            startPage = Math.max(1, totalPages - maxVisible + 1);
-            endPage = totalPages;
-        }
-
-        // Show first page and ellipsis if start is not at the beginning
-        if (startPage > 1) {
-            showFirstEllipsis = true;
-            startPage = Math.max(2, startPage); // Start from 2 since 1 is shown separately
-        }
-
-        // Show last page and ellipsis if end is not at the end
-        if (endPage < totalPages) {
-            showLastEllipsis = true;
-            endPage = Math.min(totalPages - 1, endPage); // End at totalPages-1 since last is shown separately
-        }
-
-        // Build pages array
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(i);
-        }
-
-        return { pages, showFirstEllipsis, showLastEllipsis };
     }
 }
 
