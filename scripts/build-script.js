@@ -109,9 +109,18 @@ function convertToRelativePaths(html, filePath) {
             return `href="${relativeRoot}index.html"`;
         }
 
+        // If path already ends with index.html, don't add it again
+        if (path.endsWith('index.html')) {
+            return `href="${relativeRoot}${path}"`;
+        }
+
         // Article links and other paths - just add index.html at the end
         return `href="${relativeRoot}${path}/index.html"`;
     });
+
+    // Inject recent-posts-loader.js script before closing </footer> tag
+    const recentPostsScript = `<script src="${relativeRoot}js/recent-posts-loader.js"></script>`;
+    html = html.replace(/(<footer>[\s\S]*?<!-- Scripts -->)/i, `$1\n        ${recentPostsScript}`);
 
     return html;
 }
@@ -277,7 +286,7 @@ async function generateRecentPostsJson(recentPosts) {
         const jsonPosts = recentPosts.map(post => ({
             title: post.title,
             slug: post.slug,
-            category_slug: post.category_slug || 'general'
+            category_slug: (post.category_slug || 'general')
         }));
 
         const jsonContent = JSON.stringify(jsonPosts, null, 2);
@@ -288,13 +297,6 @@ async function generateRecentPostsJson(recentPosts) {
         const staticJsonPath = path.join(staticApiDir, 'recent-posts.json');
         await fs.writeFile(staticJsonPath, jsonContent, 'utf8');
         console.log(`✓ Generated: api/recent-posts.json (${jsonPosts.length} posts)`);
-
-        // Also update public/api/recent-posts.json for development server
-        const publicApiDir = path.join(__dirname, '../public/api');
-        await fs.mkdir(publicApiDir, { recursive: true });
-        const publicJsonPath = path.join(publicApiDir, 'recent-posts.json');
-        await fs.writeFile(publicJsonPath, jsonContent, 'utf8');
-        console.log(`✓ Updated: public/api/recent-posts.json (${jsonPosts.length} posts)`);
     } catch (error) {
         console.error('✗ Failed to generate recent-posts.json:', error.message);
     }

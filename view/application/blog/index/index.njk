@@ -34,26 +34,46 @@
 
                         <div class="dailypolitics-body">
                             <section>
-                                {% if post.excerpt %}
-                                    <p itemprop="description">{{ truncate(post.content) }}</p>
-                                {% endif %}
-                                <div itemprop="articleBody">
-                                    {# Main article content would go here if available #}
-                                </div>
-                                {% if post.author_name or post.published_at %}
-                                <p>
+                                <div class="article-meta" style="padding: 16px;">
                                     {% if post.author_name %}
                                     <span itemprop="author" itemscope itemtype="https://schema.org/Person">
-                                        <strong>By <span itemprop="name">{{ post.author_name }}</span></strong>
+                                        <span itemprop="name"><strong class="dp-tag dp-tag--muted" style="font-weight: 700 !important;">By {{ post.author_name }}</strong></span>
                                     </span>
+                                    <strong class="dp-tag dp-tag--positive" style="font-weight: 700 !important;">{{ post.category_name }}</strong>
+                                    <strong class="dp-tag dp-tag--{{ post.presentation_style_slug }}" style="font-weight: 700 !important;">{{ post.presentation_style_name }}</strong>
                                     {% endif %}
-                                    {% if post.published_at %}
-                                    - <time itemprop="datePublished" datetime="{{ post.published_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">{{ post.published_at | date('MMMM Do, YYYY') }}</time>
-                                    {% endif %}
-                                </p>
-                                {% endif %}
-                                <p><a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" class="btn btn-primary green" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;" aria-label="Read more about {{ post.title }}" target="_blank" rel="noopener noreferrer">Read More</a></p>
+                                </div>
+
+                                <div itemprop="articleBody">
+                                    <p itemprop="description">{{ truncate(post.content) }}</p>
+                                </div>
+                                <!--<p><a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" class="btn btn-primary green" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;" aria-label="Read more about {{ post.title }}" target="_blank" rel="noopener noreferrer">Read More</a></p>-->
                             </section>
+                        </div>
+                        <div class="dailypolitics-footer d-flex justify-content-between">
+                            <div>
+                                <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_clock_226587.png" class="dailypolitics-margin-right-5" width="19" alt="publication date"> 
+                                {% if post.published_at %}
+                                    <time itemprop="datePublished" datetime="{{ post.published_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">{{ post.published_at | date('MMMM Do, YYYY') }}</time>
+                                {% endif %}
+                            </div>
+                            <div>
+
+
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.dailypolitics.com/2021/07/29/northern-ireland-could-become-a-permanent-casualty-of-brexit-if-the-protocol-dispute-remains-unresolved.html" target="_blank" rel="noopener noreferrer"><img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_facebook_circle_294710.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23" alt="facebook"></a>
+
+        <!--<img src="/assets/img/iconfinder_335_Telegram_logo_4375108.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23px">
+
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://www.dailypolitics.com/2021/07/29/northern-ireland-could-become-a-permanent-casualty-of-brexit-if-the-protocol-dispute-remains-unresolved.html&title=Northern Ireland could become a "permanent casualty" of Brexit if the Protocol dispute remains unresolved" target="_blank"><img src="/assets/img/iconfinder_linkedin_circle_294706.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23px"></a>-->
+
+
+        <a href="whatsapp://send?text=https://www.dailypolitics.com/2021/07/29/northern-ireland-could-become-a-permanent-casualty-of-brexit-if-the-protocol-dispute-remains-unresolved.html" target="_blank" rel="noopener noreferrer"><img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_375_Whatsapp_logo_4375153.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23" alt="whatsapp"></a>
+
+        <a href="mailto:?subject=Northern%20Ireland%20could%20become%20a%20%22permanent%20casualty%22%20of%20Brexit%20if%20the%20Protocol%20dispute%20remains%20unresolved&amp;body=https://www.dailypolitics.com/2021/07/29/northern-ireland-could-become-a-permanent-casualty-of-brexit-if-the-protocol-dispute-remains-unresolved.html" target="_blank"><img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_008_Mail_183573.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23" alt="email"></a>
+
+
+
+                            </div>
                         </div>
                     </div>
                 </div>

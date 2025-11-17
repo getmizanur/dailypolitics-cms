@@ -113,7 +113,7 @@ class PaginationHelper extends AbstractHelper {
 
         // NEWER ARTICLE button (previous article) - left side
         if (prevArticle) {
-            const prevUrl = `/${prevArticle.category_slug || 'general'}/articles/${prevArticle.slug}`;
+            const prevUrl = `/${prevArticle.category_slug || 'general'}/articles/${prevArticle.slug}/index.html`;
             html += `
                 <li class="page-item">
                     <a class="btn btn-primary green" href="${prevUrl}" rel="prev" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
@@ -126,7 +126,7 @@ class PaginationHelper extends AbstractHelper {
 
         // OLDER ARTICLE button (next article) - right side
         if (nextArticle) {
-            const nextUrl = `/${nextArticle.category_slug || 'general'}/articles/${nextArticle.slug}`;
+            const nextUrl = `/${nextArticle.category_slug || 'general'}/articles/${nextArticle.slug}/index.html`;
             html += `
                 <li class="page-item">
                     <a class="btn btn-primary green" href="${nextUrl}" rel="next" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
