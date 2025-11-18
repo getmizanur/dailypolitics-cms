@@ -7,9 +7,8 @@ class EmailAddress {
         this.email = null;  
 
         this.message = null;
-        this.messageTemplate = options.messagetepmlate || {
-            INVALID 
-                : `Invalid type given. String expected`,
+        this.messageTemplate = options.messageTepmlate || {
+            INVALID : `Invalid type given. String expected`,
             INVALID_FORMAT : `The ${this.name} is not a valid email address`
         }
     }
@@ -58,6 +57,16 @@ class EmailAddress {
         this.message = 'Valid email address'
 
         return true; 
+    }
+
+    /**
+     * Set custom message for specific message key
+     * @param {string} message 
+     * @param {string} messageKey 
+     */
+    setMessage(message, messageKey = 'INVALID_FORMAT') {
+        this.messageTemplate[messageKey] = message;
+        return this;
     }
 
     getClass() {

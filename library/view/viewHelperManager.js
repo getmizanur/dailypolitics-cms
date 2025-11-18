@@ -36,7 +36,7 @@ class ViewHelperManager {
             },
             "formPassword": {
                 "class": "/library/view/helper/formPassword",
-                "params": ["element"]
+                "params": ["element", "extraAttribs = {}"]
             },
             "formRadio": {
                 "class": "/library/view/helper/formRadio",
@@ -48,10 +48,14 @@ class ViewHelperManager {
             },
             "formText": {
                 "class": "/library/view/helper/formText",
-                "options": {}
+                "options": ["element", "extraAttribs = {}"]
             },
             "headTitle": {
                 "class": "/library/view/helper/headTitle",
+                "params": ["element"]
+            },
+            "formCsrf": {
+                "class": "/library/view/helper/formCsrf",
                 "params": ["element"]
             }
         };

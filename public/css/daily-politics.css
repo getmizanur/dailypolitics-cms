@@ -1,3 +1,152 @@
+/* Make footer stick to bottom of page using flexbox layout */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+main {
+  flex: 1;
+}
+.dp-form-group--error {
+  border-left: 4px solid #d4351c;
+  padding-left: 1rem;
+  margin-left: -1rem;
+}
+/* Error message styling for form errors (GOV.UK Design System inspired) */
+.dp-error-message {
+  color: #d4351c;
+  font-weight: bold;
+  font-size: 1.1rem;
+  list-style: none;
+  margin: 0 0 0.5rem 0;
+  padding: 0;
+}
+.dp-error-message li {
+  margin: 0;
+  padding: 0;
+}
+/* Error state for input fields, inspired by GOV.UK Design System */
+.dp-input--error {
+  border: 4px solid #d4351c !important;
+  box-shadow: none;
+}
+/* GOV.UK typeface for admin form labels and placeholders */
+.admin-login-form .dp-label,
+.admin-login-form .dp-input,
+.admin-login-form .dp-input::placeholder {
+  font-family: "nta", Arial, sans-serif !important;
+}
+.admin-login-form .dp-input,
+.admin-login-form .dp-button {
+  width: 400px !important;
+  max-width: 400px;
+  min-width: 400px;
+  box-sizing: border-box;
+}
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dp-fieldset {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 0;
+  padding: 0;
+}
+.dp-form-group {
+  width: 100%;
+}
+.dp-button {
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+/* GOV.UK Design System inspired fieldset, input, and button styles */
+.dp-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 2rem 0;
+}
+
+.dp-form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.dp-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #222;
+  font-size: 1.1rem;
+}
+
+.dp-input {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #222;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 2px solid #0b0c0c;
+  border-radius: 0;
+  box-shadow: none;
+  margin-bottom: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.dp-input:focus {
+  border-color: #1d70b8;
+  outline: 3px solid #ffdd00;
+  outline-offset: 0;
+}
+
+.dp-button {
+  display: inline-block;
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  background-color: #1d70b8;
+  color: #fff;
+  border: 2px solid #1d70b8;
+  padding: 0.6em 1.5em;
+  font-size: 1.1rem;
+  line-height: 1.25;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+.dp-button:hover, .dp-button:focus {
+  background-color: #003078;
+  border-color: #003078;
+  color: #fff;
+}
+/* Daily Politics custom form group for admin/login */
+.dp-form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.dp-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #222;
+  font-size: 1.1rem;
+}
 /*@import url(//fonts.googleapis.com/css?family=Lato&display=swap);*/
 /*@import url(//fonts.googleapis.com/css?family=Anton&display=swap);*/
 /*@import url(//fonts.googleapis.com/css?family=Roboto&display=swap);*/

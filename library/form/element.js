@@ -1,5 +1,5 @@
 const VarUtil = require(
-    global.applicationPath('/library/mvc/util/varUtil'));
+    global.applicationPath('/library/util/varUtil'));
 
 class Element {
 

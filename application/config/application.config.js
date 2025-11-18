@@ -241,6 +241,10 @@ module.exports = {
             "truncate": {
                 "class": "/application/helper/truncateHelper",
                 "params": ["text", "wordLimit = 100", "ellipsis = '...'"]
+            },
+            "errorDecorator": {
+                "class": "/application/helper/errorDecorator",
+                "params": ["element", "errorClass = 'dp-input--error'"]
             }
         }
         // Add your custom application helpers here

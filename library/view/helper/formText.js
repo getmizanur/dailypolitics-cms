@@ -1,24 +1,33 @@
 const AbstractHelper = require('./abstractHelper');
 
-class FormText extends AbstractHelper {
 
-    render(element) {
-        if(element == undefined) {
+class FormText extends AbstractHelper {
+    /**
+     * Render a text input element
+     * @param {Element} element - The form element
+     * @param {Object} extraAttribs - Optional extra attributes (e.g. { class: '...' })
+     * @returns {string}
+     */
+    render(element, extraAttribs = {}) {
+        if (element == undefined) {
             return;
         }
-
-        var input = '<input ';
-
-        var attributes = element.getAttributes();
-        for(var key in attributes) {
-            input += key + '="' + attributes[key] + '" '; 
+        let input = '<input ';
+        let attributes = Object.assign({}, element.getAttributes(), extraAttribs);
+        let classList = [];
+        if (attributes.class) {
+            classList = attributes.class.split(' ');
+            // Remove duplicate classes
+            attributes.class = Array.from(new Set(classList)).join(' ');
         }
-
+        for (let key in attributes) {
+            if (attributes[key] !== undefined && attributes[key] !== null) {
+                input += key + '="' + attributes[key] + '" ';
+            }
+        }
         input += '/>';
-        
         return input;
     }
-    
 }
 
 module.exports = FormText;

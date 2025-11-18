@@ -60,7 +60,7 @@ class PostService extends AbstractService {
             select.from('posts')
                   .joinLeft('categories', 'posts.category_id = categories.id')
                   .joinLeft('users', 'posts.author_id = users.id')
-                  .joinLeft('presentation_styles', 'posts.presentation_style_id = presentation_styles.id')
+                  .joinLeft('presentation_styles', 'categories.presentation_style_id = presentation_styles.id')
                   .columns([
                       'posts.id',
                       'posts.title',
@@ -83,6 +83,7 @@ class PostService extends AbstractService {
                       'presentation_styles.css_classes as presentation_css_classes'
                   ])
                   .where('posts.status = ?', 'published')
+                  .where('posts.deleted_at IS NULL')
                   .order('posts.published_at', 'DESC');
 
             // Apply pagination if provided
@@ -116,7 +117,7 @@ class PostService extends AbstractService {
             select.from('posts')
                   .joinLeft('categories', 'posts.category_id = categories.id')
                   .joinLeft('users', 'posts.author_id = users.id')
-                  .joinLeft('presentation_styles', 'posts.presentation_style_id = presentation_styles.id')
+                  .joinLeft('presentation_styles', 'categories.presentation_style_id = presentation_styles.id')
                   .columns([
                       'posts.*',
                       'categories.name as category_name',
@@ -141,6 +142,7 @@ class PostService extends AbstractService {
             // Only show published posts for public access
             // Remove this line if you want to fetch drafts as well for admin
             select.where('posts.status = ?', 'published');
+            select.where('posts.deleted_at IS NULL');
 
             const result = await select.execute();
             
@@ -175,6 +177,7 @@ class PostService extends AbstractService {
                       'categories.slug as category_slug'
                   ])
                   .where('posts.status = ?', 'published')
+                  .where('posts.deleted_at IS NULL')
                   .order('posts.published_at', 'DESC')
                   .limit(10);
 
@@ -219,6 +222,7 @@ class PostService extends AbstractService {
                       'users.name as author_name'
                   ])
                   .where('posts.status = ?', 'published')
+                  .where('posts.deleted_at IS NULL')
                   .order('posts.published_at', 'DESC');
 
             // Search by category slug or ID
@@ -272,6 +276,7 @@ class PostService extends AbstractService {
                       'users.name as author_name'
                   ])
                   .where('posts.status = ?', 'published')
+                  .where('posts.deleted_at IS NULL')
                   .where(`(posts.title ILIKE '%${searchTerm}%' OR posts.excerpt ILIKE '%${searchTerm}%' OR posts.content ILIKE '%${searchTerm}%')`)
                   .order('posts.published_at', 'DESC')
                   .limit(limit);
@@ -301,7 +306,8 @@ class PostService extends AbstractService {
             
             select.from('posts', [])
                   .columns(['COUNT(*) as count'])
-                  .where('posts.status = ?', 'published');
+                  .where('posts.status = ?', 'published')
+                  .where('posts.deleted_at IS NULL');
 
             // Apply filters if provided
             if (filters.categoryId) {
@@ -342,6 +348,7 @@ class PostService extends AbstractService {
                       'categories.slug as category_slug'
                   ])
                   .where('posts.status = ?', 'published')
+                  .where('posts.deleted_at IS NULL')
                   .where('posts.published_at < ?', currentPostPublishedAt)
                   .where('posts.id != ?', currentPostId)
                   .order('posts.published_at', 'DESC')
@@ -376,6 +383,7 @@ class PostService extends AbstractService {
                       'categories.slug as category_slug'
                   ])
                   .where('posts.status = ?', 'published')
+                  .where('posts.deleted_at IS NULL')
                   .where('posts.published_at > ?', currentPostPublishedAt)
                   .where('posts.id != ?', currentPostId)
                   .order('posts.published_at', 'ASC')

@@ -66,10 +66,11 @@ class Input {
         this.clearRawValue();
 
         this.value = value;
-        if(value != null) {
+        // Only set hasValue to true if value is not null and not an empty string
+        if (value !== null && value !== '') {
             this.hasValue = true;
         }
-        if(this.value != null && this.rawValue == null) {
+        if (this.value != null && this.rawValue == null) {
             this.setRawValue(value);
         }
     }

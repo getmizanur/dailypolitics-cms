@@ -1,35 +1,29 @@
 {% extends 'layout/master.njk' %}
 
 {% block content %}
-  <main class="nhsuk-main-wrapper" id="maincontent" role="main">
-    <div class="nhsuk-width-container">
-      <div class="nhsuk-grid-row">
-        <div class="nhsuk-grid-column-full">
-          <h1>Admin Panel</h1>
-          <p class="nhsuk-body-l">Welcome to the Daily Politics CMS Admin Panel.</p>
-          <p>This is the administrative interface for managing the Daily Politics content management system.</p>
-          
-          <h2>Available Functions</h2>
-          <ul class="nhsuk-list nhsuk-list--bullet">
-            <li>Content Management</li>
-            <li>User Management</li>
-            <li>System Configuration</li>
-            <li>Reports and Analytics</li>
-          </ul>
-          
-          <div class="nhsuk-card">
-            <div class="nhsuk-card__content">
-              <h3 class="nhsuk-card__heading">Quick Actions</h3>
-              <p class="nhsuk-card__description">Commonly used administrative functions</p>
-              <ul class="nhsuk-list">
-                <li><a href="#" class="nhsuk-link">Manage Users</a></li>
-                <li><a href="#" class="nhsuk-link">Content Overview</a></li>
-                <li><a href="#" class="nhsuk-link">System Settings</a></li>
-              </ul>
-            </div>
-          </div>
+<div class="container admin-login-center">
+  <div class="row w-100">
+    <div class="col-sm-12 col-md-8 offset-md-2 admin-login-form dailypolitics-!-margin-bottom-8">
+      {{ form().openTag(f) }}
+      {{ formCsrf(f.get('csrf')) | safe }}
+      <fieldset class="dp-fieldset">
+        
+        <div class="dp-form-group{% if errorDecorator(f.get('username')) %} dp-form-group--error{% endif %}">
+          {{ formLabel(f.get('username')) }}
+          {{ formError(f.get('username')) }}
+          {{ formText(f.get('username'), {class: f.get('username').getAttribute('class') ~ ' ' ~ errorDecorator(f.get('username'), 'dp-input--error') }) | safe }}
         </div>
-      </div>
+        <div class="dp-form-group{% if errorDecorator(f.get('password')) %} dp-form-group--error{% endif %}">
+          {{ formLabel(f.get('password')) }}
+           {{ formError(f.get('password')) }}
+          {{ formPassword(f.get('password'), {class: f.get('password').getAttribute('class') ~ ' ' ~ errorDecorator(f.get('password'), 'dp-input--error') }) | safe }}
+        </div>
+        <div class="dp-form-group">
+          {{ formSubmit(f.get('submit')) | safe }}
+        </div>
+      </fieldset>
+      {{ form().closeTag() }}
     </div>
-  </main>
+  </div>
+</div>
 {% endblock %}

@@ -6,16 +6,21 @@ class FormSubmit extends AbstractHelper {
         if(element == undefined) {
             return;
         }
-
         var input = '<input ';
-
         var attributes = element.getAttributes();
+        let hasClass = false;
         for(var key in attributes) {
-            input += key + '="' + attributes[key] + '" '; 
+            if(key === 'class') {
+                input += 'class="' + attributes[key] + ' dp-button" ';
+                hasClass = true;
+            } else {
+                input += key + '="' + attributes[key] + '" ';
+            }
         }
-
-        input += '/>';        
-
+        if(!hasClass) {
+            input += 'class="dp-button" ';
+        }
+        input += '/>';
         return input;
     }
 

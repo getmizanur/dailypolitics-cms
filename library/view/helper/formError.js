@@ -4,7 +4,7 @@ const AbstractHelper = require('./abstractHelper');
 class FormError extends AbstractHelper {
 
     render(element, attributes = {}) {
-        if(!element instanceof Element) {
+        if (!(element instanceof Element)) {
             throw new Error("Value is not an instance of Element");
         }
 
@@ -23,12 +23,11 @@ class FormError extends AbstractHelper {
     }
 
     messageOpenFormat(attributes) {
-        let markup = '<ul';
+        let markup = '<ul class="dp-error-message"';
         for(let key in attributes) {
             markup += ' ' + key + '="' + attributes[key] + '" ';
         }
         markup += '>';
-
         return markup;
     }
 

@@ -4,8 +4,11 @@ const Text = require(
     global.applicationPath('/library/form/element/text'));
 const Password = require(
     global.applicationPath('/library/form/element/password'));
+
 const Submit = require(
     global.applicationPath('/library/form/element/submit'));
+const Csrf = require(
+    global.applicationPath('/library/form/element/csrf'));
 
 
 class LoginForm extends Form {
@@ -17,10 +20,10 @@ class LoginForm extends Form {
         const element = new Text(name);
         element.setLabel('Username');
         element.setAttributes({
-            'class' : 'nhsuk-input nhsuk-input--width-20',
-            'id' : 'username',
-            'autocomplete' : 'username'
+            'class' : 'dp-input',
+            'id' : 'username'
         });
+        element.setLabelAttribute('class', 'dp-label');
         this.add(element);
     }
 
@@ -28,10 +31,10 @@ class LoginForm extends Form {
         const element = new Password(name);
         element.setLabel('Password');
         element.setAttributes({
-            'class' : 'nhsuk-input nhsuk-input--width-20',
-            'id' : 'password',
-            'autocomplete' : 'current-password'
+            'class' : 'dp-input',
+            'id' : 'password'
         });
+        element.setLabelAttribute('class', 'dp-label');
         this.add(element);
     }
 
@@ -39,9 +42,16 @@ class LoginForm extends Form {
         const element = new Submit(name);
         element.setValue('Login');
         element.setAttributes({
-            'class' : 'nhsuk-button'
+            'class' : 'dp-button'
         });
         this.add(element);
+    }
+
+    addCsrfField(name = 'csrf', options = {}) {
+        const element = new Csrf(name, options);
+        this.add(element);
+        // Optionally, return the token for session storage
+        return element.getToken();
     }
 }
 

@@ -39,10 +39,10 @@
                         <div class="article-meta" style="padding: 16px;">
                             {% if post.author_name %}
                             <span itemprop="author" itemscope itemtype="https://schema.org/Person">
-                                <span itemprop="name"><strong class="dp-tag dp-tag--muted" style="font-weight: 700 !important;">By {{ post.author_name }}</strong></span>
+                                <span itemprop="name"><strong class="dp-tag" style="font-weight: 700 !important;">By {{ post.author_name }}</strong></span>
                             </span>
-                            <strong class="dp-tag dp-tag--positive" style="font-weight: 700 !important;">{{ post.category_name }}</strong>
-                            <strong class="dp-tag dp-tag--{{ post.presentation_style_slug }}" style="font-weight: 700 !important;">{{ post.presentation_style_name }}</strong>
+                            <strong class="dp-tag dp-tag--{{ post.presentation_style_slug }}" style="font-weight: 700 !important;">{{ post.category_name }}</strong>
+                            <!--<strong class="dp-tag dp-tag--{{ post.presentation_style_slug }}" style="font-weight: 700 !important;">{{ post.presentation_style_name }}</strong>-->
                             {% endif %}
                         </div>
 
