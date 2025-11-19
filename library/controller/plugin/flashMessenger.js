@@ -1,11 +1,11 @@
-const Session = require(global.applicationPath('/library/mvc/session/session'));
+const Session = require(global.applicationPath('/library/session/session'));
 const VarUtil 
-    = require(global.applicationPath('/library/mvc/util/varUtil'));
+    = require(global.applicationPath('/library/util/varUtil'));
 const BasePlugin 
     = require(
-        global.applicationPath('/library/mvc/controller/basePlugin'));
+        global.applicationPath('/library/controller/basePlugin'));
 const Container 
-    = require(global.applicationPath('/library/mvc/container'));
+    = require(global.applicationPath('/library/container'));
 
 
 class FlashMessenger extends BasePlugin {
@@ -74,12 +74,12 @@ class FlashMessenger extends BasePlugin {
             // Use new session namespace system for better persistence
             const sessionNs = this.getSessionNamespace();
             let messages = sessionNs.get(namespace, []);
-            
+
             // Ensure messages is an array
             if (!Array.isArray(messages)) {
                 messages = [];
             }
-            
+
             messages.push(message);
             sessionNs.set(namespace, messages);
 
@@ -88,13 +88,16 @@ class FlashMessenger extends BasePlugin {
                 this.messages[namespace] = [];
             }
             this.messages[namespace].push(message);
-            
+
             // Update container for backward compatibility
             this.container.set(namespace, this.messages[namespace]);
 
             if(this.messageAdded == false) {
                 this.messageAdded = true;
             }
+
+            // Immediately inject updated messages into template variables
+            this._injectTemplateVariables();
         } catch (error) {
             console.warn('FlashMessenger addMessage error:', error.message);
             // Fallback to local storage
@@ -103,7 +106,7 @@ class FlashMessenger extends BasePlugin {
             }
             this.messages[namespace].push(message);
         }
-         
+
         return this;
     }
 
@@ -312,12 +315,45 @@ class FlashMessenger extends BasePlugin {
     }
 
     getMessagesFromContainer() {
-        if(!VarUtil.empty(this.messages) 
+        if(!VarUtil.empty(this.messages)
             || this.messageAdded) {
             return;
         }
 
         let container = this.getContainer();
+    }
+
+    /**
+     * Auto-inject flash message arrays into template variables
+     * This is called automatically when messages are added
+     * Private method - use underscore prefix to indicate internal use
+     */
+    _injectTemplateVariables() {
+        try {
+            const controller = this.getController();
+            if (!controller) {
+                // Controller not set yet, skip injection
+                return;
+            }
+
+            const view = controller.getView();
+            if (!view || typeof view.setVariable !== 'function') {
+                // View not ready yet, skip injection
+                return;
+            }
+
+            // Get current messages from session without clearing
+            const sessionNs = this.getSessionNamespace();
+
+            // Inject each message type as a separate array variable
+            view.setVariable('error_flash_messages', sessionNs.get(this.NAMESPACE_ERROR, []));
+            view.setVariable('success_flash_messages', sessionNs.get(this.NAMESPACE_SUCCESS, []));
+            view.setVariable('warning_flash_messages', sessionNs.get(this.NAMESPACE_WARNING, []));
+            view.setVariable('info_flash_messages', sessionNs.get(this.NAMESPACE_INFO, []));
+        } catch (error) {
+            // Silently fail - template variables will just be empty arrays
+            // This is expected during initialization or when controller isn't set
+        }
     }
 
 }

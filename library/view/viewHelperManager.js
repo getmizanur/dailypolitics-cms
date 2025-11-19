@@ -50,6 +50,18 @@ class ViewHelperManager {
                 "class": "/library/view/helper/formText",
                 "options": ["element", "extraAttribs = {}"]
             },
+            "formTextarea": {
+                "class": "/library/view/helper/formTextarea",
+                "params": ["element", "extraAttribs = {}"]
+            },
+            "formSelect": {
+                "class": "/library/view/helper/formSelect",
+                "params": ["element", "extraAttribs = {}"]
+            },
+            "formCheckbox": {
+                "class": "/library/view/helper/formCheckbox",
+                "params": ["element", "extraAttribs = {}"]
+            },
             "headTitle": {
                 "class": "/library/view/helper/headTitle",
                 "params": ["element"]

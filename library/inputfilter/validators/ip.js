@@ -1,7 +1,10 @@
 
-class Ip {
+const AbstractValidator = require('./abstractValidator');
+
+class Ip extends AbstractValidator {
 
     constructor(options = {}) {
+        super();
         this.name = options.name || 'input';
         this.allowip4 = options.allowip4 || true;
         this.allowip6 = options.allowip6 || false;

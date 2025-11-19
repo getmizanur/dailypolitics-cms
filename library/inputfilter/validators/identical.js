@@ -1,7 +1,9 @@
+const AbstractValidator = require('./abstractValidator');
 
-class Identical {
+class Identical extends AbstractValidator {
 
     constructor(options = {}) {
+        super();
         this.name = options.name || 'input';
         this.token = options.token;
         

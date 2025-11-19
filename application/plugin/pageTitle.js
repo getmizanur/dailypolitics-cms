@@ -5,33 +5,35 @@ class PageTitle extends BasePlugin {
     constructor(options = {}) {
         super(options);
         this.defaultTitle = 'Application Portal';
+        // Inject default title on first access
+        this._shouldInjectDefault = true;
     }
 
     /**
      * Set custom page title (convenience method)
+     * Automatically injects the title into template variable
      * @param {string} title - Custom page title
      * @returns {PageTitle} For method chaining
      */
     setTitle(title) {
-        try {
-            const view = this.getController().getView();
-            if (!view || typeof view.setVariable !== 'function') {
-                console.error('PageTitle.setTitle: view is not a proper ViewModel instance:', typeof view, view);
-                return this;
-            }
-            view.setVariable('pageTitle', title);
-        } catch (error) {
-            console.error('PageTitle.setTitle error:', error);
-        }
+        this._shouldInjectDefault = false; // Custom title set, no need for default
+        this._injectTemplateVariable(title);
         return this;
     }
 
     /**
      * Get current page title or default
+     * Lazily injects default title if none has been set
      * @returns {string} Current page title or default
      */
     getTitle() {
         try {
+            // Inject default title on first access if no custom title was set
+            if (this._shouldInjectDefault) {
+                this._injectTemplateVariable(this.defaultTitle);
+                this._shouldInjectDefault = false;
+            }
+
             const view = this.getController().getView();
             if (!view || typeof view.getVariable !== 'function') {
                 console.error('PageTitle.getTitle: view is not a proper ViewModel instance:', typeof view, view);
@@ -46,31 +48,16 @@ class PageTitle extends BasePlugin {
     }
 
     /**
-     * Initialize default page title if none has been set
-     * Called during post-dispatch to ensure a title is always available
-     */
-    initializePageTitle() {
-        try {
-            const view = this.getController().getView();
-            if (!view || typeof view.getVariable !== 'function') {
-                console.error('PageTitle.initializePageTitle: view is not a proper ViewModel instance:', typeof view, view);
-                return;
-            }
-            if (!view.getVariable('pageTitle')) {
-                view.setVariable('pageTitle', this.defaultTitle);
-            }
-        } catch (error) {
-            console.error('PageTitle.initializePageTitle error:', error);
-        }
-    }
-
-    /**
      * Set default title for this plugin instance
      * @param {string} title - Default title
      * @returns {PageTitle} For method chaining
      */
     setDefaultTitle(title) {
         this.defaultTitle = title;
+        // If no custom title has been set yet, inject this default
+        if (this._shouldInjectDefault) {
+            this._injectTemplateVariable(title);
+        }
         return this;
     }
 
@@ -80,6 +67,33 @@ class PageTitle extends BasePlugin {
      */
     getDefaultTitle() {
         return this.defaultTitle;
+    }
+
+    /**
+     * Auto-inject page title into template variable
+     * Private method called when title is set
+     * @param {string} title - The title to inject
+     */
+    _injectTemplateVariable(title) {
+        try {
+            const controller = this.getController();
+            if (!controller) {
+                // Controller not set yet, skip injection
+                return;
+            }
+
+            const view = controller.getView();
+            if (!view || typeof view.setVariable !== 'function') {
+                // View not ready yet, skip injection
+                return;
+            }
+
+            // Use provided title or fall back to default
+            const titleToSet = title || this.defaultTitle;
+            view.setVariable('pageTitle', titleToSet);
+        } catch (error) {
+            // Silently fail - template variable will use default or be undefined
+        }
     }
 }
 

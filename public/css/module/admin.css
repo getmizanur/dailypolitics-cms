@@ -647,3 +647,96 @@
 		margin-right: 0.25rem;
 	}
 }
+
+/* Article Edit Form Styles */
+/* Center the form container */
+.admin-article-form-container {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 2rem;
+}
+
+/* Make form fields wider */
+.admin-article-form-container .dp-input,
+.admin-article-form-container textarea.dp-input,
+.admin-article-form-container select.dp-input {
+	max-width: 100% !important;
+	width: 100% !important;
+}
+
+/* Specific styling for textareas */
+.admin-article-form-container textarea.dp-input {
+	min-height: 120px;
+	resize: vertical;
+}
+
+/* Content field should be taller */
+.admin-article-form-container #article-content {
+	min-height: 400px;
+}
+
+/* Excerpt field height */
+.admin-article-form-container #article-excerpt {
+	min-height: 100px;
+}
+
+/* Meta description field height */
+.admin-article-form-container #article-meta-description {
+	min-height: 80px;
+}
+
+/* Form group spacing */
+.admin-article-form-container .form-group {
+	margin-bottom: 2rem;
+}
+
+/* Checkbox styling */
+.admin-article-form-container .dp-checkbox {
+	width: auto !important;
+	max-width: none !important;
+	margin-right: 0.5rem;
+}
+
+/* Label next to checkbox */
+.admin-article-form-container .form-group:has(.dp-checkbox) {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.admin-article-form-container .form-group:has(.dp-checkbox) .dp-label {
+	margin-bottom: 0;
+	margin-left: 0.5rem;
+}
+
+/* Submit button styling */
+.admin-article-form-container .dp-button[type="submit"] {
+	min-width: 200px;
+	margin-top: 1rem;
+}
+
+/* Disabled fields styling */
+.admin-article-form-container .dp-input:disabled {
+	background-color: #f3f2f1;
+	color: #626a6e;
+	cursor: not-allowed;
+	opacity: 0.7;
+}
+
+/* Card padding for form */
+.admin-article-form-container .admin-dashboard-card {
+	padding: 2rem !important;
+	min-height: auto;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+	.admin-article-form-container {
+		max-width: 100%;
+		padding: 1rem;
+	}
+
+	.admin-article-form-container .admin-dashboard-card {
+		padding: 1rem !important;
+	}
+}

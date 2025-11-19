@@ -1,7 +1,10 @@
 
-class InArray {
+const AbstractValidator = require('./abstractValidator');
+
+class InArray extends AbstractValidator {
 
     constructor(options = {}) {
+        super();
         this.name = options.name || 'input';
         this.haystack = options.haystack;
 

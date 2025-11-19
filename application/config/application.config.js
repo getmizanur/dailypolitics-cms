@@ -268,8 +268,8 @@ module.exports = {
     },
 
     "view_manager" : {
-        "display_not_found_reason": process.env.VIEW_DISPLAY_NOT_FOUND_REASON === 'true' || false,
-        "display_exceptions": process.env.VIEW_DISPLAY_EXCEPTIONS === 'true' || false,
+        "display_not_found_reason": process.env.VIEW_DISPLAY_NOT_FOUND_REASON === 'true' || true,
+        "display_exceptions": process.env.VIEW_DISPLAY_EXCEPTIONS === 'true' || true,
         "doctype": process.env.VIEW_DOCTYPE || "HTML5",
         "not_found_template": process.env.VIEW_NOT_FOUND_TEMPLATE || "error/404",
         "exception_template": process.env.VIEW_EXCEPTION_TEMPLATE || "error/500",

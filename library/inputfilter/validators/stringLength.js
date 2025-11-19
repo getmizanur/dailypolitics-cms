@@ -1,7 +1,9 @@
+const AbstractValidator = require('./abstractValidator');
 
-class StringLength {
+class StringLength extends AbstractValidator {
 
     constructor(options = {}) {
+        super();
         this.name = options.name || 'input';
         this.min = options.min || null;
         this.max = options.max || null;
@@ -52,27 +54,38 @@ class StringLength {
     }
 
     isValid(value) {
+        console.log(`[StringLength] Validating value: "${value}" (length: ${value ? value.length : 0})`);
+        console.log(`[StringLength] Min: ${this.getMin()}, Max: ${this.getMax()}`);
 
         this.setLength(value.length);
 
-        if(this.getLength() < this.getMin()) {
+        if(this.getMin() !== null && this.getLength() < this.getMin()) {
+            console.log(`[StringLength] FAILED: Too short (${this.getLength()} < ${this.getMin()})`);
             this.message = this.messageTemplate.INVALID_TOO_SHORT;
             return false;
         }
 
-        if(this.getLength() > this.getMax()) {
+        if(this.getMax() !== null && this.getLength() > this.getMax()) {
+            console.log(`[StringLength] FAILED: Too long (${this.getLength()} > ${this.getMax()})`);
             this.message = this.messageTemplate.INVALID_TOO_LONG;
             return false;
         }
 
+        console.log(`[StringLength] PASSED validation`);
         return true;
 
+    }
+
+    setMessage(message, key) {
+        if (key && this.messageTemplate.hasOwnProperty(key)) {
+            this.messageTemplate[key] = message;
+        }
     }
 
     getClass() {
         return this.constructor.name;
     }
-    
+
 }
 
 module.exports = StringLength 

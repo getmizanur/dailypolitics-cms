@@ -222,8 +222,9 @@ class BaseController {
     preDispatch() {}
 
     postDispatch() {
-        // Initialize automatic page title if none was set by the action
-        this.plugin('pageTitle').initializePageTitle();
+        // Ensure default page title is set by accessing getTitle()
+        // This triggers lazy initialization if no custom title was set
+        this.plugin('pageTitle').getTitle();
     }
     
     /**

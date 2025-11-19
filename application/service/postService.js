@@ -466,6 +466,31 @@ class PostService extends AbstractService {
     }
 
     /**
+     * Get all categories (for dropdowns, forms, etc.)
+     * @returns {Promise<Array>} Array of category objects with id and name
+     */
+    async getAllCategories() {
+        try {
+            const select = await this.getSelectQuery();
+
+            select.from('categories')
+                  .columns([
+                      'id',
+                      'name',
+                      'slug',
+                      'description'
+                  ])
+                  .order('name', 'ASC');
+
+            const result = await select.execute();
+            return result.rows || result;
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Close database connection
      * Call this when shutting down the application
      */

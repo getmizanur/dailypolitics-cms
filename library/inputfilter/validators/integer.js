@@ -1,7 +1,9 @@
+const AbstractValidator = require('./abstractValidator');
 
-class Integer {
+class Integer extends AbstractValidator {
 
     constructor(options = {}) {
+        super();
         this.name = options.name || 'input'
         this.max = options.max || null;
         this.min = options.min || null;

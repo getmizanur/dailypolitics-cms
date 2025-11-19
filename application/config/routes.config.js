@@ -16,17 +16,17 @@ module.exports = {
             "controller": "index",
             "action": "dashboard"
         },
-         "adminIndexEdit": {
+         "adminIndexView": {
             "route": "/admin/dashboard/view/:slug",
             "module": "admin",
             "controller": "index",
             "action": "view"
         },
         "adminIndexEdit": {
-            "route": "/admin/dashboard/edit/:slug",
+            "route": "/admin/dashboard/edit",
             "module": "admin",
             "controller": "index",
-            "action": "edit"
+            "action": "edit-article"
         },
         "adminIndexDelete": {
             "route": "/admin/dashboard/delete/:slug",

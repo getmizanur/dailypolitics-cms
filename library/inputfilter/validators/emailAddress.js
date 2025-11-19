@@ -1,8 +1,10 @@
+const AbstractValidator = require('./abstractValidator');
 const StringUtil = require('../../util/stringUtil');
 
-class EmailAddress {
+class EmailAddress extends AbstractValidator {
 
     constructor(options = {}) {
+        super();
         this.name = options.name || 'input';
         this.email = null;  
 

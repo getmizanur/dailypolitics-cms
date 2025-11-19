@@ -1,5 +1,6 @@
+const AbstractValidator = require('./abstractValidator');
 
-class Uuid {
+class Uuid extends AbstractValidator {
     
     constructor(options = {}) {
         this.name = options.name || 'input';

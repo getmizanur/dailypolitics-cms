@@ -1,16 +1,19 @@
 
-class AlphaNumeric {
-    
+const AbstractValidator = require('./abstractValidator');
+
+class AlphaNumeric extends AbstractValidator {
+
     constructor(options = {}) {
+        super();
         this.name = options.name || 'input';
         this.allowWhiteSpace = options.allowWhiteSpace || false;
         this.allowDashAndUnderscore = options.allowDashAndUnderscore || false;
 
         this.message = null;
         this.messageTemplate = options.messageTemplate || {
-            INVALID 
+            INVALID
                 : `Invalid type is given. String expected`,
-            INVALID_FORMAT 
+            INVALID_FORMAT
                 : `The ${this.name} is not a valid AlphaNumeric string`
         }
     }
@@ -37,10 +40,20 @@ class AlphaNumeric {
 
         if(value.search(regexp) === -1) {
             this.message = this.messageTemplate.INVALID_FORMAT;
-            return false;     
+            return false;
         }
 
         return true;
+    }
+
+    setMessage(message, key) {
+        if (key && this.messageTemplate.hasOwnProperty(key)) {
+            this.messageTemplate[key] = message;
+        }
+    }
+
+    getClass() {
+        return this.constructor.name;
     }
 
 }

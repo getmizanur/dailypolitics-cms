@@ -1,13 +1,28 @@
+const AbstractValidator = require('./abstractValidator');
 
-class Callback {
+class Callback extends AbstractValidator {
 
     constructor(options = {}) {
+        super();
         this.callback = options.callback;
-        this.message = options.message; 
+        this.message = null;
+        this.messageTemplate = options.messageTemplate || {
+            INVALID: 'The input value is invalid'
+        };
     }
 
     isValid(value) {
-        return this.callback(value); 
+        const result = this.callback(value);
+        if (!result) {
+            this.message = this.messageTemplate.INVALID;
+        }
+        return result;
+    }
+
+    setMessage(message, key) {
+        if (key && this.messageTemplate.hasOwnProperty(key)) {
+            this.messageTemplate[key] = message;
+        }
     }
 
     getClass() {

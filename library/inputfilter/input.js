@@ -103,13 +103,16 @@ class Input {
     isValid(context = null) {
         let value = this.getValue();
         let hasValue = this.getHasValue();
-        let empty = (value === null || value === '');  
+        let empty = (value === null || value === '');
         let required = this.isRequired();
         let allowEmpty = this.getAllowEmpty();
         let continueIfEmpty = this.getContinueIfEmpty();
         let inputContext = context;
-        
+
+        console.log(`[Input:${this.name}] isValid() - value: "${value ? value.substring(0, 50) + '...' : value}", hasValue: ${hasValue}, empty: ${empty}, required: ${required}`);
+
         if(!hasValue && !required) {
+            console.log(`[Input:${this.name}] Skipping validation - no value and not required`);
             return true;
         }
 
@@ -117,21 +120,25 @@ class Input {
 			/* istanbul ignore next */
             if(this.errorMessages.length === 0) {
                 // Use custom message if set, otherwise use default
-                const message = this.customRequiredMessage || 
+                const message = this.customRequiredMessage ||
                     this.prepareRequiredValidationFailureMessage.NOT_EMPTY;
                 this.setErrorMessage(message);
             }
+            console.log(`[Input:${this.name}] FAILED - required field has no value`);
             return false;
         }
 
         if(empty && !required && !continueIfEmpty) {
+            console.log(`[Input:${this.name}] Skipping validation - empty, not required, not continueIfEmpty`);
             return true;
         }
 
         if(empty && allowEmpty && !continueIfEmpty) {
+            console.log(`[Input:${this.name}] Skipping validation - empty and allowEmpty`);
             return true;
         }
 
+        console.log(`[Input:${this.name}] Running ${this.getValidators().length} validators`);
         let result = true;
         const validators = this.getValidators();
         validators.forEach((validator) => {
