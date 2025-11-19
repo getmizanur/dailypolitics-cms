@@ -6,6 +6,23 @@ class Index extends Controller {
         super(options);
     }
 
+    preDispatch() {
+        // IMPORTANT NOTICE:
+        // Expose the current controller to the view context so that view helpers
+        // (such as onDemandCss) can access routing and request information.
+        // This is required for onDemandCss to determine the current module and load
+        // the correct CSS file dynamically based on the route.
+        //
+        // This was done because dp.css was too big and had to be split up
+        // for better maintainability and understanding. Admin-specific and 
+        // bolg-specific CSS is now loaded on demand using onDemandCss.
+        //
+        // If you wish to remove this line, you must also:
+        //   1. Remove {{ onDemandCss(controller) }} from master.njk
+        //   2. Deregister 'onDemandCss' from application.config.js under view_helpers
+        this.getView().setVariable('controller', this);
+    }
+
     /**
      * Display all published posts (blog index page)
      */

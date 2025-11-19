@@ -231,8 +231,12 @@ module.exports = {
     "view_helpers": {
         "invokables": {
             "sidebar": {
-                "class": "/application/helper/sidebarHelper",
+                "class": "/application/helper/recentPostsSidebarHelper",
                 "params": ["posts = null"]
+            },
+            "adminSidebar": {
+                "class": "/application/helper/adminSidebarHelper",
+                "params": []
             },
             "pages": {
                 "class": "/application/helper/paginationHelper",
@@ -243,8 +247,12 @@ module.exports = {
                 "params": ["text", "wordLimit = 100", "ellipsis = '...'"]
             },
             "errorDecorator": {
-                "class": "/application/helper/errorDecorator",
+                "class": "/application/helper/errorDecoratorHelper",
                 "params": ["element", "errorClass = 'dp-input--error'"]
+            },
+            "onDemandCss": {
+                "class": "/application/helper/onDemandCssHelper",
+                "params": ["controller"]
             }
         }
         // Add your custom application helpers here

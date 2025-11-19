@@ -6,7 +6,9 @@ const AbstractHelper = require(global.applicationPath('/library/view/helper/abst
  *   Posts: {{ pages(pagination) | safe }}
  *   Articles: {{ pages({mode: 'article', prevArticle: prevArticle, nextArticle: nextArticle}) | safe }}
  */
+
 class PaginationHelper extends AbstractHelper {
+
     /**
      * Renders pagination HTML with NEWER and OLDER buttons
      *
@@ -32,6 +34,8 @@ class PaginationHelper extends AbstractHelper {
 
         if (mode === 'article') {
             return this._renderArticleNavigation(options);
+        } else if (mode === 'admin') {
+            return this._renderAdminNumberedPagination(options);
         } else {
             return this._renderPostsNavigation(options);
         }
@@ -65,7 +69,7 @@ class PaginationHelper extends AbstractHelper {
             const newerUrl = prevPage === 1 ? baseUrl || '/' : `${baseUrl}/page/${prevPage}/index.html`;
             html += `
                 <li class="page-item">
-                    <a class="btn btn-primary green" href="${newerUrl}" rel="prev" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
+                    <a class="btn btn-green" href="${newerUrl}" rel="prev" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
                         ← Newer Posts
                     </a>
                 </li>`;
@@ -77,7 +81,7 @@ class PaginationHelper extends AbstractHelper {
         if (hasNext) {
             html += `
                 <li class="page-item">
-                    <a class="btn btn-primary green" href="${baseUrl}/page/${nextPage}/index.html" rel="next" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
+                    <a class="btn btn-green" href="${baseUrl}/page/${nextPage}/index.html" rel="next" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
                         Older Posts →
                     </a>
                 </li>`;
@@ -141,6 +145,53 @@ class PaginationHelper extends AbstractHelper {
             </ul>
         </nav>`;
 
+        return html;
+    }
+
+     /**
+     * Render numbered pagination for admin dashboard (10 articles per page)
+     * @param {Object} options - { currentPage, totalItems, baseUrl }
+     * @returns {string} - HTML string for numbered pagination
+     */
+    _renderAdminNumberedPagination(options = {}) {
+        const {
+            currentPage = 1,
+            totalItems = 0,
+            baseUrl = ''
+        } = options;
+        const perPage = 10;
+        const totalPages = Math.ceil(totalItems / perPage);
+        if (totalPages <= 1) return '';
+
+        let html = `\n<nav aria-label="Admin pagination" class="mt-5 mb-5">\n  <ul class="pagination justify-content-center" style="margin-top: 2rem; margin-bottom: 2rem;">`;
+
+        // Previous button
+        if (currentPage > 1) {
+            const prevUrl = currentPage === 2 ? baseUrl || '/admin/dashboard' : `${baseUrl}/page/${currentPage - 1}`;
+            html += `\n    <li class="page-item"><a class="page-link" href="${prevUrl}" rel="prev">&laquo; Prev</a></li>`;
+        } else {
+            html += `\n    <li class="page-item disabled"><span class="page-link">&laquo; Prev</span></li>`;
+        }
+
+        // Numbered page links
+        for (let i = 1; i <= totalPages; i++) {
+            let pageUrl = i === 1 ? baseUrl || '/admin' : `${baseUrl}/page/${i}`;
+            if (i === currentPage) {
+                html += `\n    <li class="page-item active"><span class="page-link">${i}</span></li>`;
+            } else {
+                html += `\n    <li class="page-item"><a class="page-link" href="${pageUrl}">${i}</a></li>`;
+            }
+        }
+
+        // Next button
+        if (currentPage < totalPages) {
+            const nextUrl = `${baseUrl}/page/${currentPage + 1}`;
+            html += `\n    <li class="page-item"><a class="page-link" href="${nextUrl}" rel="next">Next &raquo;</a></li>`;
+        } else {
+            html += `\n    <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>`;
+        }
+
+        html += `\n  </ul>\n</nav>`;
         return html;
     }
 }

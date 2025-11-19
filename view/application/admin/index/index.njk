@@ -7,7 +7,6 @@
       {{ form().openTag(f) }}
       {{ formCsrf(f.get('csrf')) | safe }}
       <fieldset class="dp-fieldset">
-        
         <div class="dp-form-group{% if errorDecorator(f.get('username')) %} dp-form-group--error{% endif %}">
           {{ formLabel(f.get('username')) }}
           {{ formError(f.get('username')) }}
@@ -15,7 +14,7 @@
         </div>
         <div class="dp-form-group{% if errorDecorator(f.get('password')) %} dp-form-group--error{% endif %}">
           {{ formLabel(f.get('password')) }}
-           {{ formError(f.get('password')) }}
+          {{ formError(f.get('password')) }}
           {{ formPassword(f.get('password'), {class: f.get('password').getAttribute('class') ~ ' ' ~ errorDecorator(f.get('password'), 'dp-input--error') }) | safe }}
         </div>
         <div class="dp-form-group">

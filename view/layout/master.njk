@@ -1,28 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <style>
-            /* Center forms in admin and add spacing */
-            .admin-login-center {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                min-height: 60vh;
-            }
-            .admin-login-form {
-                max-width: 400px;
-                width: 100%;
-                margin: 0 auto;
-                background: #fff;
-                padding: 2rem 2.5rem 2rem 2.5rem;
-                border-radius: 8px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            }
-            .menu-content-area {
-                margin-bottom: 0.5rem;
-            }
-        </style>
     <meta charset="utf-8">
     <meta name="author" content="Daily Politics">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -32,11 +10,97 @@
     <meta name="title" content="{% block metaTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
     <meta name="description" content="{% block metaDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
 
-    <!-- Preload font files -->
+    <!-- Preconnect to font origins for faster DNS resolution -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto&display=swap" rel="stylesheet">
+    <!-- Load fonts asynchronously with font-display: optional to prevent layout shifts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=optional" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=optional" rel="stylesheet"></noscript>
+
+    <!-- Fallback font stack while custom fonts load (preserves Roboto/Anton when loaded) -->
+    <style>
+        /* Prevent layout shift by matching fallback font metrics to web fonts */
+        @font-face {
+            font-family: 'Roboto Fallback';
+            src: local('Arial');
+            size-adjust: 100%;
+            ascent-override: 92.77%;
+            descent-override: 24.34%;
+            line-gap-override: 0%;
+        }
+
+        @font-face {
+            font-family: 'Anton Fallback';
+            src: local('Impact'), local('Arial Black');
+            size-adjust: 107%;
+            ascent-override: 90%;
+            descent-override: 10%;
+            line-gap-override: 0%;
+        }
+
+        .navbar-brand {
+            font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif !important;
+            font-size: 52px !important;
+        }
+
+        .card-header {
+            font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif !important;
+        }
+
+        .post-header {
+            font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif !important;
+        }
+
+        /* Prevent blog layout shift (CLS fix) */
+        /* Reserve space for blog article cards */
+        .dailypolitics-correction.card {
+            margin-bottom: 2rem;
+        }
+
+        /* Reserve space for article headers */
+        .dailypolitics-heading-xl {
+            min-height: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Stabilize story-body figure image containers */
+        .story-body figure {
+            margin-bottom: 1rem;
+        }
+
+        .media-landscape .image-and-copyright-container {
+            display: block;
+            width: 100%;
+            background-color: #f3f2f1;
+        }
+
+        .media-landscape .image-and-copyright-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Reserve space for article body */
+        .dailypolitics-body {
+            min-height: 100px;
+        }
+
+        /* Reserve space for dailypolitics-footer */
+        .dailypolitics-footer {
+            min-height: 40px;
+            padding: 1rem 0;
+        }
+
+        /* Reserve space for sidebar */
+        .card-header {
+            min-height: 3rem;
+        }
+
+        .list-group {
+            min-height: 200px;
+        }
+    </style>
     
     <!-- Open Graph / Facebook -->
     <meta property="fb:app_id" content="1505589612955663" />
@@ -58,21 +122,31 @@
     <meta name="twitter:title" content="{% block twitterTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
     <meta name="twitter:description" content="{% block twitterDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
     
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <!--<link rel="stylesheet" href="/css/bootstrap.min.441.css" />-->
-    <link rel="preload" href="/css/daily-politics.css" as="style" onload="this.rel='stylesheet'" />
+    <!-- Critical CSS inlined for performance -->
+    {{ onDemandCss(controller) | safe }}
+
+    <!-- Load main.css reliably to prevent FOUC and missing styles -->
+    <link rel="stylesheet" href="/css/main.css">
+
+    <!-- Load Bootstrap CSS asynchronously (non-critical) -->
+    <link rel="preload" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <noscript><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"></noscript>
+
+    <!-- Polyfill for browsers that don't support rel="preload" -->
+    <script>
+        !function(e){"use strict";var t=function(t,n,r){var o,i=e.document,c=i.createElement("link");if(n)o=n;else{var a=(i.body||i.getElementsByTagName("head")[0]).childNodes;o=a[a.length-1]}var d=i.styleSheets;if(r)for(var s in r)r.hasOwnProperty(s)&&c.setAttribute(s,r[s]);c.rel="stylesheet",c.href=t,c.media="only x",function e(t){if(i.body)return t();setTimeout(function(){e(t)})}(function(){o.parentNode.insertBefore(c,n?o:o.nextSibling)});var f=function(e){for(var t=c.href,n=d.length;n--;)if(d[n].href===t)return e();setTimeout(function(){f(e)})};return c.addEventListener&&c.addEventListener("load",f),c.onloadcssdefined=f,f(function(){}),c};"undefined"!=typeof exports?exports.loadCSS=t:e.loadCSS=t}("undefined"!=typeof global?global:this);
+    </script>
     
     <!-- Icons and Favicons -->
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="canonical" href="{{ request.url | default('http://localhost:8080') }}">
+    <link rel="canonical" href="{% block canonicalUrl %}{{ canonicalUrl | default('https://www.dailypolitics.com/') }}{% endblock %}">
     <link rel="apple-touch-icon" href="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png">
 </head>
 <body>
     <!-- Skip to main content link for accessibility -->
     <a href="#main-content" class="sr-only sr-only-focusable" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:1000;background:#fff;color:#00703C;padding:8px 16px;border-radius:4px;outline:2px solid #FFD600;outline-offset:2px;" onfocus="this.style.left='0';this.style.width='auto';this.style.height='auto';this.style.overflow='visible';" onblur="this.style.left='-999px';this.style.width='1px';this.style.height='1px';this.style.overflow='hidden';">Skip to main content</a>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-fixed-top">
         <div class="container" style="padding-left: 0px; padding-right: 0px;">
             <h1 class="navbar-brand">
                 <a href="/" class="isDisabled">Daily Politics</a>
@@ -123,9 +197,9 @@
     
     <!-- Footer -->
     <footer>
-        <!-- Scripts -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <!-- Scripts (deferred for better performance) -->
+        <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
             <footer class="footer mt-5 bg-light border-top">
                 <div class="container py-4">
                     <ul class="list-inline mb-2">

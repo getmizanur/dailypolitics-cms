@@ -1,4 +1,4 @@
-class ErrorDecorator {
+class ErrorDecoratorHelper {
     /**
      * Returns the error class if the element has error messages
      * @param {Element} element - The form element instance
@@ -17,4 +17,4 @@ class ErrorDecorator {
     }
 }
 
-module.exports = ErrorDecorator;
+module.exports = ErrorDecoratorHelper;

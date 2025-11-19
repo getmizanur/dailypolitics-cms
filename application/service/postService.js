@@ -5,11 +5,78 @@ const AbstractService = require('./abstractService');
  * Extends AbstractService to provide database operations for posts
  * using PostgreSQL adapter and query builder system
  */
+
 class PostService extends AbstractService {
     constructor() {
         super();
         this.dbAdapter = null;
     }
+
+    /**
+     * Fetch all posts with status 'draft', 'published', or 'archived' (not deleted)
+     * @param {number} limit - Optional limit for results
+     * @param {number} offset - Optional offset for pagination
+     * @returns {Promise<Array>} Array of posts with allowed statuses
+     */
+
+    /**
+     * Fetch all posts with given statuses (not deleted)
+     * @param {Array<string>} statuses - Array of allowed statuses (e.g. ['draft','published','archived'])
+     * @param {number} limit - Optional limit for results
+     * @param {number} offset - Optional offset for pagination
+     * @returns {Promise<Array>} Array of posts with allowed statuses
+     */
+    async getAllPostsWithStatus(statuses = ['draft', 'published', 'archived'], limit = null, offset = null) {
+        try {
+            const select = await this.getSelectQuery();
+
+            // Build query: SELECT posts with joins for category, author, and presentation styles
+            select.from('posts')
+                  .joinLeft('categories', 'posts.category_id = categories.id')
+                  .joinLeft('users', 'posts.author_id = users.id')
+                  .joinLeft('presentation_styles', 'categories.presentation_style_id = presentation_styles.id')
+                  .columns([
+                      'posts.id',
+                      'posts.title',
+                      'posts.slug',
+                      'posts.excerpt',
+                      'posts.content',
+                      'posts.hero_image_url',
+                      'posts.presentation_style_id',
+                      'posts.header_color_override',
+                      'posts.is_featured',
+                      'posts.status',
+                      'posts.created_at',
+                      'posts.updated_at',
+                      'posts.published_at',
+                      'categories.name as category_name',
+                      'categories.slug as category_slug',
+                      'users.name as author_name',
+                      'users.email as author_email',
+                      'presentation_styles.name as presentation_style_name',
+                      'presentation_styles.slug as presentation_style_slug',
+                      'presentation_styles.css_classes as presentation_css_classes'
+                  ])
+                  .where('posts.status = ANY(?)', [statuses])
+                  .where('posts.deleted_at IS NULL')
+                  .order('posts.published_at', 'DESC');
+
+            // Apply pagination if provided
+            if (limit !== null) {
+                select.limit(limit);
+            }
+            if (offset !== null) {
+                select.offset(offset);
+            }
+
+            const result = await select.execute();
+            return result.rows || result;
+        } catch (error) {
+            console.error('Error fetching posts with status:', statuses, error);
+            throw error;
+        }
+    }
+
 
     /**
      * Initialize database adapter and query builder

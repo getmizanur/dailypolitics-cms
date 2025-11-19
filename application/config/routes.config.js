@@ -3,13 +3,45 @@
 
 module.exports = {
     "routes": {
-        // Home page route
+        // Admin section routes
         "adminIndexIndex": {
             "route": "/admin",
             "module": "admin",
             "controller": "index",
             "action": "index"
         },
+        "adminIndexDashboard": {
+            "route": "/admin/dashboard(/page/:page)?",
+            "module": "admin",
+            "controller": "index",
+            "action": "dashboard"
+        },
+         "adminIndexEdit": {
+            "route": "/admin/dashboard/view/:slug",
+            "module": "admin",
+            "controller": "index",
+            "action": "view"
+        },
+        "adminIndexEdit": {
+            "route": "/admin/dashboard/edit/:slug",
+            "module": "admin",
+            "controller": "index",
+            "action": "edit"
+        },
+        "adminIndexDelete": {
+            "route": "/admin/dashboard/delete/:slug",
+            "module": "admin",
+            "controller": "index",
+            "action": "delete"
+        },
+        "adminIndexLogout": {
+            "route": "/admin/dashboard/logout",
+            "module": "admin",
+            "controller": "index",
+            "action": "logout"
+        },
+
+        // Blog section routes
         "blogIndexIndex": {
             "route": "/(page/:page/index.html)?",
             "module": "blog",

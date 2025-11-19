@@ -10,6 +10,23 @@ class Index extends Controller {
         super(options);
     }
 
+    preDispatch() {
+        // IMPORTANT NOTICE:
+        // Expose the current controller to the view context so that view helpers
+        // (such as onDemandCss) can access routing and request information.
+        // This is required for onDemandCss to determine the current module and load
+        // the correct CSS file dynamically based on the route.
+        //
+        // This was done because dp.css was too big and had to be split up
+        // for better maintainability and understanding. Admin-specific and 
+        // bolg-specific CSS is now loaded on demand using onDemandCss.
+        //
+        // If you wish to remove this line, you must also:
+        //   1. Remove {{ onDemandCss(controller) }} from master.njk
+        //   2. Deregister 'onDemandCss' from application.config.js under view_helpers
+        this.getView().setVariable('controller', this);
+    }
+
     indexAction() {
         const form = new LoginForm();
         form.setAction(
@@ -99,7 +116,6 @@ class Index extends Controller {
             }
             
         }
-        
 
         const session = new Container('security');
         session.set('csrfToken', csrfToken);
@@ -107,6 +123,54 @@ class Index extends Controller {
         // Pass form and token to the view (adjust as needed for your view system)
         return this.getView()
             .setVariable('f', form);
+    }
+
+    async dashboardAction() {
+        try {
+            const postService = this.getServiceManager().get('PostService');
+            const page = parseInt(this.getParam('page')) || 1;
+            const limit = 5;
+            const offset = (page - 1) * limit;
+
+            // Fetch posts with all statuses and total count for pagination
+            const [posts, totalCount] = await Promise.all([
+                postService.getAllPostsWithStatus(['draft', 'published', 'archived'], limit, offset),
+                postService.getPostCount()
+            ]);
+
+            // Get recent posts for sidebar
+            const recentPosts = await postService.getRecentPostsForSidebar();
+
+            // Calculate pagination
+            const totalPages = Math.ceil(totalCount / limit);
+            // Build numbered pagination array
+            const pages = [];
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push({
+                    number: i,
+                    isCurrent: i === page
+                });
+            }
+
+            // Set page title
+            this.getPluginManager().get('pageTitle').setTitle('Admin');
+
+            // Set view variables
+            this.getView()
+                .setVariable('posts', posts)
+                .setVariable('pagination', {
+                    mode : 'admin',
+                    currentPage: page,
+                    totalItems: totalCount,
+                    baseUrl: '/admin/dashboard'
+                });
+
+            return this.getView();
+
+        } catch (error) {
+            console.error('Error in dashboardAction:', error);
+            throw error;
+        }
     }
 
 }

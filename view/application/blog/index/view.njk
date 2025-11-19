@@ -20,7 +20,7 @@
                             <img class="js-image-replace"
                                  src="{{ post.hero_image_url }}"
                                  alt="{{ post.hero_image_alt if post.hero_image_alt else post.title }}"
-                                 itemprop="url contentUrl">
+                                 itemprop="image" fetchpriority="high">
                         </span>
                         {% if post.hero_image_caption %}
                         <figcaption class="media-caption">

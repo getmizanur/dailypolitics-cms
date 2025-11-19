@@ -1,6 +1,49 @@
-@import url(//fonts.googleapis.com/css?family=Anton&display=swap);
-@import url(//fonts.googleapis.com/css?family=Lato&display=swap);
-@import url(//fonts.googleapis.com/css?family=Roboto&display=swap);
+/* Restore previously removed rules */
+.ng-view {
+    background-color: #d4351c;
+}
+.ng-view .container .list-group .list-group-item{
+    background-color: #c0392b;
+}
+
+.ng-view .container .list-group .list-group-item a{
+    color: #fff;
+}
+
+
+@media screen and (min-width: 600px) {
+  .visible-phone {
+    display: none;
+    clear: both;
+    float: left;
+    margin: 10px auto 5px 20px;
+    display:normal;
+    overflow:auto
+  }
+}
+
+.off-screen {
+    visibility: none;
+}
+
+/* Make footer stick to bottom of page using flexbox layout */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+main {
+  flex: 1;
+}
+
+/*@import url(//fonts.googleapis.com/css?family=Lato&display=swap);*/
+/*@import url(//fonts.googleapis.com/css?family=Anton&display=swap);*/
+/*@import url(//fonts.googleapis.com/css?family=Roboto&display=swap);*/
 
 body {
     /*font-family: "nta", Arial, sans-serif !important;*/
@@ -193,12 +236,14 @@ body {
     text-transform: uppercase;
     /*text-shadow: rgba(0,0,0,.15) 1px 1px 2px;*/
     word-break: break-word;
+    font-size: 32px !important;
 }
 
 
 .dailypolitics-heading-xl a {
 	color: #ffffff;
 	text-decoration:none;
+	font-size: inherit;
 }
 
 .dailypolitics-heading-l, .app-prose-scope h2 {
@@ -284,16 +329,6 @@ body {
     max-width: 950px;
 }
 
-.ng-view {
-    background-color: #d4351c;
-}
-.ng-view .container .list-group .list-group-item{
-    background-color: #c0392b;
-}
-
-.ng-view .container .list-group .list-group-item a{
-    color: #fff;
-}
 
 .navbar-brand {
 	/*font-family: 'EB Garamond', 'Garamond', serif;*/
@@ -305,110 +340,6 @@ body {
 	font-weight: normal;
 }
 
-.card {
-    position: relative;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    min-width: 0;
-    word-wrap: break-word;
-	/*background-color: #e8e5c3;*/
-	background-color: #fff;
-    background-clip: border-box;
-    border: 1px solid rgba(0,0,0,.125);
-    border-top-color: rgba(0, 0, 0, 0.125);
-    border-top-style: solid;
-}
-
-.card-header {
-    padding: .75rem 1.25rem;
-	/*letter-spacing: 0.01618em;*/
-	font-family: Anton,sans-serif;
-    /*color: #fff;*/
-    color: #000;
-    margin-bottom: 0;
-    background-color: #fff; 
-    /*background-color: #003078;  */
-    border-bottom: 1px solid rgba(0,0,0,.125);
-	letter-spacing: 0;
-    line-height: 1.2em;
-    text-transform: uppercase;
-    /*text-shadow: rgba(0,0,0,.15) 1px 1px 2px;*/
-    word-break: break-word;
-}
-
-.related-header {
-    padding: .75rem 1.25rem;
-	/*letter-spacing: 0.01618em;*/
-	font-family: Anton,sans-serif;
-    color: #000;
-    margin-bottom: 0;
-    background-color: #b1b4b6;
-    border-bottom: 1px solid rgba(0,0,0,.125);
-	letter-spacing: 0;
-    line-height: 1.2em;
-    text-transform: uppercase;
-    /*text-shadow: rgba(0,0,0,.15) 1px 1px 2px;*/
-    word-break: break-word;
-}
-
-.card-header:first-child {
-    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
-}
-
-.card-body {
-    -ms-flex: 1 1 auto;
-    flex: 1 1 auto;
-    padding: 1.25rem;
-	/*background-color: #e8e5c3;*/
-	background-color: #f3f2f1;
-}
-
-
-.dailypolitics-grid-column-two-thirds {
-    box-sizing: border-box;
-    width: 100%;
-    padding: 0 15px;
-}
-
-.item-right {
-   float: right;
-   display:block;
-   position:relative;
-}
-
-.card .card-body .content-ul {
-    overflow-y: auto;
-    padding-right: 10px;
-    line-height: 1.8;
-	padding-left: 35px;
-	background-color: #f3f2f1;
-	list-style-type:none;
-}
-
-.card li {
-	border:0;
-    padding: .75rem 1.25rem;
-	/*background-color: #e8e5c3;*/
-	background-color: #fff;
-	font-family: Roboto,sans-serif;
-	font-size:16px;
-}
-
-/*.card li.even { */
-	/*background-color: #f8f2bf;*/
-/*}*/
-
-.card li.odd {
-	/*background-color: #e8e5c3;*/
-    border-top: 1px solid rgba(0,0,0,.125);
-}
-
-.card li.even {
-	/*background-color: #e8e5c3;*/
-	background-color: rgba(0,0,0,.03) !important;
-}
 
 
 
@@ -599,24 +530,9 @@ a.dailypolitics-btn__pagination:hover{
 }
 
 @media screen and (max-width: 600px) {
-  .hidden-phone {
-    display: none;
-    clear: both;
-    float: left;
-    margin: 10px auto 5px 20px;
-    display: none;
-  }
 }
 
 @media screen and (min-width: 600px) {
-  .visible-phone {
-    display: none;
-    clear: both;
-    float: left;
-    margin: 10px auto 5px 20px;
-    display:normal;
-	overflow:auto
-  }
 }
 
 .dailypolitics-correction {
@@ -625,6 +541,8 @@ a.dailypolitics-btn__pagination:hover{
 }
 
 .story-body .media-caption {
+    min-height: 24px; /* or whatever is typical for your captions */
+    padding: 16px;
     padding: 16px;
 }
 
@@ -649,13 +567,7 @@ a.dailypolitics-btn__pagination:hover{
 	color: #fff;
 }
 
-.off-screen {
-	visibility: none;
-}
 
-.list_group {
-	font-family: "Roboto", "nta", Arial, sans-serif !important;
-}
 
 .dailypolitics-\!-padding-8-left {
     padding-left: 0px;
@@ -806,6 +718,7 @@ blockquote {
 
 .card li a {  
 	color: #003078;
+	font-size: 19px;
 }
 
 /*.card li a:active {*/
@@ -839,4 +752,240 @@ blockquote {
 
 .bookcard-cover-container {
 	padding-bottom: 16px;
+}
+
+/* =========================================
+   Tag component (Daily Politics)
+   ========================================= */
+
+.dp-tag {
+  display: inline-block;
+  padding: 0.4rem 0.75rem; 
+  border-radius: 4px; /* rectagular */
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+  background-color: #f3f2f1;
+  color: #222222;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Space tags when multiple are shown together */
+.dp-tag + .dp-tag {
+  margin-left: 0.25rem;
+}
+
+/* Neutral / default tag (e.g. "Opinion", "Analysis") */
+.dp-tag--neutral {
+  background-color: #f3f2f1;
+  border-color: #d0d0d0;
+  color: #444444;
+}
+
+/* Primary / attention tag (e.g. "Breaking") */
+.dp-tag--primary {
+  background-color: #0050b3;
+  border-color: #003a82;
+  color: #ffffff;
+}
+
+/* Positive tag (e.g. "Passed", "Approved") */
+.dp-tag--positive {
+  background-color: #0f8243;
+  border-color: #0a5c30;
+  color: #ffffff;
+}
+
+/* Warning tag (e.g. "Delayed", "At risk") */
+.dp-tag--warning {
+  background-color: #f3a800;
+  border-color: #c68600;
+  color: #222222;
+}
+
+/* Negative / danger tag (e.g. "Rejected", "Urgent") */
+.dp-tag--negative {
+  background-color: #c52a1a;
+  border-color: #8f1f13;
+  color: #ffffff;
+}
+
+/* Muted / low emphasis tag (e.g. "Archived", "Draft") */
+.dp-tag--muted {
+  background-color: #e5e5e5;
+  border-color: #cccccc;
+  color: #555555;
+}
+
+
+.dp-tag--breaking {
+    background-color: #c0392b;
+	color:#fff;
+}
+
+.dp-tag--red {
+	background-color: #d4351c;
+	color:#fff !important;
+}
+
+.dp-tag--red a {
+	color:#fff !important;
+}
+
+.dp-tag--yellow {
+	background-color: #ffdd00;
+	color:#000 !important;
+}
+
+.dp-tag--yellow a {
+	color:#000 !important;
+}
+
+.dp-tag--green {
+	background-color: #00703c;
+	color:#fff !important;
+}
+
+.dp-tag--green a {
+	color:#fff !important;
+}
+
+.dp-tag--blue {
+	background-color: #1d70b8;
+	color:#fff !important;
+}
+
+.dp-tag--blue a {
+	color:#fff !important;
+}
+
+.dp-tag--dark-blue {
+	background-color: #003078;
+	color:#fff !important;	
+}
+
+.dp-tag--dark-blue a {
+	color:#fff !important;	
+}
+
+.dp-tag--light-blue {
+	background-color: #5694ca;
+	color:#000 !important;	
+}
+
+.dp-tag--light-blue a {
+	color:#000 !important;	
+}
+
+.dp-tag--purple {
+	background-color:#4c2c92;
+	color:#fff !important;	
+}
+
+.dp-tag--purple a {
+	color:#fff !important;	
+}
+
+.dp-tag--black {
+	background-color: #0b0c0c;
+	color:#000 !important;	
+}
+
+.dp-tag--black a{
+	color:#000 !important;	
+}
+
+.dp-tag--dark-grey {
+	background-color: #626a6e;
+	color:#fff !important;	
+}
+
+.dp-tag--dark-grey a {
+	color:#fff !important;	
+}
+
+.dp-tag--mid-grey {
+	background-color: #b1b4b6;
+	color:#000 !important;	
+}
+
+.dp-tag--mid-grey a {
+	color:#000 !important;	
+}
+
+.dp-tag--light-purple {
+	background-color:#6f72af;
+	color:#000 !important;	
+}
+
+.dp-tag--light-purple a {
+	color:#000 !important;	
+}
+
+.dp-tag--bright-purple {
+	background-color:#912b88;
+	color:#fff !important;	
+}
+
+.dp-tag--bright-purple a {
+	color:#fff !important;	
+}
+
+.dp-tag--pink {
+	background-color:#d53880;
+	color:#000 !important;	
+}
+
+.dp-tag--pink a {
+	color:#000 !important;	
+}
+
+.light-pink {
+	background-color:#f499be;
+	color:#000 !important;	
+}
+
+.dp-tag--light-pink a {
+	color:#000 !important;	
+}
+
+.dp-tag--orange {
+	background-color:#f47738;
+	color:#000 !important;	
+}
+
+.dp-tag--orange a {
+	color:#000 !important;	
+}
+
+.dp-tag--brown {
+	background-color:#b58840;
+	color:#000 !important;	
+}
+
+.dp-tag--brown a {
+	color:#000 !important;	
+}
+
+.dp-tag--light-green {
+	background-color:#85994b;
+	color:#000 !important;	
+}
+
+.dp-tag--light-green a {
+	color:#000 !important;	
+}
+
+.dp-tag--turquoise {
+	background-color:#28a197;
+	color:#000 !important;	
+}
+
+.dp-tag--turquoise a {
+	color:#000 !important;	
 }

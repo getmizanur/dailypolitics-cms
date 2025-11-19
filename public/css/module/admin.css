@@ -1,0 +1,649 @@
+/* Table caption style based on ONS Design System */
+.dp-table__caption {
+	font-weight: 700;
+	font-size: 1.25rem;
+	margin-bottom: 0.5rem;
+	color: #222;
+	caption-side: top;
+	text-align: center;
+}
+/* Responsive table styles based on ONS Design System (ONS branding replaced with dp) */
+.dp-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 2rem;
+	background: #fff;
+	font-size: 1rem;
+}
+.dp-table th,
+.dp-table td {
+	border: 1px solid #b1b4b6;
+	padding: 0.75rem 1rem;
+	text-align: left;
+	vertical-align: top;
+}
+.dp-table th {
+	background: #f3f2f1;
+	font-weight: 700;
+}
+.dp-table tr:nth-child(even) td {
+	background: #f8f8f8;
+}
+.dp-table--responsive {
+	display: block;
+	width: 100%;
+	overflow-x: auto;
+}
+.dp-u-visually-hidden {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	border: 0 !important;
+}
+.dp-btn {
+	display: inline-block;
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	white-space: nowrap;
+	vertical-align: middle;
+	user-select: none;
+	border: 1px solid #b1b4b6;
+	padding: 0.375rem 0.75rem;
+	border-radius: 0.25rem;
+	background: #f3f2f1;
+	color: #222;
+	transition: background 0.15s, color 0.15s, border 0.15s;
+	margin-bottom: 0.25rem;
+}
+.dp-btn--secondary {
+	background: #f3f2f1;
+	color: #222;
+}
+.dp-btn--secondary:hover,
+.dp-btn--secondary:focus {
+	background: #e1e1e1;
+	color: #222;
+}
+.dp-btn--destructive {
+	background: #d4351c;
+	color: #fff;
+	border-color: #d4351c;
+}
+.dp-btn--destructive:hover,
+.dp-btn--destructive:focus {
+	background: #aa2a16;
+	color: #fff;
+	border-color: #aa2a16;
+}
+.dp-u-mr-xs {
+	margin-right: 0.5rem !important;
+}
+/* Add space between card and nav in admin dashboard */
+.admin-dashboard-card + nav {
+	margin-top: 2rem !important;
+}
+/* Center forms in admin and add spacing */
+.admin-login-center {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 60vh;
+}
+
+.admin-login-form {
+	max-width: 400px;
+	width: 100%;
+	margin: 0 auto;
+	background: #fff;
+	padding: 2rem 2.5rem 2rem 2.5rem;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.menu-content-area {
+	margin-bottom: 0.5rem;
+}
+
+/* Utility class for top and bottom margin (equivalent to dailypolitics-!-margin-bottom-8 dailypolitics-!-margin-top-8) */
+.admin-dashboard-margin-y-8 {
+	margin-top: 3rem !important;
+	margin-bottom: 3rem !important;
+}
+
+/* CLS prevention: Apply Roboto fallback font to admin pages */
+.admin-dashboard-card,
+.admin-dashboard-card * {
+	font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+/* CLS prevention: Fix table layout to prevent shifts */
+.admin-dashboard-card .table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+/* CLS prevention: Reserve minimum height for admin card */
+.admin-dashboard-card {
+	min-height: 400px;
+}
+
+/* CLS prevention: Fix table header and row heights */
+.admin-dashboard-card .table thead th {
+	height: 50px;
+	padding: 0.75rem;
+	vertical-align: middle;
+}
+
+.admin-dashboard-card .table tbody tr {
+	height: 60px;
+}
+
+.admin-dashboard-card .table tbody td {
+	padding: 0.75rem;
+	vertical-align: middle;
+}
+
+/* Ensure strong tags work properly in admin table */
+.admin-dashboard-card .table tbody td strong {
+	font-weight: 700 !important;
+}
+
+/* CLS prevention: Reserve space for pagination */
+.admin-dashboard-card + nav .pagination {
+	min-height: 44px;
+	margin: 2rem 0;
+}
+.admin-dashboard-fix-row > [class^="col-"] > * {
+	margin-top: 0 !important;
+	padding-top: 0 !important;
+}
+.admin-dashboard-fix-row > [class^="col-"] {
+	align-self: flex-start !important;
+}
+.admin-dashboard-fix-row > [class^="col-"] > *:first-child {
+	margin-top: 0 !important;
+}
+/* Fix vertical alignment for admin dashboard columns */
+.admin-dashboard-fix-row {
+	display: flex;
+	align-items: flex-start;
+}
+.admin-dashboard-fix-row > [class^="col-"] {
+	display: flex;
+	flex-direction: column;
+	justify-content: stretch;
+}
+.admin-dashboard-card {
+	flex: 1 1 auto;
+}
+/* Make admin dashboard card take full width of its column */
+.admin-dashboard-card {
+	width: 100%;
+	box-sizing: border-box;
+	/* Remove Bootstrap card padding to allow table to fill completely */
+	padding: 0 !important;
+	overflow: hidden; /* Prevent table overflow */
+}
+
+/* Ensure table fills the entire card */
+.admin-dashboard-card .dp-table {
+	margin-bottom: 0; /* Remove bottom margin to fill card */
+	border-radius: 0; /* Remove border radius for flush edges */
+}
+
+/* Remove outer borders from table cells when inside card */
+.admin-dashboard-card .dp-table tr:first-child th {
+	border-top: none;
+}
+
+.admin-dashboard-card .dp-table tr:last-child td {
+	border-bottom: none;
+}
+
+.admin-dashboard-card .dp-table th:first-child,
+.admin-dashboard-card .dp-table td:first-child {
+	border-left: none;
+}
+
+.admin-dashboard-card .dp-table th:last-child,
+.admin-dashboard-card .dp-table td:last-child {
+	border-right: none;
+}
+/* Flex alignment for admin dashboard columns */
+.admin-dashboard-row {
+	display: flex;
+	align-items: center;
+}
+.admin-dashboard-row > .admin-dashboard-col {
+	min-height: 40px;
+	display: flex;
+	align-items: center;
+}
+/* GOV.UK Design System inspired pagination styles for admin */
+.pagination {
+	display: flex;
+	flex-wrap: wrap;
+	padding-left: 0;
+	list-style: none;
+	margin: 2rem 0;
+	align-items: center;
+}
+
+.justify-content-center {
+	justify-content: center !important;
+}
+
+.page-item {
+	margin: 0 0.25rem;
+}
+
+/* Disabled state (Prev/Next when not available) */
+.page-item.disabled .page-link {
+	color: #626a6e;
+	pointer-events: none;
+	background-color: transparent;
+	border: none;
+	cursor: not-allowed;
+	text-decoration: none;
+}
+
+/* Active page number */
+.page-item.active .page-link {
+	background-color: #1d70b8;
+	color: #ffffff;
+	font-weight: 700;
+	border: none;
+	min-width: 2.75rem;
+	height: 2.75rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+/* Regular page links */
+.page-link {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.75rem;
+	height: 2.75rem;
+	padding: 0.5rem 0.75rem;
+	font-family: "Roboto", Arial, sans-serif;
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.25;
+	color: #1d70b8;
+	background-color: transparent;
+	border: none;
+	text-decoration: underline;
+	text-underline-offset: 0.1em;
+	border-radius: 0;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+.page-link:hover {
+	color: #003078;
+	background-color: #f3f2f1;
+	text-decoration: underline;
+}
+
+.page-link:focus {
+	background-color: #ffdd00;
+	color: #0b0c0c;
+	outline: 3px solid #ffdd00;
+	outline-offset: 0;
+	text-decoration: none;
+}
+
+/* Prev/Next link styles */
+.page-item:first-child .page-link,
+.page-item:last-child .page-link {
+	font-weight: 400;
+	min-width: auto;
+}
+
+/* Number-only links (not prev/next) */
+.page-item:not(:first-child):not(:last-child) .page-link {
+	text-decoration: none;
+	border: 1px solid transparent;
+}
+
+.page-item:not(:first-child):not(:last-child) .page-link:hover {
+	background-color: #f3f2f1;
+	border-color: #b1b4b6;
+}
+/* Admin-only error and form styles moved from dp.css */
+.dp-form-group--error {
+	border-left: 4px solid #d4351c;
+	padding-left: 1rem;
+	margin-left: -1rem;
+}
+/* Error message styling for form errors (GOV.UK Design System inspired) */
+.dp-error-message {
+	color: #d4351c;
+	font-weight: bold;
+	font-size: 1.1rem;
+	list-style: none;
+	margin: 0 0 0.5rem 0;
+	padding: 0;
+}
+.dp-error-message li {
+	margin: 0;
+	padding: 0;
+}
+/* Error state for input fields, inspired by GOV.UK Design System */
+.dp-input--error {
+	border: 4px solid #d4351c !important;
+	box-shadow: none;
+}
+/* Admin-only styles moved from dp.css */
+.admin-login-form .dp-label,
+.admin-login-form .dp-input,
+.admin-login-form .dp-input::placeholder {
+	font-family: "nta", Arial, sans-serif !important;
+}
+.admin-login-form .dp-input,
+.admin-login-form .dp-button {
+	width: 400px !important;
+	max-width: 400px;
+	min-width: 400px;
+	box-sizing: border-box;
+}
+.admin-login-form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.dp-fieldset {
+	width: 100%;
+	max-width: 400px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border: 0;
+	padding: 0;
+}
+.dp-form-group {
+	width: 100%;
+}
+.dp-button {
+	width: 100%;
+	max-width: 400px;
+	box-sizing: border-box;
+}
+/* GOV.UK Design System inspired fieldset, input, and button styles */
+.dp-fieldset {
+	border: 0;
+	padding: 0;
+	margin: 0 0 2rem 0;
+}
+
+.dp-form-group {
+	margin-bottom: 1.5rem;
+	display: flex;
+	flex-direction: column;
+}
+
+.dp-label {
+	font-weight: 600;
+	margin-bottom: 0.5rem;
+	color: #222;
+	font-size: 1.1rem;
+}
+
+.dp-input {
+	display: block;
+	width: 100%;
+	max-width: 400px;
+	padding: 0.5rem 0.75rem;
+	font-size: 1.1rem;
+	line-height: 1.5;
+	color: #222;
+	background-color: #fff;
+	background-clip: padding-box;
+	border: 2px solid #0b0c0c;
+	border-radius: 0;
+	box-shadow: none;
+	margin-bottom: 0.25rem;
+	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.dp-input:focus {
+	border-color: #1d70b8;
+	outline: 3px solid #ffdd00;
+	outline-offset: 0;
+}
+
+.dp-button {
+	display: inline-block;
+	font-weight: 700;
+	text-align: center;
+	vertical-align: middle;
+	user-select: none;
+	background-color: #1d70b8;
+	color: #fff;
+	border: 2px solid #1d70b8;
+	padding: 0.6em 1.5em;
+	font-size: 1.1rem;
+	line-height: 1.25;
+	border-radius: 0;
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s, border 0.15s;
+}
+.dp-button:hover, .dp-button:focus {
+	background-color: #003078;
+	border-color: #003078;
+	color: #fff;
+}
+/* Daily Politics custom form group for admin/login */
+.dp-form-group {
+	margin-bottom: 1.5rem;
+	display: flex;
+	flex-direction: column;
+}
+
+.dp-label {
+	font-weight: 600;
+	margin-bottom: 0.5rem;
+	color: #222;
+	font-size: 1.1rem;
+}
+
+/* Smaller dp-tag size for admin dashboard */
+.dp-tag--small {
+	padding: 0.25rem 0.5rem;
+	font-size: 0.75rem;
+	font-weight: 500;
+}
+
+/* Pill-shaped variant for tags */
+.dp-tag--pill {
+	border-radius: 50rem;
+}
+
+/* GOV.UK Design System inspired link buttons for admin actions */
+.dp-link-button {
+	display: inline-block;
+	font-family: "Roboto", Arial, sans-serif;
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.1875;
+	text-decoration: none;
+	text-align: center;
+	padding: 0.5rem 0.75rem;
+	border: 2px solid transparent;
+	border-radius: 0;
+	cursor: pointer;
+	margin-right: 0.5rem;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+	box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+	vertical-align: top;
+}
+
+.dp-link-button:last-child {
+	margin-right: 0;
+}
+
+/* Dark-grey button (View, Edit) */
+.dp-link-button--dark-grey {
+	background-color: #626a6e;
+	color: #ffffff;
+}
+
+.dp-link-button--dark-grey:hover {
+	background-color: #4d5356;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.dp-link-button--dark-grey:focus {
+	background-color: #626a6e;
+	color: #0b0c0c;
+	outline: 3px solid #ffdd00;
+	outline-offset: 0;
+	box-shadow: inset 0 0 0 1px #ffdd00;
+}
+
+.dp-link-button--dark-grey:active {
+	background-color: #626a6e;
+	box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+	top: 2px;
+}
+
+/* Red button (Delete) */
+.dp-link-button--red {
+	background-color: #d4351c;
+	color: #ffffff;
+}
+
+.dp-link-button--red:hover {
+	background-color: #aa2a16;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.dp-link-button--red:focus {
+	background-color: #d4351c;
+	color: #0b0c0c;
+	outline: 3px solid #ffdd00;
+	outline-offset: 0;
+	box-shadow: inset 0 0 0 1px #ffdd00;
+}
+
+.dp-link-button--red:active {
+	background-color: #d4351c;
+	box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+	top: 2px;
+}
+
+/* Small variant for table actions - WCAG 2.2 compliant target size (minimum 24x24px) */
+.dp-link-button--small {
+	font-size: 0.875rem;
+	padding: 0.5rem 0.75rem;
+	min-width: 44px;
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Bold table headers in admin dashboard */
+.admin-dashboard-card .table thead th {
+	font-weight: 700;
+}
+
+/* Roboto font for admin dashboard table */
+.admin-dashboard-card .table {
+	font-family: Roboto, sans-serif;
+}
+
+/* Alternating row colors for admin dashboard table (WCAG AA 2.2 compliant) */
+.admin-dashboard-card .table tbody tr:nth-child(odd) {
+	background-color: #ffffff;
+}
+
+.admin-dashboard-card .table tbody tr:nth-child(even) {
+	background-color: #f8f8f8;
+}
+
+/* WCAG AA 2.2 compliant color overrides for admin dashboard tags */
+.admin-dashboard-card .dp-tag--orange {
+	background-color: #d45e20;
+	color: #ffffff !important;
+}
+
+.admin-dashboard-card .dp-tag--muted {
+	background-color: #e5e5e5;
+	color: #2b2b2b !important;
+}
+
+/* Responsive table for WCAG 2.2 Reflow (1.4.10) */
+@media screen and (max-width: 640px) {
+	.admin-dashboard-card .table {
+		display: block;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.admin-dashboard-card .table thead {
+		display: none;
+	}
+
+	.admin-dashboard-card .table tbody,
+	.admin-dashboard-card .table tr,
+	.admin-dashboard-card .table td {
+		display: block;
+		width: 100%;
+	}
+
+	.admin-dashboard-card .table tr {
+		margin-bottom: 1rem;
+		border: 1px solid #b1b4b6;
+		padding: 0.5rem;
+	}
+
+	.admin-dashboard-card .table td {
+		text-align: left !important;
+		padding: 0.5rem;
+		position: relative;
+		padding-left: 40%;
+		border: none;
+	}
+
+	.admin-dashboard-card .table td:before {
+		content: attr(data-label);
+		position: absolute;
+		left: 0.5rem;
+		width: 35%;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.admin-dashboard-card .table td:first-child:before {
+		content: "Status";
+	}
+
+	.admin-dashboard-card .table td:nth-child(2):before {
+		content: "Title";
+	}
+
+	.admin-dashboard-card .table td:last-child:before {
+		content: "Actions";
+	}
+
+	.admin-dashboard-card .dp-link-button--small {
+		display: inline-flex;
+		margin-bottom: 0.25rem;
+		margin-right: 0.25rem;
+	}
+}

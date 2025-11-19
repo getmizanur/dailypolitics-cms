@@ -11,6 +11,7 @@ const nunjucks = require('nunjucks');
 const dotenv = require('dotenv');
 const genuuid = require('uuid');
 const session = require('express-session');
+const compression = require('compression');
 // body-parser is now built into Express 4.16+
 
 // Load environment variables from .env file
@@ -28,6 +29,7 @@ class Bootstrap extends Bootstrapper {
 
     initAppConfig() {
         // Use Express's built-in body parsing middleware (available since Express 4.16)
+        this.app.use(compression());
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
     }
