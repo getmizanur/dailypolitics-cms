@@ -13,7 +13,7 @@ class Index extends Controller {
         // This is required for onDemandCss to determine the current module and load
         // the correct CSS file dynamically based on the route.
         //
-        // This was done because dp.css was too big and had to be split up
+        // This was done because main.css was too big and had to be split up
         // for better maintainability and understanding. Admin-specific and 
         // bolg-specific CSS is now loaded on demand using onDemandCss.
         //

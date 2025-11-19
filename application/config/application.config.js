@@ -253,6 +253,10 @@ module.exports = {
             "onDemandCss": {
                 "class": "/application/helper/onDemandCssHelper",
                 "params": ["controller"]
+            },
+            "newsArticleJsonLd": {
+                "class": "/application/helper/newsArticleJsonLdHelper",
+                "params": ["data", "options = {}"]
             }
         }
         // Add your custom application helpers here

@@ -141,6 +141,10 @@
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="canonical" href="{% block canonicalUrl %}{{ canonicalUrl | default('https://www.dailypolitics.com/') }}{% endblock %}">
     <link rel="apple-touch-icon" href="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png">
+
+    {% block head %}
+    {# Additional head content from child templates #}
+    {% endblock %}
 </head>
 <body>
     <!-- Skip to main content link for accessibility -->

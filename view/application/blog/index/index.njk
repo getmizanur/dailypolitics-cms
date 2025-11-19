@@ -1,5 +1,12 @@
 {% extends 'layout/master.njk' %}
 
+{% block head %}
+    {# JSON-LD structured data for NewsArticles - improves SEO #}
+    {% if posts and posts.length > 0 %}
+        {{ newsArticleJsonLd(posts, { baseUrl: 'http://localhost:8080' }) | safe }}
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <div class="row">
