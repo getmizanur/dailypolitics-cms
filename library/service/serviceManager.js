@@ -10,6 +10,13 @@ class ServiceManager {
         this.services = {};
         this.invokables = null;
         this.factories = null;
+
+        // Framework-level service factories - protected from developer modification
+        this.frameworkFactories = {
+            "ViewManager": "/library/service/factory/viewManagerFactory",
+            "ViewHelperManager": "/library/service/factory/viewHelperManagerFactory",
+            "PluginManager": "/library/service/factory/pluginManagerFactory"
+        };
     }
 
     setController(controller) {
@@ -27,22 +34,27 @@ class ServiceManager {
         if (this.invokables == null || this.factories == null) {
             this.loadConfiguration();
         }
-        
+
         // Return cached service if exists
         if (this.services[name]) {
             return this.services[name];
         }
-        
-        // Try factories first (higher priority)
-        if (this.factories.hasOwnProperty(name)) {
-            return this.createFromFactory(name);
+
+        // Try framework factories first (highest priority, protected)
+        if (this.frameworkFactories.hasOwnProperty(name)) {
+            return this.createFromFactory(name, true);
         }
-        
+
+        // Try application factories second
+        if (this.factories.hasOwnProperty(name)) {
+            return this.createFromFactory(name, false);
+        }
+
         // Fall back to invokables (direct instantiation)
         if (this.invokables.hasOwnProperty(name)) {
             return this.createFromInvokable(name);
         }
-        
+
         throw new Error(`Service '${name}' not found in service manager`);
     }
 
@@ -61,11 +73,16 @@ class ServiceManager {
     /**
      * Create service using factory pattern
      * @param {string} name - Service name
+     * @param {boolean} isFramework - Whether this is a framework factory
      * @returns {Object} - Service instance
      */
-    createFromFactory(name) {
+    createFromFactory(name, isFramework = false) {
         try {
-            let factoryPath = global.applicationPath(this.factories[name]);
+            // Get factory path from appropriate source
+            const factoryPath = isFramework
+                ? global.applicationPath(this.frameworkFactories[name])
+                : global.applicationPath(this.factories[name]);
+
             let FactoryClass = require(factoryPath);
             
             // Validate factory extends AbstractFactory
@@ -177,13 +194,46 @@ class ServiceManager {
         if (this.invokables == null || this.factories == null) {
             this.loadConfiguration();
         }
-        
-        return this.factories.hasOwnProperty(name) || 
+
+        return this.frameworkFactories.hasOwnProperty(name) ||
+               this.factories.hasOwnProperty(name) ||
                this.invokables.hasOwnProperty(name);
     }
 
     /**
-     * Get all available service names
+     * Check if a service is a framework service
+     * @param {string} name - Service name
+     * @returns {boolean} True if framework service
+     */
+    isFrameworkService(name) {
+        return this.frameworkFactories.hasOwnProperty(name);
+    }
+
+    /**
+     * Get list of framework service names
+     * @returns {Array} Array of framework service names
+     */
+    getFrameworkServiceNames() {
+        return Object.keys(this.frameworkFactories);
+    }
+
+    /**
+     * Validate that application services don't accidentally override framework services
+     * @param {Object} applicationFactories - Application factories to validate
+     * @returns {Array} Array of conflicts (if any)
+     */
+    validateApplicationServices(applicationFactories = {}) {
+        const conflicts = [];
+        Object.keys(applicationFactories).forEach(serviceName => {
+            if (this.isFrameworkService(serviceName)) {
+                conflicts.push(serviceName);
+            }
+        });
+        return conflicts;
+    }
+
+    /**
+     * Get all available service names (framework + application)
      * @returns {Array} - Array of service names
      */
     getAvailableServices() {

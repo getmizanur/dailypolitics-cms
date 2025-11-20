@@ -123,7 +123,7 @@
     <meta name="twitter:description" content="{% block twitterDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
     
     <!-- Critical CSS inlined for performance -->
-    {{ onDemandCss(controller) | safe }}
+    {{ onDemandCss() | safe }}
 
     <!-- Load main.css reliably to prevent FOUC and missing styles -->
     <link rel="stylesheet" href="/css/main.css">

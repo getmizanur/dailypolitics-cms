@@ -4,7 +4,10 @@ const AbstractHelper = require('./abstractHelper');
 
 class FormRadio extends AbstractHelper {
 
-    render(element, valueOption = null) {
+    render(...args) {
+        const cleanArgs = this._extractContext(args);
+        const [element, valueOption = null] = cleanArgs;
+
         if(valueOption != null) {
             let value = valueOption.value;
             let type = element.getAttribute('type');

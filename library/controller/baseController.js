@@ -1,7 +1,5 @@
 const ViewModel = require('../view/viewModel');
-const PluginManager = require('./pluginManager');
 const ServiceManager = require('../service/serviceManager');
-const ViewManager = require('../view/viewManager');
 
 class BaseController {
 
@@ -109,19 +107,43 @@ class BaseController {
     }
 
     dispatch(request = null, response = null) {
-        let view = null; 
+        let view = null;
 
         if(request != null) {
             this.setRequest(request);
         }else{
-            request = this.getRequest(); 
+            request = this.getRequest();
         }
 
         if(response != null) {
             this.setResponse(response);
         }else{
             response = this.getResponse();
-        } 
+        }
+
+        // Set module and controller metadata as template variables (before preDispatch to ensure availability)
+        const viewModel = this.getView();
+        if (viewModel && request) {
+            // Set module name (from route)
+            if (typeof request.getModuleName === 'function') {
+                viewModel.setVariable('_moduleName', request.getModuleName());
+            }
+
+            // Set controller name (from route)
+            if (typeof request.getControllerName === 'function') {
+                viewModel.setVariable('_controllerName', request.getControllerName());
+            }
+
+            // Set action name (from route)
+            if (typeof request.getActionName === 'function') {
+                viewModel.setVariable('_controllerActionName', request.getActionName());
+            }
+
+            // Set route name for convenience
+            if (typeof request.getRouteName === 'function') {
+                viewModel.setVariable('_routeName', request.getRouteName());
+            }
+        }
 
         this.preDispatch();
         if(this.getRequest().isDispatched()) {
@@ -165,27 +187,16 @@ class BaseController {
     }
 
     setPluginManager(pluginManager) {
-        if(!(pluginManager instanceof PluginManager)) {
-            throw Error('Invalid PluginManager');
-        }
+        // Type checking removed since we're getting it from ServiceManager
+        // which ensures proper instantiation
         this.pluginManager = pluginManager;
         this.pluginManager.setController(this)
     }
 
     getPluginManager() {
         if(!this.pluginManager) {
-            const pluginManager = new PluginManager();
-            
-            // Pass configuration to plugin manager if available
-            if (this.container && this.container.get) {
-                try {
-                    const appConfig = this.container.get('application');
-                    pluginManager.setConfig(appConfig);
-                } catch (error) {
-                    console.warn('Could not load application config for plugin manager:', error.message);
-                }
-            }
-            
+            // Get PluginManager from ServiceManager
+            const pluginManager = this.getServiceManager().get('PluginManager');
             this.setPluginManager(pluginManager);
         }
 
@@ -194,29 +205,20 @@ class BaseController {
 
     getViewManager() {
         if (!this.viewManager) {
-            // Get view_manager configuration from application config
-            let viewManagerConfig = {};
-            if (this.container && this.container.get) {
-                try {
-                    const appConfig = this.container.get('application');
-                    viewManagerConfig = appConfig.view_manager || {};
-                } catch (error) {
-                    console.warn('Could not load view_manager config:', error.message);
-                }
-            }
-            
-            this.viewManager = new ViewManager(viewManagerConfig);
+            // Get ViewManager from ServiceManager
+            this.viewManager = this.getServiceManager().get('ViewManager');
         }
 
         return this.viewManager;
     }
 
-    plugin(name, options = {}) {
-        return this.getPluginManager().get(name, options);
+    getViewHelperManager() {
+        // Get ViewHelperManager from ServiceManager
+        return this.getServiceManager().get('ViewHelperManager');
     }
 
-    helper(name, options = {}) {
-        return this.getViewManager().getHelper(name, options);
+    plugin(name, options = {}) {
+        return this.getPluginManager().get(name, options);
     }
 
     preDispatch() {}

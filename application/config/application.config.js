@@ -201,12 +201,18 @@ module.exports = {
          */
     },
     
-    // Service Manager configuration
+    // Service Manager configuration - for custom application services only
+    // Framework services (ViewManager, ViewHelperManager, PluginManager) are managed by ServiceManager
     "service_manager": {
         "invokables": {
             "EmailService": "/application/service/verifyEmailService",
             "PostService": "/application/service/postService"
         }
+        // Add your custom service factories here
+        // Example:
+        // "factories": {
+        //     "MyCustomService": "/application/service/factory/myCustomServiceFactory"
+        // }
     },
     
     // Controller Plugins configuration - only custom application plugins
@@ -252,7 +258,7 @@ module.exports = {
             },
             "onDemandCss": {
                 "class": "/application/helper/onDemandCssHelper",
-                "params": ["controller"]
+                "params": []
             },
             "newsArticleJsonLd": {
                 "class": "/application/helper/newsArticleJsonLdHelper",

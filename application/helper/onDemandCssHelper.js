@@ -2,35 +2,18 @@
 // View helper to load module-specific CSS on demand
 const fs = require('fs');
 const path = require('path');
-const routesConfig = require(global.applicationPath('/application/config/routes.config.js'));
+const AbstractHelper = require(global.applicationPath('/library/view/helper/abstractHelper'));
 
-class OnDemandCssHelper {
-    getModuleName(controller) {
-        // Try to get route name from request or controller
-        const req = controller && controller.getRequest && controller.getRequest();
-        let routeName = null;
-        if (req && typeof req.getRouteName === 'function') {
-            routeName = req.getRouteName();
-        }
-        if (!routeName && req && req.routeName) {
-            routeName = req.routeName;
-        }
-        if (!routeName) {
-            // fallback: try controller property
-            routeName = controller && controller.routeName;
-        }
-        if (!routeName) return null;
-        // Find module name from routes config
-        const routeDef = routesConfig.routes[routeName];
-        if (routeDef && routeDef.module) {
-            return routeDef.module;
-        }
-        return null;
-    }
-
+class OnDemandCssHelper extends AbstractHelper {
+    /**
+     * Generate inline CSS or link tag for module-specific CSS
+     * @param {string} moduleName - Module name
+     * @returns {string} HTML style or link tag
+     */
     cssLinkTag(moduleName) {
         const cssPath = `/css/module/${moduleName}.css`;
         const absPath = path.join(global.applicationPath('/public/css/module'), `${moduleName}.css`);
+
         if (fs.existsSync(absPath)) {
             // Inline critical CSS to avoid render-blocking
             try {
@@ -41,12 +24,26 @@ class OnDemandCssHelper {
                 return `<link rel="stylesheet" href="${cssPath}" />`;
             }
         }
+
         return '';
     }
 
-    render(controller) {
-        const moduleName = this.getModuleName(controller);
-        if (!moduleName) return '';
+    /**
+     * Render module-specific CSS
+     * Reads module name from Nunjucks context variables set by BaseController
+     * @returns {string} HTML style or link tag
+     */
+    render(...args) {
+        // Extract Nunjucks context from arguments
+        this._extractContext(args);
+
+        // Get module name from context (set by BaseController in dispatch)
+        const moduleName = this.getVariable('_moduleName');
+
+        if (!moduleName) {
+            return '';
+        }
+
         return this.cssLinkTag(moduleName);
     }
 }

@@ -4,26 +4,67 @@ class HeadTitle extends AbstractHelper {
 
     constructor() {
         super();
-        this.titles = [];
-        this.separator = ' | ';
+        this.separator = ' - ';
         this.defaultTitle = 'Application Portal';
     }
 
     /**
      * Main render method - can be called with various parameters
-     * @param {string} title - Title to set, append, or null for automatic generation
-     * @param {string} routeName - Route name for automatic title generation
-     * @returns {string} Rendered title
+     * Supports persistent title building via Nunjucks context
+     * @param {string|null} title - Title to set/append
+     * @param {string} mode - 'set', 'append', 'prepend', or 'render' (default: 'set')
+     * @returns {string} Rendered title or empty string if setting for later
      */
-    render(title = null) {
-        if (title === null) {
-            // No title or route - return default
+    render(...args) {
+        // Extract Nunjucks context from arguments
+        const cleanArgs = this._extractContext(args);
+        const [title = null, mode = 'set'] = cleanArgs;
+
+        // Get stored titles from context or initialize
+        let titles = this.getVariable('_headTitleParts', []);
+
+        if (title === null && mode === 'set') {
+            // No arguments - just render what we have
+            return this._renderTitles(titles);
+        }
+
+        // Handle different modes
+        switch (mode) {
+            case 'set':
+                titles = [title];
+                break;
+            case 'append':
+                titles.push(title);
+                break;
+            case 'prepend':
+                titles.unshift(title);
+                break;
+            case 'render':
+                // Just render without modifying
+                return this._renderTitles(titles);
+        }
+
+        // Store updated titles back to context
+        this.setVariable('_headTitleParts', titles);
+
+        // For set/append/prepend, return empty string (they're building, not rendering)
+        if (mode !== 'render') {
+            return '';
+        }
+
+        return this._renderTitles(titles);
+    }
+
+    /**
+     * Render titles array to string
+     * @param {Array} titles - Array of title parts
+     * @returns {string}
+     */
+    _renderTitles(titles) {
+        if (!titles || titles.length === 0) {
             return this.defaultTitle;
         }
-        
-        // Custom title provided - set and return
-        this.set(title);
-        return this.toString();
+        return titles.join(this.separator);
     }
 
     /**

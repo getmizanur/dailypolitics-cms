@@ -13,7 +13,11 @@ class TruncateHelper extends AbstractHelper {
      * @param {string} ellipsis - Ellipsis string to append (default: '...')
      * @returns {string} - Truncated text with ellipsis if needed
      */
-    render(text, wordLimit = 100, ellipsis = '...') {
+    render(...args) {
+        // Extract Nunjucks context from arguments
+        const cleanArgs = this._extractContext(args);
+        const [text, wordLimit = 100, ellipsis = '...'] = cleanArgs;
+
         // Handle null, undefined, or non-string inputs
         if (!text || typeof text !== 'string') {
             return '';

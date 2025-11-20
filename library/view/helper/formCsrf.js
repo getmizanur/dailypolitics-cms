@@ -6,7 +6,10 @@ class FormCsrf extends AbstractHelper {
      * @param {Element} element - Csrf element instance
      * @returns {string} HTML for hidden CSRF input
      */
-    render(element) {
+    render(...args) {
+        const cleanArgs = this._extractContext(args);
+        const [element] = cleanArgs;
+
         if (!element) return '';
         let input = '<input ';
         const attributes = element.getAttributes();

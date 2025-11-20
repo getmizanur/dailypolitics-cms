@@ -2,7 +2,10 @@ const AbstractHelper = require('./abstractHelper');
 
 class FormButton extends AbstractHelper {
 
-    render(element) {
+    render(...args) {
+        const cleanArgs = this._extractContext(args);
+        const [element] = cleanArgs;
+
         if(element == undefined) {
             return;
         }

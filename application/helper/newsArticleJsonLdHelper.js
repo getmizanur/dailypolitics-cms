@@ -16,7 +16,11 @@ class NewsArticleJsonLdHelper extends AbstractHelper {
      * @param {string} options.publisherLogoUrl - Publisher logo URL
      * @returns {string} - JSON-LD script tag
      */
-    render(data, options = {}) {
+    render(...args) {
+        // Extract Nunjucks context from arguments
+        const cleanArgs = this._extractContext(args);
+        const [data, options = {}] = cleanArgs;
+
         // Handle null or undefined data
         if (!data) {
             return '';

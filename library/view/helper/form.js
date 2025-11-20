@@ -2,7 +2,8 @@ const AbstractHelper = require('./abstractHelper');
 
 class Form extends AbstractHelper {
 
-    render() {
+    render(...args) {
+        const cleanArgs = this._extractContext(args);
         return this;
     }
 

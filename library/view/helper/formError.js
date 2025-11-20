@@ -3,7 +3,10 @@ const AbstractHelper = require('./abstractHelper');
 
 class FormError extends AbstractHelper {
 
-    render(element, attributes = {}) {
+    render(...args) {
+        const cleanArgs = this._extractContext(args);
+        const [element, attributes = {}] = cleanArgs;
+
         if (!(element instanceof Element)) {
             throw new Error("Value is not an instance of Element");
         }

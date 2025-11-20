@@ -3,7 +3,11 @@ const AbstractHelper = require(global.applicationPath('/library/view/helper/abst
 
 class RecentPostsSidebarHelper extends AbstractHelper {
 
-    render(posts = null) {
+    render(...args) {
+        // Extract Nunjucks context from arguments
+        const cleanArgs = this._extractContext(args);
+        const [posts = null] = cleanArgs;
+
         // Default posts data if none provided
         const defaultPosts = [
             {

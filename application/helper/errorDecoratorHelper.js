@@ -1,11 +1,17 @@
-class ErrorDecoratorHelper {
+const AbstractHelper = require(global.applicationPath('/library/view/helper/abstractHelper'));
+
+class ErrorDecoratorHelper extends AbstractHelper {
     /**
      * Returns the error class if the element has error messages
      * @param {Element} element - The form element instance
      * @param {string} errorClass - The class to return if error exists (default: 'dp-input--error')
      * @returns {string}
      */
-    render(element, errorClass = 'dp-input--error') {
+    render(...args) {
+        // Extract Nunjucks context from arguments
+        const cleanArgs = this._extractContext(args);
+        const [element, errorClass = 'dp-input--error'] = cleanArgs;
+
         if (!element || typeof element.getMessages !== 'function') {
             return '';
         }

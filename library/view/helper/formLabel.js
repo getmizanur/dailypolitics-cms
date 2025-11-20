@@ -3,10 +3,13 @@ const AbstractHelper = require('./abstractHelper');
 
 class FormLabel extends AbstractHelper {
 
-    render(elementOrAttribs, labelContent = null) {
+    render(...args) {
+        const cleanArgs = this._extractContext(args);
+        const [elementOrAttribs, labelContent = null] = cleanArgs;
+
         if(elementOrAttribs instanceof Element) {
-            return this.openTag(elementOrAttribs) 
-				+ ((labelContent) ? labelContent : elementOrAttribs.getLabel()) 
+            return this.openTag(elementOrAttribs)
+				+ ((labelContent) ? labelContent : elementOrAttribs.getLabel())
                 + this.closeTag();
         }
         return this.openTag(elementOrAttribs) + labelContent + this.closeTag();

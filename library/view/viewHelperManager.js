@@ -64,7 +64,15 @@ class ViewHelperManager {
             },
             "headTitle": {
                 "class": "/library/view/helper/headTitle",
-                "params": ["element"]
+                "params": ["title = null", "mode = 'set'"]
+            },
+            "headMeta": {
+                "class": "/library/view/helper/headMeta",
+                "params": ["nameOrProperty = null", "content = null", "mode = 'add'"]
+            },
+            "headLink": {
+                "class": "/library/view/helper/headLink",
+                "params": ["attributes = null", "mode = 'add'"]
             },
             "formCsrf": {
                 "class": "/library/view/helper/formCsrf",

@@ -29,7 +29,11 @@ class PaginationHelper extends AbstractHelper {
      *
      * @returns {string} - HTML string for pagination
      */
-    render(options = {}) {
+    render(...args) {
+        // Extract Nunjucks context from arguments
+        const cleanArgs = this._extractContext(args);
+        const [options = {}] = cleanArgs;
+
         const mode = options.mode || 'posts';
 
         if (mode === 'article') {

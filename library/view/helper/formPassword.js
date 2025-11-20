@@ -8,7 +8,10 @@ class FormPassword extends AbstractHelper {
      * @param {Object} extraAttribs - Optional extra attributes (e.g. { class: '...' })
      * @returns {string}
      */
-    render(element, extraAttribs = {}) {
+    render(...args) {
+        const cleanArgs = this._extractContext(args);
+        const [element, extraAttribs = {}] = cleanArgs;
+
         if (element == undefined) {
             return;
         }
