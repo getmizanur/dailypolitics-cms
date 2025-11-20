@@ -200,7 +200,10 @@ class Bootstrap extends Bootstrapper {
                 const helperPath = typeof helperConfig === 'string' ? helperConfig : helperConfig.class;
                 const ViewHelper = require(global.applicationPath(helperPath));
                 const helperInstance = new ViewHelper();
-                return helperInstance.render(...args);
+
+                // IMPORTANT: pass Nunjucks ctx as FINAL argument
+                return helperInstance.render(...args, this);
+                //                                     ^^^ this = Nunjucks ctx
             });
         });
     }

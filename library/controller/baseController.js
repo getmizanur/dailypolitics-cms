@@ -226,7 +226,7 @@ class BaseController {
         // This triggers lazy initialization if no custom title was set
         this.plugin('pageTitle').getTitle();
     }
-    
+
     /**
      * Helper method to get flash messages for views
      * @param {boolean} clearAfterRead - Whether to clear messages after reading (default: true)
