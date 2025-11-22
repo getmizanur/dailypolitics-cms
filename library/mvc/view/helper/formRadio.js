@@ -1,5 +1,5 @@
-const Element = require('../../form/element');
-const StringUtil = require('../../util/stringUtil');
+const Element = require('../../../form/element');
+const StringUtil = require('../../../util/stringUtil');
 const AbstractHelper = require('./abstractHelper');
 
 class FormRadio extends AbstractHelper {

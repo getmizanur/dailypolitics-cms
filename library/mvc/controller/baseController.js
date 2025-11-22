@@ -1,6 +1,6 @@
 const ViewModel = require('../view/viewModel');
-const ServiceManager = require('../service/serviceManager');
-const Container = require('../container');
+const ServiceManager = require('../../service/serviceManager');
+const Container = require('../../core/container');
 
 class BaseController {
 

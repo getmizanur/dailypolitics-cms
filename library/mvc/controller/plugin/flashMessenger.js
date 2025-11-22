@@ -1,11 +1,11 @@
 const Session = require(global.applicationPath('/library/session/session'));
 const VarUtil 
     = require(global.applicationPath('/library/util/varUtil'));
-const BasePlugin 
+const BasePlugin
     = require(
-        global.applicationPath('/library/controller/basePlugin'));
-const Container 
-    = require(global.applicationPath('/library/container'));
+        global.applicationPath('/library/mvc/controller/basePlugin'));
+const Container
+    = require(global.applicationPath('/library/core/container'));
 
 
 class FlashMessenger extends BasePlugin {

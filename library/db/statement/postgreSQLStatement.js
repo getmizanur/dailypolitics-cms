@@ -1,4 +1,4 @@
-const Statement = require('../statement');
+const Statement = require('../sql/statement');
 
 /**
  * PostgreSQL Statement Implementation

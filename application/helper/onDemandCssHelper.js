@@ -2,7 +2,7 @@
 // View helper to load module-specific CSS on demand
 const fs = require('fs');
 const path = require('path');
-const AbstractHelper = require(global.applicationPath('/library/view/helper/abstractHelper'));
+const AbstractHelper = require(global.applicationPath('/library/mvc/view/helper/abstractHelper'));
 
 class OnDemandCssHelper extends AbstractHelper {
     /**

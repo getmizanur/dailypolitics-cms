@@ -14,7 +14,7 @@ class DatabaseAdapter {
      * @returns {Select} - New Select instance
      */
     select() {
-        const Select = require('../select');
+        const Select = require('../sql/select');
         return new Select(this);
     }
 
@@ -23,7 +23,7 @@ class DatabaseAdapter {
      * @returns {Insert} - New Insert instance
      */
     insertQuery() {
-        const Insert = require('../insert');
+        const Insert = require('../sql/insert');
         return new Insert(this);
     }
 
@@ -32,7 +32,7 @@ class DatabaseAdapter {
      * @returns {Update} - New Update instance
      */
     updateQuery() {
-        const Update = require('../update');
+        const Update = require('../sql/update');
         return new Update(this);
     }
 
@@ -41,7 +41,7 @@ class DatabaseAdapter {
      * @returns {Delete} - New Delete instance
      */
     deleteQuery() {
-        const Delete = require('../delete');
+        const Delete = require('../sql/delete');
         return new Delete(this);
     }
 

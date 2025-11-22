@@ -1,9 +1,9 @@
-const Controller = require(global.applicationPath('/library/controller/baseController'));
+const Controller = require(global.applicationPath('/library/mvc/controller/baseController'));
 const LoginForm = require(global.applicationPath('/application/form/loginForm'));
 const ArticleForm = require(global.applicationPath('/application/form/articleForm'));
 const Container = require(global.applicationPath('/library/session/container'));
 const InputFilter = require(
-    global.applicationPath('/library/inputfilter/inputFilter'));
+    global.applicationPath('/library/input-filter/inputFilter'));
 const DbAdapter = require(global.applicationPath('/library/authentication/adapter/dbAdapter'));
 const fs = require('fs');
 
@@ -331,10 +331,10 @@ class Index extends Controller {
             log('Form initialized with categories');
 
             // If editing existing article, fetch and populate data
-            const articleId = this.getParam('id');
-            if (articleId) {
-                log(`Fetching article with ID: ${articleId}`);
-                const article = await postService.getSinglePost(articleId, false);
+            const articleSlug = this.getParam('slug');
+            if (articleSlug) {
+                log(`Fetching article with slug: ${articleSlug}`);
+                const article = await postService.getSinglePost(articleSlug, true);
                 if (article) {
                     log('Article found, populating form');
                     form.setData({
@@ -594,6 +594,8 @@ class Index extends Controller {
                         });
                     }
                 }
+            } else {
+                form.populate
             }
 
             log('Returning view with form');

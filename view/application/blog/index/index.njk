@@ -85,8 +85,8 @@
                     </div>
                 </div>
                 {% endfor %}
-                {% if pages %}
-                    {{ pages(pagination) | safe }}
+                {% if pager %}
+                    {{ pager(pagination) | safe }}
                 {% endif %}
             {% else %}
                 <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">

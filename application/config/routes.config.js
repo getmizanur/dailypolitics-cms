@@ -23,7 +23,7 @@ module.exports = {
             "action": "view"
         },
         "adminIndexEdit": {
-            "route": "/admin/dashboard/edit",
+            "route": "/admin/dashboard/edit/:slug",
             "module": "admin",
             "controller": "index",
             "action": "edit-article"

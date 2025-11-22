@@ -46,7 +46,7 @@ function initNunjucks() {
 
     // Load application config to register view helpers
     const appConfig = require(global.applicationPath('/application/config/application.config'));
-    const ViewHelperManager = require(global.applicationPath('/library/view/viewHelperManager'));
+    const ViewHelperManager = require(global.applicationPath('/library/mvc/view/viewHelperManager'));
 
     const viewHelperManager = new ViewHelperManager();
     const applicationHelpers = appConfig.view_helpers?.invokables || {};

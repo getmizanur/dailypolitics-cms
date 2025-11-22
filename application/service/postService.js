@@ -109,7 +109,7 @@ class PostService extends AbstractService {
      */
     async getSelectQuery() {
         const adapter = await this.initializeDatabase();
-        const Select = require('../../library/db/select');
+        const Select = require('../../library/db/sql/select');
         return new Select(adapter);
     }
 
@@ -174,12 +174,13 @@ class PostService extends AbstractService {
      * Fetch a single post by ID or slug
      * @param {string|number} identifier - Post ID or slug
      * @param {boolean} bySlug - Whether to search by slug (default: false, search by ID)
+     * @param {boolean} includeDrafts - Whether to include draft posts (default: false, only published)
      * @returns {Promise<Object|null>} Single post object or null if not found
      */
-    async getSinglePost(identifier, bySlug = false) {
+    async getSinglePost(identifier, bySlug = false, includeDrafts = false) {
         try {
             const select = await this.getSelectQuery();
-            
+
             // Build query with joins for complete post data
             select.from('posts')
                   .joinLeft('categories', 'posts.category_id = categories.id')
@@ -206,13 +207,14 @@ class PostService extends AbstractService {
                 select.where('posts.id = ?', identifier);
             }
 
-            // Only show published posts for public access
-            // Remove this line if you want to fetch drafts as well for admin
-            select.where('posts.status = ?', 'published');
+            // Filter by status: published only for public, both published and draft for admin
+            if (!includeDrafts) {
+                select.where('posts.status = ?', 'published');
+            }
             select.where('posts.deleted_at IS NULL');
 
             const result = await select.execute();
-            
+
             const rows = result.rows || result;
             return rows.length > 0 ? rows[0] : null;
         } catch (error) {
@@ -229,7 +231,7 @@ class PostService extends AbstractService {
     async getRecentPostsForSidebar(excludePostId = null) {
         try {
             const select = await this.getSelectQuery();
-            
+
             // Build query for sidebar posts - minimal data needed
             select.from('posts')
                   .joinLeft('categories', 'posts.category_id = categories.id')
@@ -254,7 +256,7 @@ class PostService extends AbstractService {
             }
 
             const result = await select.execute();
-            
+
             return result.rows || result;
         } catch (error) {
             console.error('Error fetching recent posts for sidebar:', error);
@@ -273,7 +275,7 @@ class PostService extends AbstractService {
     async getPostsByCategory(categoryIdentifier, bySlug = true, limit = null, offset = null) {
         try {
             const select = await this.getSelectQuery();
-            
+
             select.from('posts')
                   .join('categories', 'posts.category_id = categories.id', 'INNER')
                   .joinLeft('users', 'posts.author_id = users.id')
@@ -309,7 +311,7 @@ class PostService extends AbstractService {
 
             // const statement = select.getStatement();
             const result = await select.execute();
-            
+
             return result.rows || result;
         } catch (error) {
             console.error('Error fetching posts by category:', error);
@@ -322,12 +324,13 @@ class PostService extends AbstractService {
      * @param {string} searchTerm - Search term
      * @param {number} limit - Optional limit for results
      * @param {number} offset - Optional offset for pagination
+     * @param {boolean} includeDrafts - Whether to include draft posts (default: false, only published)
      * @returns {Promise<Array>} Array of matching posts
      */
-    async searchPosts(searchTerm, limit = 20, offset = null) {
+    async searchPosts(searchTerm, limit = 20, offset = null, includeDrafts = false) {
         try {
             const select = await this.getSelectQuery();
-            
+
             select.from('posts')
                   .joinLeft('categories', 'posts.category_id = categories.id')
                   .joinLeft('users', 'posts.author_id = users.id')
@@ -341,9 +344,14 @@ class PostService extends AbstractService {
                       'categories.name as category_name',
                       'categories.slug as category_slug',
                       'users.name as author_name'
-                  ])
-                  .where('posts.status = ?', 'published')
-                  .where('posts.deleted_at IS NULL')
+                  ]);
+
+            // Filter by status: published only for public, both published and draft for admin
+            if (!includeDrafts) {
+                select.where('posts.status = ?', 'published');
+            }
+
+            select.where('posts.deleted_at IS NULL')
                   .where(`(posts.title ILIKE '%${searchTerm}%' OR posts.excerpt ILIKE '%${searchTerm}%' OR posts.content ILIKE '%${searchTerm}%')`)
                   .order('posts.published_at', 'DESC')
                   .limit(limit);
@@ -354,7 +362,7 @@ class PostService extends AbstractService {
 
             // const statement = select.getStatement();
             const result = await select.execute();
-            
+
             return result.rows || result;
         } catch (error) {
             console.error('Error searching posts:', error);
@@ -364,29 +372,34 @@ class PostService extends AbstractService {
 
     /**
      * Get post count for pagination
-     * @param {Object} filters - Optional filters (category, search, etc.)
+     * @param {Object} filters - Optional filters (category, search, includeDrafts, etc.)
      * @returns {Promise<number>} Total count of posts
      */
     async getPostCount(filters = {}) {
         try {
             const select = await this.getSelectQuery();
-            
+
             select.from('posts', [])
-                  .columns(['COUNT(*) as count'])
-                  .where('posts.status = ?', 'published')
-                  .where('posts.deleted_at IS NULL');
+                  .columns(['COUNT(*) as count']);
+
+            // Filter by status: published only for public, both published and draft for admin
+            if (!filters.includeDrafts) {
+                select.where('posts.status = ?', 'published');
+            }
+
+            select.where('posts.deleted_at IS NULL');
 
             // Apply filters if provided
             if (filters.categoryId) {
                 select.where('posts.category_id = ?', filters.categoryId);
             }
-            
+
             if (filters.search) {
                 select.where(`(posts.title ILIKE '%${filters.search}%' OR posts.excerpt ILIKE '%${filters.search}%' OR posts.content ILIKE '%${filters.search}%')`);
             }
 
             const result = await select.execute();
-            
+
             const rows = result.rows || result;
             return parseInt(rows[0].count) || 0;
         } catch (error) {

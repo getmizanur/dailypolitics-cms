@@ -1,5 +1,5 @@
 const BasePlugin = require('../basePlugin');
-const VarUtil = require('../../util/varUtil');
+const VarUtil = require('../../../util/varUtil');
 
 class Redirect extends BasePlugin {
 

@@ -29,18 +29,18 @@
                   <span class="dp-tag dp-tag--muted dp-tag--small dp-tag--pill">{{ post.status|capitalize }}</span>
                 {% endif %}
               </td>
-              <td>{{ post.title }}<br><strong style="font-weight: 700;">Author:</strong> {{ post.author_name }} &nbsp; <strong style="font-weight: 700;">Created:</strong> {{post.create_at | date('yyyy-MM-DD') }} &nbsp; <strong style="font-weight: 700;">Updated:</strong> {{ post.updated_at | date('yyyy-MM-DD') }}</td>
+              <td>{{ post.title }}<br><strong style="font-weight: 700;">Author:</strong> {{ post.author_name }} &nbsp; <strong style="font-weight: 700;">Created:</strong> {{post.create_at | date('yyyy-MM-DD') }} &nbsp; <strong style="font-weight: 700;">Updated:</strong> {{ post.updated_at | date('yyyy-MM-DD') }} {{ post.slug | safe }}</td>
               <td class="text-right">
-                <a href="#" class="dp-link-button dp-link-button--dark-grey dp-link-button--small" aria-label="View {{ post.title }}">View</a>
-                <a href="#" class="dp-link-button dp-link-button--dark-grey dp-link-button--small" aria-label="Edit {{ post.title }}">Edit</a>
-                <a href="#" class="dp-link-button dp-link-button--red dp-link-button--small" aria-label="Delete {{ post.title }}">Delete</a>
+                <a href="{{ url('adminIndexEdit', { slug : post.slug }) }}" class="dp-link-button dp-link-button--dark-grey dp-link-button--small" aria-label="View {{ post.title }}" traget="_blank" rel="noopener noreferrer">View</a>
+                <a href="{{ url('adminIndexEdit', { slug : post.slug }) }}" class="dp-link-button dp-link-button--dark-grey dp-link-button--small" aria-label="Edit {{ post.title }}" target="_blank" rel="noopener noreferrer">Edit</a>
+                <a href="{{ url('adminIndexDelete', { slug : post.slug }) }}" class="dp-link-button dp-link-button--red dp-link-button--small" aria-label="Delete {{ post.title }}">Delete</a>
               </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
-      {{ pages(pagination) }}
+      {{ pager(pagination) }}
     </div>
   </div>
 </div>

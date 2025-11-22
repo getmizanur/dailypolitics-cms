@@ -104,7 +104,7 @@
                 </article>
 
                 {# Article Navigation - Previous/Next #}
-                {{ pages({mode: 'article', prevArticle: prevArticle, nextArticle: nextArticle}) | safe }}
+                {{ pager({mode: 'article', prevArticle: prevArticle, nextArticle: nextArticle}) | safe }}
             {% else %}
                 <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">
                     <div class="card-body text-center">

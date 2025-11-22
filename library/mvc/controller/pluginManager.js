@@ -8,30 +8,33 @@ class PluginManager {
 
         // Framework plugins that should not be modified by developers
         this.frameworkPlugins = {
-            "flashMessenger": {
-                "class": "/library/controller/plugin/flashMessenger",
-                "options": {}
+            "invokables": {
+                "flashMessenger": {
+                    "class": "/library/mvc/controller/plugin/flashMessenger",
+                    "options": {}
+                },
+                "layout": {
+                    "class": "/library/mvc/controller/plugin/layout",
+                    "options": {}
+                },
+                "params": {
+                    "class": "/library/mvc/controller/plugin/params",
+                    "options": {}
+                },
+                "redirect": {
+                    "class": "/library/mvc/controller/plugin/redirect",
+                    "options": {}
+                },
+                "url": {
+                    "class": "/library/mvc/controller/plugin/url",
+                    "options": {}
+                },
+                "session": {
+                    "class": "/library/mvc/controller/plugin/session",
+                    "options": {}
+                }
             },
-            "layout": {
-                "class": "/library/controller/plugin/layout",
-                "options": {}
-            },
-            "params": {
-                "class": "/library/controller/plugin/params",
-                "options": {}
-            },
-            "redirect": {
-                "class": "/library/controller/plugin/redirect",
-                "options": {}
-            },
-            "url": {
-                "class": "/library/controller/plugin/url",
-                "options": {}
-            },
-            "session": {
-                "class": "/library/controller/plugin/session",
-                "options": {}
-            }
+            "factories": {}
         };
 
         // Load application plugins from configuration
@@ -56,15 +59,15 @@ class PluginManager {
      */
     getAllPlugins() {
         // Start with framework plugins
-        let allPlugins = { ...this.frameworkPlugins };
-        
+        let allPlugins = { ...this.frameworkPlugins.invokables };
+
         // Add application plugins from config
         const applicationPlugins = this.loadApplicationPluginsFromConfig();
-        
+
         // Warn about conflicts and merge
         this.validateApplicationPlugins(applicationPlugins);
         Object.assign(allPlugins, applicationPlugins);
-        
+
         return allPlugins;
     }
 
@@ -105,10 +108,10 @@ class PluginManager {
      * @param {Object} applicationPlugins Application plugin configuration
      */
     validateApplicationPlugins(applicationPlugins) {
-        const conflicts = Object.keys(applicationPlugins).filter(name => 
-            this.frameworkPlugins.hasOwnProperty(name)
+        const conflicts = Object.keys(applicationPlugins).filter(name =>
+            this.frameworkPlugins.invokables.hasOwnProperty(name)
         );
-        
+
         if (conflicts.length > 0) {
             console.warn(`Warning: Application plugins override framework plugins: ${conflicts.join(', ')}`);
         }

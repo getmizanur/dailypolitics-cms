@@ -1,5 +1,5 @@
 const BasePlugin = require('../basePlugin');
-const StringUtil = require('../../util/stringUtil');
+const StringUtil = require('../../../util/stringUtil');
 
 class Layout extends BasePlugin {
 

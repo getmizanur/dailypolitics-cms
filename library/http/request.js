@@ -1,4 +1,4 @@
-const StringUtil = require('../../util/stringUtil'); 
+const StringUtil = require('../util/stringUtil'); 
 
 class Request {
 

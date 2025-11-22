@@ -238,7 +238,7 @@ module.exports = {
                 "class": "/application/helper/adminSidebarHelper",
                 "params": []
             },
-            "pages": {
+            "pager": {
                 "class": "/application/helper/paginationHelper",
                 "params": ["options = {}"]
             },

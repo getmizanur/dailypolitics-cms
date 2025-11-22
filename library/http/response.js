@@ -1,5 +1,5 @@
-const StringUtil = require('../../util/stringUtil');
-const VarUtil = require('../../util/varUtil');
+const StringUtil = require('../util/stringUtil');
+const VarUtil = require('../util/varUtil');
 
 
 class Response {

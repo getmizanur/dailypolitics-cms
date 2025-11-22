@@ -1,4 +1,4 @@
-const AbstractHelper = require(global.applicationPath('/library/view/helper/abstractHelper'));
+const AbstractHelper = require(global.applicationPath('/library/mvc/view/helper/abstractHelper'));
 
 class ErrorDecoratorHelper extends AbstractHelper {
     /**

@@ -1,6 +1,6 @@
 const AbstractFactory = require('../abstractFactory');
-const PluginManager = require('../../controller/pluginManager');
-const Container = require('../../container');
+const PluginManager = require('../../mvc/controller/pluginManager');
+const Container = require('../../core/container');
 
 class PluginManagerFactory extends AbstractFactory {
 

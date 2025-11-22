@@ -1,4 +1,4 @@
-const AbstractHelper = require(global.applicationPath('/library/view/helper/abstractHelper'));
+const AbstractHelper = require(global.applicationPath('/library/mvc/view/helper/abstractHelper'));
 
 /**
  * NewsArticleJsonLdHelper - Generates JSON-LD structured data for NewsArticle schema

@@ -11,7 +11,7 @@ async function basicStatementExamples() {
     console.log('📋 Basic Statement Usage Examples\n');
 
     // PostgreSQL Statement Example
-    const PostgreSQLAdapter = require('./adapter/postgreSQLAdapter');
+    const PostgreSQLAdapter = require('../adapter/postgreSQLAdapter');
     const pgAdapter = new PostgreSQLAdapter({
         host: 'localhost',
         database: 'test',
@@ -52,7 +52,7 @@ async function advancedStatementExamples() {
     console.log('🚀 Advanced Statement Features Examples\n');
 
     // MySQL Statement with different fetch modes
-    const MySQLAdapter = require('./adapter/mysqlAdapter');
+    const MySQLAdapter = require('../adapter/mysqlAdapter');
     const mysqlAdapter = new MySQLAdapter({
         host: 'localhost',
         database: 'test',
@@ -97,7 +97,7 @@ async function transactionStatementExamples() {
     console.log('🔄 Transaction-Safe Statement Examples\n');
 
     // SQL Server Statement in transaction
-    const SqlServerAdapter = require('./adapter/sqlServerAdapter');
+    const SqlServerAdapter = require('../adapter/sqlServerAdapter');
     const sqlServerAdapter = new SqlServerAdapter({
         server: 'localhost',
         database: 'test',
@@ -156,7 +156,7 @@ async function cursorStatementExamples() {
     console.log('📊 Cursor-Based Processing Examples\n');
 
     // SQLite Statement with cursor processing
-    const SQLiteAdapter = require('./adapter/sqliteAdapter');
+    const SQLiteAdapter = require('../adapter/sqliteAdapter');
     const sqliteAdapter = new SQLiteAdapter({
         database: './test.db'
     });
@@ -213,25 +213,25 @@ async function crossDatabaseStatements() {
     const adapters = [
         {
             name: 'PostgreSQL',
-            adapter: new (require('./adapter/postgreSQLAdapter'))({
+            adapter: new (require('../adapter/postgreSQLAdapter'))({
                 host: 'localhost', database: 'test', username: 'user', password: 'pass'
             })
         },
         {
             name: 'MySQL',
-            adapter: new (require('./adapter/mysqlAdapter'))({
+            adapter: new (require('../adapter/mysqlAdapter'))({
                 host: 'localhost', database: 'test', user: 'root', password: 'pass'
             })
         },
         {
             name: 'SQL Server',
-            adapter: new (require('./adapter/sqlServerAdapter'))({
+            adapter: new (require('../adapter/sqlServerAdapter'))({
                 server: 'localhost', database: 'test', user: 'sa', password: 'pass'
             })
         },
         {
             name: 'SQLite',
-            adapter: new (require('./adapter/sqliteAdapter'))({
+            adapter: new (require('../adapter/sqliteAdapter'))({
                 database: ':memory:'
             })
         }
@@ -268,7 +268,7 @@ async function crossDatabaseStatements() {
 async function statementPerformanceExamples() {
     console.log('⚡ Statement Performance Examples\n');
 
-    const adapter = new (require('./adapter/postgreSQLAdapter'))({
+    const adapter = new (require('../adapter/postgreSQLAdapter'))({
         host: 'localhost', database: 'test', username: 'user', password: 'pass'
     });
 
@@ -315,7 +315,7 @@ async function statementPerformanceExamples() {
 async function errorHandlingExamples() {
     console.log('🛡️ Error Handling Examples\n');
 
-    const adapter = new (require('./adapter/mysqlAdapter'))({
+    const adapter = new (require('../adapter/mysqlAdapter'))({
         host: 'localhost', database: 'test', user: 'root', password: 'pass'
     });
 

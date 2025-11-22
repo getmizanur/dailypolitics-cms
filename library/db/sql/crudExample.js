@@ -3,10 +3,10 @@
  * Demonstrates how to use Insert, Update, Delete, and Select classes
  */
 
-const PostgreSQLAdapter = require('./adapter/postgreSQLAdapter');
-const MySQLAdapter = require('./adapter/mysqlAdapter');
-const SqlServerAdapter = require('./adapter/sqlServerAdapter');
-const SQLiteAdapter = require('./adapter/sqliteAdapter');
+const PostgreSQLAdapter = require('../adapter/postgreSQLAdapter');
+const MySQLAdapter = require('../adapter/mysqlAdapter');
+const SqlServerAdapter = require('../adapter/sqlServerAdapter');
+const SQLiteAdapter = require('../adapter/sqliteAdapter');
 
 /**
  * Insert Query Builder Examples

@@ -1,4 +1,4 @@
-const Element = require('../../form/element');
+const Element = require('../../../form/element');
 const AbstractHelper = require('./abstractHelper');
 
 class FormError extends AbstractHelper {

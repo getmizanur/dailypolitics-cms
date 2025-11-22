@@ -15,7 +15,7 @@ class HeadTitle extends AbstractHelper {
      * @returns {Array} Array of title parts
      */
     _getTitles() {
-        const Container = require('../../container');
+        const Container = require('../../../core/container');
         const container = new Container('__framework');
 
         if (container.has('ViewHelperManager')) {
@@ -42,7 +42,7 @@ class HeadTitle extends AbstractHelper {
         this.titles = titles;
 
         // Store in Container for persistence across requests
-        const Container = require('../../container');
+        const Container = require('../../../core/container');
         const container = new Container('__framework');
 
         if (container.has('ViewHelperManager')) {

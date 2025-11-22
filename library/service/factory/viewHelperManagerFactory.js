@@ -1,6 +1,6 @@
 const AbstractFactory = require('../abstractFactory');
-const ViewHelperManager = require('../../view/viewHelperManager');
-const Container = require('../../container');
+const ViewHelperManager = require('../../mvc/view/viewHelperManager');
+const Container = require('../../core/container');
 
 class ViewHelperManagerFactory extends AbstractFactory {
 
