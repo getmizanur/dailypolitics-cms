@@ -1,7 +1,6 @@
 const BaseController = require('../mvc/controller/base-controller');
 const ClassUtil = require('../util/class-util');
 const StringUtil = require('../util/string-util');
-const VarUtil = require('../util/var-util');
 const Registry = require('./registry');
 const Session = require('../session/session');
 const Request = require('../http/request');
@@ -165,10 +164,17 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         controller = StringUtil.toCamelCase(controller);
         action = StringUtil.toCamelCase(action);
 
-        let delimiter = this.getDelimiter();  
+        let delimiter = this.getDelimiter();
         let controllerPath = StringUtil.strReplace(delimiter, '/', controller);
 
-        const FrontController 
+        // Convert controller name from camelCase to kebab-case and append -controller
+        // e.g., "index" -> "index-controller", "postEditor" -> "post-editor-controller"
+        controllerPath = controllerPath
+            .replace(/([A-Z])/g, '-$1')
+            .toLowerCase()
+            .replace(/^-/, '') + '-controller';
+
+        const FrontController
             = require(global.applicationPath(`/application/module/${module}/controller/${controllerPath}`));
         
         // Inject configuration

@@ -288,13 +288,7 @@ class BaseController {
 
     preDispatch() {}
 
-    postDispatch() {
-        // Ensure default page title is set if not already set
-        const viewModel = this.getView();
-        if (viewModel && !viewModel.getVariable('pageTitle')) {
-            viewModel.setVariable('pageTitle', 'Application Portal');
-        }
-    }
+    postDispatch() {}
 
     /**
      * Helper method to get flash messages for views
@@ -305,25 +299,7 @@ class BaseController {
         const flashMessenger = this.plugin('flashMessenger');
         return flashMessenger.getAllMessages(clearAfterRead);
     }
-    
-    /**
-     * Helper method to render view with proper template path
-     * @param {string} template - Template path (e.g., 'intro/index/test')
-     * @param {Object} variables - Variables to pass to view
-     * @returns {ViewModel} Configured view model
-     */
-    renderView(template, variables = {}) {
-        const viewModel = this.getView();
-        viewModel.setTemplate(template);
-        
-        // Set variables
-        Object.keys(variables).forEach(key => {
-            viewModel.setVariable(key, variables[key]);
-        });
-        
-        return viewModel;
-    }
-    
+
     /**
      * Programmatically trigger 404 page (like ZF's forward to not-found)
      * @param {string} message - Custom error message

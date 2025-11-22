@@ -7,7 +7,7 @@ const InputFilter = require(
 const DbAdapter = require(global.applicationPath('/library/authentication/adapter/db-adapter'));
 const fs = require('fs');
 
-class Index extends Controller {
+class IndexController extends Controller {
 
     constructor(options = {}) {
         super(options);
@@ -631,4 +631,4 @@ class Index extends Controller {
     }
 }
 
-module.exports = Index;
+module.exports = IndexController;

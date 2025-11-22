@@ -1,6 +1,6 @@
 const Controller = require(global.applicationPath('/library/mvc/controller/base-controller'));
 
-class Index extends Controller {
+class IndexController extends Controller {
 
     constructor(options = {}) {
         super(options);
@@ -94,4 +94,4 @@ class Index extends Controller {
 
 }
 
-module.exports = Index;
+module.exports = IndexController;
