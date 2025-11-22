@@ -4,40 +4,40 @@
 module.exports = {
     "routes": {
         // Admin section routes
-        "adminIndexIndex": {
+        "adminLoginIndex": {
             "route": "/admin",
             "module": "admin",
-            "controller": "index",
+            "controller": "login",
             "action": "index"
         },
-        "adminIndexDashboard": {
+        "adminDashboardIndex": {
             "route": "/admin/dashboard(/page/:page)?",
             "module": "admin",
-            "controller": "index",
-            "action": "dashboard"
+            "controller": "dashboard",
+            "action": "index"
         },
-         "adminIndexView": {
+         "adminDashboardView": {
             "route": "/admin/dashboard/view/:slug",
             "module": "admin",
-            "controller": "index",
+            "controller": "dashboard",
             "action": "view"
         },
-        "adminIndexEdit": {
+        "adminDashboardEdit": {
             "route": "/admin/dashboard/edit/:slug",
             "module": "admin",
-            "controller": "index",
+            "controller": "dashboard",
             "action": "edit-article"
         },
-        "adminIndexDelete": {
+        "adminDashboardDelete": {
             "route": "/admin/dashboard/delete/:slug",
             "module": "admin",
-            "controller": "index",
+            "controller": "dashboard",
             "action": "delete"
         },
-        "adminIndexLogout": {
+        "adminLoginLogout": {
             "route": "/admin/dashboard/logout",
             "module": "admin",
-            "controller": "index",
+            "controller": "login",
             "action": "logout"
         },
 

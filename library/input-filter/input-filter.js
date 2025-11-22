@@ -1,6 +1,5 @@
 const Input = require('./input');
 const VarUtil = require('../util/var-util');
-const StringUtil = require('../util/string-util');
 
 class InputFilter {
 
@@ -94,9 +93,11 @@ class InputFilter {
                     try {
                         const { name } = filter;
                         if(VarUtil.isString(name) && !VarUtil.empty(name)) {
-                            const Instance 
-                                = require(`./filters/${StringUtil.lcfirst(name)}`);
-                            const obj = new Instance(); 
+                            // Convert name to kebab-case for requiring files
+                            const fileName = name.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '');
+                            const Instance
+                                = require(`./filters/${fileName}`);
+                            const obj = new Instance();
 						    /* istanbul ignore next */
                             if(typeof(obj.filter) === 'function') {
                                 input.setFilters(obj);
@@ -114,8 +115,10 @@ class InputFilter {
                     try {
                         const { name, options, messages } = validator;
                         if(VarUtil.isString(name) && !VarUtil.empty(name)) {
-                            const Instance 
-                                = require(`./validators/${StringUtil.lcfirst(name)}`);
+                            // Convert name to kebab-case for requiring files
+                            const fileName = name.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '');
+                            const Instance
+                                = require(`./validators/${fileName}`);
                             const obj = (VarUtil.isObject(options) 
                                 ? new Instance(options) : new Instance()); 
 						    /* istanbul ignore next */
