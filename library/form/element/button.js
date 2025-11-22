@@ -1,5 +1,5 @@
 const Element = require('../element');
-const StrUtil = require('../../util/stringUtil');
+const StrUtil = require('../../util/string-util');
 
 class Button extends Element {
     

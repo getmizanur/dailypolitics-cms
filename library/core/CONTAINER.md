@@ -223,7 +223,7 @@ All managers implement conflict detection. If an application tries to override a
    - Create new instance if not found
    - Store in Container for future use
 
-3. **Controllers** (library/mvc/controller/baseController.js)
+3. **Controllers** (library/mvc/controller/base-controller.js)
    - getServiceManager() checks Container first
    - Creates and stores if needed
 

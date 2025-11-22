@@ -117,7 +117,7 @@ editArticleAction() {
 Default separator: ` - ` (space-dash-space)
 Default title: `Application Portal` (used when no title is set)
 
-These can be customized by modifying the HeadTitle class constructor in `/library/mvc/view/helper/headTitle.js`.
+These can be customized by modifying the HeadTitle class constructor in `/library/mvc/view/helper/head-title.js`.
 
 ## Important Notes
 

@@ -1,4 +1,4 @@
-const BasePlugin = require('../basePlugin');
+const BasePlugin = require('../base-plugin');
 
 class Params extends BasePlugin {
 

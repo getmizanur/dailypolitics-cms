@@ -1,5 +1,5 @@
 
-const AbstractValidator = require('./abstractValidator');
+const AbstractValidator = require('./abstract-validator');
 
 class Ip extends AbstractValidator {
 

@@ -1,10 +1,10 @@
-const Controller = require(global.applicationPath('/library/mvc/controller/baseController'));
-const LoginForm = require(global.applicationPath('/application/form/loginForm'));
-const ArticleForm = require(global.applicationPath('/application/form/articleForm'));
+const Controller = require(global.applicationPath('/library/mvc/controller/base-controller'));
+const LoginForm = require(global.applicationPath('/application/form/login-form'));
+const ArticleForm = require(global.applicationPath('/application/form/article-form'));
 const Container = require(global.applicationPath('/library/session/container'));
 const InputFilter = require(
-    global.applicationPath('/library/input-filter/inputFilter'));
-const DbAdapter = require(global.applicationPath('/library/authentication/adapter/dbAdapter'));
+    global.applicationPath('/library/input-filter/input-filter'));
+const DbAdapter = require(global.applicationPath('/library/authentication/adapter/db-adapter'));
 const fs = require('fs');
 
 class Index extends Controller {

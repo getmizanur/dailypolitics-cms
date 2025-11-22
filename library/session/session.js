@@ -1,5 +1,5 @@
-const SessionNamespace = require('./sessionNamespace');
-const SessionSecurity = require('./sessionSecurity');
+const SessionNamespace = require('./session-namespace');
+const SessionSecurity = require('./session-security');
 
 class Session {
     

@@ -61,7 +61,7 @@ if (!storage.isEmpty()) {
 storage.clear();
 ```
 
-### 3. **Authentication Service** (`authenticationService.js`)
+### 3. **Authentication Service** (`authentication-service.js`)
 Main service that coordinates authentication using adapters and storage.
 
 **Key Methods:**
@@ -73,9 +73,9 @@ Main service that coordinates authentication using adapters and storage.
 
 **Example:**
 ```javascript
-const AuthenticationService = require('./library/authentication/authenticationService');
+const AuthenticationService = require('./library/authentication/authentication-service');
 const SessionStorage = require('./library/authentication/storage/session');
-const DbAdapter = require('./library/authentication/adapter/dbAdapter');
+const DbAdapter = require('./library/authentication/adapter/db-adapter');
 
 // Initialize service with session storage
 const authService = new AuthenticationService(
@@ -100,7 +100,7 @@ if (result.isValid()) {
 }
 ```
 
-### 4. **Database Adapter** (`adapter/dbAdapter.js`)
+### 4. **Database Adapter** (`adapter/db-adapter.js`)
 Authenticates credentials against a database using salted MD5 password hashing.
 
 **Password Hashing:**
@@ -333,11 +333,11 @@ await createUser('admin@example.com', 'secure_password_123');
 The `Database` service is registered as a framework service in ServiceManager:
 
 ```javascript
-// library/service/serviceManager.js
+// library/service/service-manager.js
 this.frameworkFactories = {
-    "ViewManager": "/library/service/factory/viewManagerFactory",
-    "ViewHelperManager": "/library/service/factory/viewHelperManagerFactory",
-    "PluginManager": "/library/service/factory/pluginManagerFactory",
+    "ViewManager": "/library/service/factory/view-manager-factory",
+    "ViewHelperManager": "/library/service/factory/view-helper-manager-factory",
+    "PluginManager": "/library/service/factory/plugin-manager-factory",
     "Database": "/library/service/factory/databaseFactory"
 };
 ```
@@ -468,9 +468,9 @@ class RedisStorage {
 library/authentication/
 ├── README.md                           # This file
 ├── result.js                           # Authentication result
-├── authenticationService.js            # Main authentication service
+├── authentication-service.js           # Main authentication service
 ├── adapter/
-│   └── dbAdapter.js                    # Database authentication adapter
+│   └── db-adapter.js                   # Database authentication adapter
 └── storage/
     └── session.js                      # Session-based storage
 

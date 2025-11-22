@@ -5,15 +5,15 @@
 ### Directory Structure
 - Created `/library/mvc/db/adapter/` directory
 - Moved database adapter files to the new organized structure:
-  - `databaseAdapter.js` → `/library/mvc/db/adapter/databaseAdapter.js`
-  - `postgreSQLAdapter.js` → `/library/mvc/db/adapter/postgreSQLAdapter.js`
+  - `database-adapter.js` → `/library/mvc/db/adapter/database-adapter.js`
+  - `postgre-sql-adapter.js` → `/library/mvc/db/adapter/postgre-sql-adapter.js`
 
 ### Updated Imports
 
 #### Direct Import Pattern (Consistent)
 ```javascript
-const DatabaseAdapter = require('./library/mvc/db/adapter/databaseAdapter');
-const PostgreSQLAdapter = require('./library/mvc/db/adapter/postgreSQLAdapter');
+const DatabaseAdapter = require('./library/mvc/db/adapter/database-adapter');
+const PostgreSQLAdapter = require('./library/mvc/db/adapter/postgre-sql-adapter');
 ```
 
 ### Files Updated

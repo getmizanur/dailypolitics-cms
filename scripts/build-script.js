@@ -46,7 +46,7 @@ function initNunjucks() {
 
     // Load application config to register view helpers
     const appConfig = require(global.applicationPath('/application/config/application.config'));
-    const ViewHelperManager = require(global.applicationPath('/library/mvc/view/viewHelperManager'));
+    const ViewHelperManager = require(global.applicationPath('/library/mvc/view/view-helper-manager'));
 
     const viewHelperManager = new ViewHelperManager();
     const applicationHelpers = appConfig.view_helpers?.invokables || {};
@@ -148,7 +148,7 @@ async function writeHtmlFile(filePath, content) {
  */
 async function fetchPostData() {
     try {
-        const PostService = require(global.applicationPath('/application/service/postService'));
+        const PostService = require(global.applicationPath('/application/service/post-service'));
         const postService = new PostService();
 
         // Get all published posts
@@ -170,7 +170,7 @@ async function fetchPostData() {
  */
 async function fetchRecentPosts() {
     try {
-        const PostService = require(global.applicationPath('/application/service/postService'));
+        const PostService = require(global.applicationPath('/application/service/post-service'));
         const postService = new PostService();
 
         const recentPosts = await postService.getRecentPostsForSidebar();
@@ -241,7 +241,7 @@ async function generateArticlePages(env, posts, recentPosts) {
         const post = posts[i];
 
         try {
-            const PostService = require(global.applicationPath('/application/service/postService'));
+            const PostService = require(global.applicationPath('/application/service/post-service'));
             const postService = new PostService();
 
             // Get prev/next articles

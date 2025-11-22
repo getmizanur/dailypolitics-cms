@@ -1,5 +1,5 @@
 const Session = require('../../../session/session');
-const BasePlugin = require('../basePlugin');
+const BasePlugin = require('../base-plugin');
 
 /**
  * Session Plugin for Controllers

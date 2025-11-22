@@ -1,8 +1,8 @@
 // Example usage of instanceof to identify helper classes
-const AbstractHelper = require('./library/mvc/view/helper/abstractHelper');
+const AbstractHelper = require('./library/mvc/view/helper/abstract-helper');
 const SidebarHelper = require('./application/view/helper/sidebarHelper');
-const HeadTitle = require('./library/mvc/view/helper/headTitle');
-const FormText = require('./library/mvc/view/helper/formText');
+const HeadTitle = require('./library/mvc/view/helper/head-title');
+const FormText = require('./library/mvc/view/helper/form-text');
 
 // Create instances
 const sidebar = new SidebarHelper();

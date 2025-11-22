@@ -1,4 +1,4 @@
-const Controller = require(global.applicationPath('/library/mvc/controller/baseController'));
+const Controller = require(global.applicationPath('/library/mvc/controller/base-controller'));
 
 class Index extends Controller {
 

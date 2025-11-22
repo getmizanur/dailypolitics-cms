@@ -205,11 +205,11 @@ module.exports = {
     // Framework services (ViewManager, ViewHelperManager, PluginManager) are managed by ServiceManager
     "service_manager": {
         "invokables": {
-            "PostService": "/application/service/postService"
+            "PostService": "/application/service/post-service"
         },
         "factories": {
-            "AuthenticationService": "/application/service/factory/authenticationServiceFactory",
-            "Database": "/application/service/factory/databaseFactory"
+            "AuthenticationService": "/application/service/factory/authentication-service-factory",
+            "Database": "/application/service/factory/database-factory"
         }
     },
     
@@ -231,31 +231,31 @@ module.exports = {
     "view_helpers": {
         "invokables": {
             "sidebar": {
-                "class": "/application/helper/recentPostsSidebarHelper",
+                "class": "/application/helper/recent-posts-sidebar-helper",
                 "params": ["posts = null"]
             },
             "adminSidebar": {
-                "class": "/application/helper/adminSidebarHelper",
+                "class": "/application/helper/admin-sidebar-helper",
                 "params": []
             },
             "pager": {
-                "class": "/application/helper/paginationHelper",
+                "class": "/application/helper/pagination-helper",
                 "params": ["options = {}"]
             },
             "truncate": {
-                "class": "/application/helper/truncateHelper",
+                "class": "/application/helper/truncate-helper",
                 "params": ["text", "wordLimit = 100", "ellipsis = '...'"]
             },
             "errorDecorator": {
-                "class": "/application/helper/errorDecoratorHelper",
+                "class": "/application/helper/error-decorator-helper",
                 "params": ["element", "errorClass = 'dp-input--error'"]
             },
             "onDemandCss": {
-                "class": "/application/helper/onDemandCssHelper",
+                "class": "/application/helper/on-demand-css-helper",
                 "params": []
             },
             "newsArticleJsonLd": {
-                "class": "/application/helper/newsArticleJsonLdHelper",
+                "class": "/application/helper/news-article-json-ld-helper",
                 "params": ["data", "options = {}"]
             }
         }

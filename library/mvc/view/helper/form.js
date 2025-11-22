@@ -1,4 +1,4 @@
-const AbstractHelper = require('./abstractHelper');
+const AbstractHelper = require('./abstract-helper');
 
 class Form extends AbstractHelper {
 

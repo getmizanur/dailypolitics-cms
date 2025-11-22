@@ -157,11 +157,11 @@ await db.transaction(async (trx) => {
 ```
 library/mvc/db/
 ├── select.js                    # Main query builder class
-├── tableGateway.js              # Existing table gateway (updated)
+├── table-gateway.js             # Existing table gateway (updated)
 ├── examples.js                  # Usage examples and patterns
 └── adapter/
-    ├── databaseAdapter.js       # Abstract database interface
-    └── postgreSQLAdapter.js     # PostgreSQL implementation
+    ├── database-adapter.js      # Abstract database interface
+    └── postgre-sql-adapter.js   # PostgreSQL implementation
 
 docs/
 ├── database-query-builder.md    # Main documentation guide
