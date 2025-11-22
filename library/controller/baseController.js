@@ -1,5 +1,6 @@
 const ViewModel = require('../view/viewModel');
 const ServiceManager = require('../service/serviceManager');
+const Container = require('../container');
 
 class BaseController {
 
@@ -10,13 +11,13 @@ class BaseController {
         this.request = options.req || null;
         this.response = options.res || null;
 		this.method = null;
-        
+
         this.moduleName = null;
         this.controllerName = null;
         this.actionName = null;
 
         this.model = null;
-		
+
         this.delimiter = null;
 
         this.pluginManager = null;
@@ -34,10 +35,59 @@ class BaseController {
 
     getServiceManager() {
         if(!this.serviceLocator) {
-            this.setServiceLocator(new ServiceManager());
+            // Always create new instance (configs stored in Container, not instance)
+            const serviceManager = new ServiceManager();
+            this.setServiceLocator(serviceManager);
+
+            // Check if configs already stored in Container
+            const container = new Container('__framework');
+            if (!container.has('ServiceManager')) {
+                // First time: load config and store merged configs
+                serviceManager.loadConfiguration();
+
+                // Merge framework factories with application factories (with conflict check)
+                const mergedFactories = this._mergeFactories(
+                    serviceManager.frameworkFactories,
+                    serviceManager.factories || {}
+                );
+
+                // Store configs in container (no instance)
+                container.set('ServiceManager', {
+                    configs: {
+                        invokables: serviceManager.invokables || {},
+                        factories: mergedFactories
+                    }
+                });
+            }
         }
 
         return this.serviceLocator;
+    }
+
+    /**
+     * Merge framework factories with application factories
+     * Throws error if application tries to override framework factory
+     * @private
+     */
+    _mergeFactories(frameworkFactories, applicationFactories) {
+        // Check for conflicts
+        const conflicts = Object.keys(applicationFactories).filter(key =>
+            frameworkFactories.hasOwnProperty(key)
+        );
+
+        if (conflicts.length > 0) {
+            throw new Error(
+                `Application factories cannot override framework factories. ` +
+                `The following keys are already in use by the framework: ${conflicts.join(', ')}. ` +
+                `Please choose different names for your application factories.`
+            );
+        }
+
+        // Merge: framework factories first, then application factories
+        return {
+            ...frameworkFactories,
+            ...applicationFactories
+        };
     }
 
     // Backward compatibility alias - deprecated, use getServiceManager() instead
@@ -68,6 +118,21 @@ class BaseController {
 
     setResponse(res) {
         this.response = res;
+    }
+
+    getSession() {
+        if (!this.request) {
+            throw new Error('Request object not available');
+        }
+        return this.request.session;
+    }
+
+    setSession(session) {
+        if (!this.request) {
+            throw new Error('Request object not available');
+        }
+        this.request.session = session;
+        return this;
     }
 
     setView(viewModel) {
@@ -224,9 +289,11 @@ class BaseController {
     preDispatch() {}
 
     postDispatch() {
-        // Ensure default page title is set by accessing getTitle()
-        // This triggers lazy initialization if no custom title was set
-        this.plugin('pageTitle').getTitle();
+        // Ensure default page title is set if not already set
+        const viewModel = this.getView();
+        if (viewModel && !viewModel.getVariable('pageTitle')) {
+            viewModel.setVariable('pageTitle', 'Application Portal');
+        }
     }
 
     /**

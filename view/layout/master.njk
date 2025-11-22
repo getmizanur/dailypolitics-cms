@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="author" content="Daily Politics">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+
     <!-- Primary Meta Tags -->
-    <title>{% block pageTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}</title>
-    <meta name="title" content="{% block metaTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
+    <title>{{ headTitle('Daily Politics', 'prepend') }}</title>
+    <meta name="title" content="{{ headTitle() }}">
     <meta name="description" content="{% block metaDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
 
     <!-- Preconnect to font origins for faster DNS resolution -->

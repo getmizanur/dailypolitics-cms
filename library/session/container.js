@@ -2,38 +2,44 @@ class Container {
     /**
      * Create a new session container (namespace)
      * @param {string} name - The name of the container/namespace
-     * @param {object} session - The session instance (optional, for advanced use)
+     * @param {object} session - The express-session req.session instance (optional)
      */
     constructor(name = 'Default', session = null) {
         this.name = name;
-        this._session = session;
-        this._data = this._getData();
+        this._expressSession = session;
+        this._fallbackData = {}; // In-memory fallback storage
     }
 
     /**
      * Get the data object for this container from the session
+     * Always accesses session directly (not cached) to ensure persistence
      * @returns {object}
      */
     _getData() {
-        if (this._session && this._session._sessionData) {
-            if (!this._session._sessionData[this.name]) {
-                this._session._sessionData[this.name] = {};
+        // First priority: Use express-session if provided directly
+        if (this._expressSession) {
+            if (!this._expressSession.customData) {
+                this._expressSession.customData = {};
             }
-            return this._session._sessionData[this.name];
-        } else if (typeof global !== 'undefined' && global.locals && global.locals.session) {
-            if (!global.locals.session.data) {
-                global.locals.session.data = {};
+            if (!this._expressSession.customData[this.name]) {
+                this._expressSession.customData[this.name] = {};
             }
-            if (!global.locals.session.data[this.name]) {
-                global.locals.session.data[this.name] = {};
-            }
-            return global.locals.session.data[this.name];
-        } else {
-            if (!this._data) {
-                this._data = {};
-            }
-            return this._data;
+            return this._expressSession.customData[this.name];
         }
+
+        // Second priority: Use express-session from global.locals
+        if (typeof global !== 'undefined' && global.locals && global.locals.expressSession) {
+            if (!global.locals.expressSession.customData) {
+                global.locals.expressSession.customData = {};
+            }
+            if (!global.locals.expressSession.customData[this.name]) {
+                global.locals.expressSession.customData[this.name] = {};
+            }
+            return global.locals.expressSession.customData[this.name];
+        }
+
+        // Fallback: Use in-memory storage (not persisted)
+        return this._fallbackData;
     }
 
     /**
@@ -42,7 +48,16 @@ class Container {
      * @param {*} value
      */
     set(key, value) {
-        this._data[key] = value;
+        const data = this._getData();
+        data[key] = value;
+
+        // Force express-session to detect modification by touching a top-level property
+        // This is necessary because express-session with resave:false doesn't detect
+        // deep nested object modifications automatically
+        if (this._expressSession) {
+            this._expressSession._modifiedAt = Date.now();
+        }
+
         return this;
     }
 
@@ -53,7 +68,8 @@ class Container {
      * @returns {*}
      */
     get(key, defaultValue = null) {
-        return this._data.hasOwnProperty(key) ? this._data[key] : defaultValue;
+        const data = this._getData();
+        return data.hasOwnProperty(key) ? data[key] : defaultValue;
     }
 
     /**
@@ -62,7 +78,8 @@ class Container {
      * @returns {boolean}
      */
     has(key) {
-        return this._data.hasOwnProperty(key);
+        const data = this._getData();
+        return data.hasOwnProperty(key);
     }
 
     /**
@@ -70,9 +87,16 @@ class Container {
      * @param {string} key
      */
     remove(key) {
-        if (this._data.hasOwnProperty(key)) {
-            delete this._data[key];
+        const data = this._getData();
+        if (data.hasOwnProperty(key)) {
+            delete data[key];
         }
+
+        // Touch session to force persistence
+        if (this._expressSession) {
+            this._expressSession._modifiedAt = Date.now();
+        }
+
         return this;
     }
 
@@ -81,15 +105,39 @@ class Container {
      * @returns {object}
      */
     all() {
-        return { ...this._data };
+        const data = this._getData();
+        return { ...data };
     }
 
     /**
      * Clear all data in the container
      */
     clear() {
-        Object.keys(this._data).forEach(key => delete this._data[key]);
+        const data = this._getData();
+        Object.keys(data).forEach(key => delete data[key]);
         return this;
+    }
+
+    /**
+     * Save the session to persistent storage
+     * This is necessary when using express-session with resave:false
+     * to ensure session data is persisted before redirects or other responses
+     * @returns {Promise<void>}
+     */
+    async save() {
+        if (this._expressSession && typeof this._expressSession.save === 'function') {
+            return new Promise((resolve, reject) => {
+                this._expressSession.save((err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        }
+        // No-op if no express session available
+        return Promise.resolve();
     }
 }
 

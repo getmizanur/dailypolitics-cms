@@ -180,26 +180,62 @@ class Bootstrap extends Bootstrapper {
         const registry = super.getContainer();
         const appConfig = registry.get('application');
         const ViewHelperManager = require(global.applicationPath('/library/view/viewHelperManager'));
-        
-        const viewHelperManager = new ViewHelperManager();
-        const applicationHelpers = appConfig.view_helpers?.invokables || {};
-        
-        // Validate application helpers (optional warning)
-        const conflicts = viewHelperManager.validateApplicationHelpers(applicationHelpers);
-        if (conflicts.length > 0) {
-            console.warn(`Warning: Application helpers override framework helpers: ${conflicts.join(', ')}`);
-        }
-        
-        // Get all helpers (framework + application)
-        const allHelpers = viewHelperManager.getAllHelpers(applicationHelpers);
+        const Container = require(global.applicationPath('/library/container'));
 
-        // Register all view helpers from configuration (same pattern as before)
-        Object.entries(allHelpers).forEach(([helperName, helperConfig]) => {
+        const applicationHelpers = appConfig.view_helpers?.invokables || {};
+        const viewHelperManager = new ViewHelperManager(applicationHelpers);
+
+        // Store the nunjucks env in global for controller access
+        global.nunjucksEnv = env;
+
+        // Store application environment in Container (__framework namespace)
+        // This separates Daily Politics app env from Nunjucks template engine env
+        const container = new Container('__framework');
+        container.set('applicationConfig', appConfig);
+        container.set('routesConfig', registry.get('routes'));
+
+        // Store configs in Container (configs only, no instance)
+        // Merge framework helpers with application helpers (with conflict check)
+        const mergedHelpers = {};
+        const frameworkHelpers = viewHelperManager.frameworkHelpers;
+
+        // Check for conflicts
+        const conflicts = Object.keys(applicationHelpers).filter(key =>
+            frameworkHelpers.hasOwnProperty(key)
+        );
+
+        if (conflicts.length > 0) {
+            throw new Error(
+                `Application helpers cannot override framework helpers. ` +
+                `The following keys are already in use by the framework: ${conflicts.join(', ')}. ` +
+                `Please choose different names for your application helpers.`
+            );
+        }
+
+        // Merge: framework helpers first, then application helpers
+        Object.assign(mergedHelpers, frameworkHelpers, applicationHelpers);
+
+        // Store configs in Container
+        container.set('ViewHelperManager', {
+            configs: {
+                invokables: mergedHelpers,
+                factories: {}
+            },
+            helpers: {}  // Runtime storage for helper-specific data (titles, meta tags, links, scripts)
+        });
+
+        // Get all available helper names
+        const helperNames = viewHelperManager.getAvailableHelpers();
+
+        // Register each helper directly on env.globals for template access
+        // Templates can use {{ headTitle() }} directly
+        helperNames.forEach(helperName => {
             env.addGlobal(helperName, function(...args) {
-                // Handle both old string format and new object format
-                const helperPath = typeof helperConfig === 'string' ? helperConfig : helperConfig.class;
-                const ViewHelper = require(global.applicationPath(helperPath));
-                const helperInstance = new ViewHelper();
+                // Get the helper instance from ViewHelperManager
+                const helperInstance = viewHelperManager.get(helperName);
+
+                // Set the nunjucks context on the helper
+                helperInstance.setContext(this);
 
                 // IMPORTANT: pass Nunjucks ctx as FINAL argument
                 return helperInstance.render(...args, this);

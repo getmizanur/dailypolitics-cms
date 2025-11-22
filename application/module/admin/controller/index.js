@@ -4,6 +4,7 @@ const ArticleForm = require(global.applicationPath('/application/form/articleFor
 const Container = require(global.applicationPath('/library/session/container'));
 const InputFilter = require(
     global.applicationPath('/library/inputfilter/inputFilter'));
+const DbAdapter = require(global.applicationPath('/library/authentication/adapter/dbAdapter'));
 const fs = require('fs');
 
 class Index extends Controller {
@@ -13,23 +14,42 @@ class Index extends Controller {
     }
 
     preDispatch() {
-        // IMPORTANT NOTICE:
-        // Expose the current controller to the view context so that view helpers
-        // (such as onDemandCss) can access routing and request information.
-        // This is required for onDemandCss to determine the current module and load
-        // the correct CSS file dynamically based on the route.
-        //
-        // This was done because main.css was too big and had to be split up
-        // for better maintainability and understanding. Admin-specific and 
-        // bolg-specific CSS is now loaded on demand using onDemandCss.
-        //
-        // If you wish to remove this line, you must also:
-        //   1. Remove {{ onDemandCss(controller) }} from master.njk
-        //   2. Deregister 'onDemandCss' from application.config.js under view_helpers
-        this.getView().setVariable('controller', this);
+        // Check authentication for all actions except login
+        const actionName = this.getRequest().getActionName();
+
+        if (actionName !== 'indexAction') {
+            const authService = this.getServiceManager().get('AuthenticationService');
+
+            if (!authService.hasIdentity()) {
+                super.plugin('flashMessenger').addErrorMessage('You must be logged in to access this page');
+                return this.plugin('redirect').toRoute('adminIndexIndex');
+            }
+        }
+
+        // Access headTitle helper through the view
+        //const viewModel = this.getView();
+        //const headTitle = viewModel.getHelper('headTitle');
+        //headTitle.append('Admin');
+        this.getServiceManager().get('ViewHelperManager').get('headTitle').append('Admin');
     }
 
-    indexAction() {
+    async indexAction() {
+        // Initialize authentication service
+        const authService = this.getServiceManager().get('AuthenticationService');
+
+        // Initialize security session container for CSRF token management
+        // Pass the express-session object directly to the Container
+        const expressSession = this.getSession();
+        const securitySession = new Container('security', expressSession);
+
+        console.log('Session ID:', expressSession ? expressSession.id : 'NO SESSION');
+        console.log('Session customData:', expressSession ? JSON.stringify(expressSession.customData) : 'NO SESSION');
+
+        // Check if user is already authenticated - redirect to dashboard
+        if (authService.hasIdentity()) {
+            return this.plugin('redirect').toRoute('adminIndexDashboard');
+        }
+
         const form = new LoginForm();
         form.setAction(
             super.plugin('url').fromRoute('adminIndexIndex'));
@@ -37,8 +57,17 @@ class Index extends Controller {
         form.addUsernameField();
         form.addPasswordField();
         form.addSubmitButton();
-        // Add CSRF field and store token in session
-        const csrfToken = form.addCsrfField();
+
+        // Get or generate CSRF token
+        let csrfToken = securitySession.get('csrfToken');
+        if (!csrfToken) {
+            // Only generate new token if one doesn't exist
+            csrfToken = form.addCsrfField();
+            securitySession.set('csrfToken', csrfToken);
+        } else {
+            // Use existing token from session
+            form.addCsrfField('csrf', { token: csrfToken });
+        }
 
         const inputFilter = InputFilter.factory({
             'username': {
@@ -72,8 +101,36 @@ class Index extends Controller {
                         name : 'StringLength',
                         options : {
                             name : "password",
-                            min : 7,
                             max : 50
+                        }
+                    }
+                ]
+            },
+            'csrf': {
+                required : true,
+                filters : [
+                    { name : 'HtmlEntities' },
+                    { name : 'StringTrim' },
+                    { name : 'StripTags' }
+                ],
+                validators : [
+                    {
+                        name : 'StringLength',
+                        options : {
+                            min : 64,
+                            max : 64,
+                            messageTemplate : {
+                                INVALID_TOO_SHORT : 'Invalid CSRF token',
+                                INVALID_TOO_LONG : 'Invalid CSRF token'
+                            }
+                        }
+                    },
+                    {
+                        name : 'AlphaNumeric',
+                        options : {
+                            messageTemplate : {
+                                INVALID_FORMAT : 'CSRF token must contain only alphanumeric characters'
+                            }
                         }
                     }
                 ]
@@ -86,18 +143,90 @@ class Index extends Controller {
             form.setData(postData);
 
             if(form.isValid()) {
+                // Get filtered values
+                const values = form.getData();
 
-            }else{
+                // Verify CSRF token
+                const storedCsrfToken = securitySession.get('csrfToken');
+
+                console.log('CSRF Check:');
+                console.log('  Submitted CSRF:', values.csrf);
+                console.log('  Stored CSRF:', storedCsrfToken);
+                console.log('  Match:', values.csrf === storedCsrfToken);
+
+                if (values.csrf !== storedCsrfToken) {
+                    console.log('CSRF token mismatch! Regenerating new token...');
+                    // Clear the old token and regenerate on next page load
+                    securitySession.remove('csrfToken');
+                    super.plugin('flashMessenger').addErrorMessage('Invalid CSRF token. Please try again.');
+                } else {
+                    console.log('CSRF token valid, proceeding with authentication');
+                    // Perform authentication
+                    try {
+                        console.log('Starting authentication...');
+                        const db = this.getServiceManager().get('Database');
+                        console.log('Database adapter retrieved:', db.constructor.name);
+
+                        // Connect to database if not already connected
+                        if (!db.connection) {
+                            console.log('Connecting to database...');
+                            await db.connect();
+                            console.log('Database connected successfully');
+                        }
+
+                        const adapter = new DbAdapter(db, 'users', 'email', 'password_hash', 'password_salt');
+                        adapter.setUsername(values.username);
+                        adapter.setPassword(values.password);
+
+                        console.log('Attempting authentication for user:', values.username);
+
+                        authService.setAdapter(adapter);
+                        const result = await authService.authenticate();
+
+                        console.log('Authentication result:', result.getCode(), result.getMessages());
+
+                        if (result.isValid()) {
+                            // Authentication successful
+                            console.log('Authentication successful');
+
+                            // Write identity to session (without regeneration for now)
+                            const identity = result.getIdentity();
+                            const authStorage = authService.getStorage();
+                            authStorage.write(identity);
+                            console.log('Identity written to session');
+                            console.log('Session customData after write:', JSON.stringify(expressSession.customData));
+
+                            // Explicitly save session before redirect
+                            await securitySession.save();
+                            console.log('Session saved successfully');
+
+                            super.plugin('flashMessenger').addSuccessMessage('Login successful');
+                            const redirectResponse = this.plugin('redirect').toRoute('adminIndexDashboard');
+                            console.log('Redirect response created:', redirectResponse ? 'YES' : 'NO');
+                            console.log('Redirect URL:', redirectResponse ? redirectResponse.getHeader('Location') : 'NONE');
+                            console.log('Is redirect?:', redirectResponse ? redirectResponse.isRedirect() : 'NONE');
+                            return redirectResponse;
+                        } else {
+                            // Authentication failed - show generic error
+                            console.log('Authentication failed');
+                            super.plugin('flashMessenger').addErrorMessage('Authentication unsuccessful');
+                        }
+                    } catch (error) {
+                        console.error('Authentication error:', error);
+                        super.plugin('flashMessenger').addErrorMessage('An error occurred during authentication: ' + error.message);
+                    }
+                }
+            } else {
                 // After form.isValid() returns false
                 // Get validation messages from form
                 const formMessages = form.getMessages();
-                
+
                 Object.keys(formMessages).forEach((fieldName) => {
                     if (form.has(fieldName)) {
                         form.get(fieldName).setMessages(formMessages[fieldName]);
                     }
                 });
-                
+
                 // Extract error messages for flash messenger
                 let errorMessages = [];
                 Object.keys(formMessages).forEach((fieldName) => {
@@ -110,18 +239,15 @@ class Index extends Controller {
                 });
 
                 // Add validation error messages to flash messenger
-                /*if (errorMessages.length > 0) {
+                if (errorMessages.length > 0) {
                     errorMessages.forEach((message) => {
                         super.plugin('flashMessenger').addErrorMessage(message);
                     });
-                }*/
+                }
             }
-            
+
         }
 
-        const session = new Container('security');
-        session.set('csrfToken', csrfToken);
-        
         // Pass form and token to the view (adjust as needed for your view system)
         return this.getView()
             .setVariable('f', form);
@@ -153,9 +279,6 @@ class Index extends Controller {
                     isCurrent: i === page
                 });
             }
-
-            // Set page title
-            this.getPluginManager().get('pageTitle').setTitle('Admin');
 
             // Set view variables
             this.getView()
@@ -483,6 +606,26 @@ class Index extends Controller {
             fs.appendFileSync(logFile, errorMsg + '\n');
             throw error;
         }
+    }
+
+    async logoutAction() {
+        // Initialize authentication service
+        const authService = this.getServiceManager().get('AuthenticationService');
+
+        // Clear identity
+        authService.clearIdentity();
+
+        // Add success message
+        super.plugin('flashMessenger').addSuccessMessage('You have been logged out successfully');
+
+        // Explicitly save session before redirect
+        const expressSession = this.getSession();
+        const securitySession = new Container('security', expressSession);
+        await securitySession.save();
+        console.log('Session saved after logout');
+
+        // Redirect to login page
+        return this.plugin('redirect').toRoute('adminIndexIndex');
     }
 }
 

@@ -205,24 +205,18 @@ module.exports = {
     // Framework services (ViewManager, ViewHelperManager, PluginManager) are managed by ServiceManager
     "service_manager": {
         "invokables": {
-            "EmailService": "/application/service/verifyEmailService",
             "PostService": "/application/service/postService"
+        },
+        "factories": {
+            "AuthenticationService": "/application/service/factory/authenticationServiceFactory",
+            "Database": "/application/service/factory/databaseFactory"
         }
-        // Add your custom service factories here
-        // Example:
-        // "factories": {
-        //     "MyCustomService": "/application/service/factory/myCustomServiceFactory"
-        // }
     },
     
     // Controller Plugins configuration - only custom application plugins
     // Framework plugins (flashMessenger, layout, params, etc.) are managed by PluginManager
     "controller_plugins": {
         "invokables": {
-            "pageTitle": {
-                "class": "/application/plugin/pageTitle",
-                "description": "Page title management plugin"
-            }
             // Add your custom application plugins here
             // Example:
             // "customPlugin": {
@@ -274,8 +268,8 @@ module.exports = {
     },
 
     "view_manager" : {
-        "display_not_found_reason": process.env.VIEW_DISPLAY_NOT_FOUND_REASON === 'true' || true,
-        "display_exceptions": process.env.VIEW_DISPLAY_EXCEPTIONS === 'true' || true,
+        "display_not_found_reason": process.env.VIEW_DISPLAY_NOT_FOUND_REASON === 'true' || false,
+        "display_exceptions": process.env.VIEW_DISPLAY_EXCEPTIONS === 'true' || false,
         "doctype": process.env.VIEW_DOCTYPE || "HTML5",
         "not_found_template": process.env.VIEW_NOT_FOUND_TEMPLATE || "error/404",
         "exception_template": process.env.VIEW_EXCEPTION_TEMPLATE || "error/500",

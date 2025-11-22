@@ -1,4 +1,4 @@
-const Session = require('../../session');
+const Session = require('../../session/session');
 const BasePlugin = require('../basePlugin');
 
 /**

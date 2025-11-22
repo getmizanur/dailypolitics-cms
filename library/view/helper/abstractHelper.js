@@ -64,6 +64,16 @@ class AbstractHelper {
     }
 
     /**
+     * Set the Nunjucks context
+     * @param {object} context - Nunjucks context object
+     * @returns {AbstractHelper} For method chaining
+     */
+    setContext(context) {
+        this.nunjucksContext = context;
+        return this;
+    }
+
+    /**
      * Abstract render method that must be implemented by extending classes
      * @param {...any} args - Variable arguments passed to the render method
      * @throws {Error} If not implemented by extending class

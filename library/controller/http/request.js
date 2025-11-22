@@ -29,6 +29,7 @@ class Request {
         this.url = null;
         this.path = null;
         this.routeName = null;
+        this.session = null; // Express-session req.session object
     }
 
 	setMethod(value) {
@@ -228,6 +229,15 @@ class Request {
 
     getRouteName() {
         return this.routeName;
+    }
+
+    setSession(session) {
+        this.session = session;
+        return this;
+    }
+
+    getSession() {
+        return this.session;
     }
 
 }

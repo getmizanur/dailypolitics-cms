@@ -5,7 +5,56 @@ class HeadTitle extends AbstractHelper {
     constructor() {
         super();
         this.separator = ' - ';
-        this.defaultTitle = 'Application Portal';
+        this.defaultTitle = 'Application';
+        this.titles = []; // Fallback storage when context not available
+    }
+
+    /**
+     * Get stored titles from Container storage
+     * Structure: global.nunjucksEnv.globals.__framework.ViewHelperManager.helpers.headTitle.titles
+     * @returns {Array} Array of title parts
+     */
+    _getTitles() {
+        const Container = require('../../container');
+        const container = new Container('__framework');
+
+        if (container.has('ViewHelperManager')) {
+            const vhmData = container.get('ViewHelperManager');
+            if (!vhmData.helpers) {
+                vhmData.helpers = {};
+            }
+            if (!vhmData.helpers.headTitle) {
+                vhmData.helpers.headTitle = { titles: [] };
+            }
+            return vhmData.helpers.headTitle.titles || [];
+        }
+
+        // Fallback to instance storage
+        return this.titles;
+    }
+
+    /**
+     * Set titles to Container storage
+     * @param {Array} titles - Array of title parts
+     */
+    _setTitles(titles) {
+        // Always store in instance as fallback
+        this.titles = titles;
+
+        // Store in Container for persistence across requests
+        const Container = require('../../container');
+        const container = new Container('__framework');
+
+        if (container.has('ViewHelperManager')) {
+            const vhmData = container.get('ViewHelperManager');
+            if (!vhmData.helpers) {
+                vhmData.helpers = {};
+            }
+            if (!vhmData.helpers.headTitle) {
+                vhmData.helpers.headTitle = {};
+            }
+            vhmData.helpers.headTitle.titles = titles;
+        }
     }
 
     /**
@@ -20,11 +69,11 @@ class HeadTitle extends AbstractHelper {
         const cleanArgs = this._extractContext(args);
         const [title = null, mode = 'set'] = cleanArgs;
 
-        // Get stored titles from context or initialize
-        let titles = this.getVariable('_headTitleParts', []);
+        // Get stored titles from context
+        let titles = this._getTitles();
 
-        if (title === null && mode === 'set') {
-            // No arguments - just render what we have
+        if (title === null) {
+            // No title provided - just render what we have
             return this._renderTitles(titles);
         }
 
@@ -45,13 +94,10 @@ class HeadTitle extends AbstractHelper {
         }
 
         // Store updated titles back to context
-        this.setVariable('_headTitleParts', titles);
+        this._setTitles(titles);
 
-        // For set/append/prepend, return empty string (they're building, not rendering)
-        if (mode !== 'render') {
-            return '';
-        }
-
+        
+        // Return rendered title for immediate display
         return this._renderTitles(titles);
     }
 
@@ -64,6 +110,9 @@ class HeadTitle extends AbstractHelper {
         if (!titles || titles.length === 0) {
             return this.defaultTitle;
         }
+
+        console.log('=======HeadTitle=============');
+        console.log(titles);
         return titles.join(this.separator);
     }
 
@@ -73,7 +122,7 @@ class HeadTitle extends AbstractHelper {
      * @returns {HeadTitle} For method chaining
      */
     set(title) {
-        this.titles = [title];
+        this._setTitles([title]);
         return this;
     }
 
@@ -83,7 +132,9 @@ class HeadTitle extends AbstractHelper {
      * @returns {HeadTitle} For method chaining
      */
     append(title) {
-        this.titles.push(title);
+        const titles = this._getTitles();
+        titles.push(title);
+        this._setTitles(titles);
         return this;
     }
 
@@ -93,7 +144,9 @@ class HeadTitle extends AbstractHelper {
      * @returns {HeadTitle} For method chaining
      */
     prepend(title) {
-        this.titles.unshift(title);
+        const titles = this._getTitles();
+        titles.unshift(title);
+        this._setTitles(titles);
         return this;
     }
 
@@ -122,7 +175,7 @@ class HeadTitle extends AbstractHelper {
      * @returns {Array} Array of titles
      */
     getTitles() {
-        return this.titles;
+        return this._getTitles();
     }
 
     /**
@@ -130,7 +183,7 @@ class HeadTitle extends AbstractHelper {
      * @returns {HeadTitle} For method chaining
      */
     clear() {
-        this.titles = [];
+        this._setTitles([]);
         return this;
     }
 
@@ -139,7 +192,7 @@ class HeadTitle extends AbstractHelper {
      * @returns {boolean} True if no titles set
      */
     isEmpty() {
-        return this.titles.length === 0;
+        return this._getTitles().length === 0;
     }
 
     /**
@@ -147,11 +200,8 @@ class HeadTitle extends AbstractHelper {
      * @returns {string} Formatted title string
      */
     toString() {
-        if (this.isEmpty()) {
-            return this.defaultTitle;
-        }
-        
-        return this.titles.join(this.separator);
+        const titles = this._getTitles();
+        return this._renderTitles(titles);
     }
 
 }

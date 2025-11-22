@@ -241,6 +241,8 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         request.setParams(req.params || {});
         // Set POST data
         request.setPost(req.body);
+        // Set express-session object
+        request.setSession(req.session);
 
         front.setRequest(request);
 

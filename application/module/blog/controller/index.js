@@ -7,20 +7,7 @@ class Index extends Controller {
     }
 
     preDispatch() {
-        // IMPORTANT NOTICE:
-        // Expose the current controller to the view context so that view helpers
-        // (such as onDemandCss) can access routing and request information.
-        // This is required for onDemandCss to determine the current module and load
-        // the correct CSS file dynamically based on the route.
-        //
-        // This was done because main.css was too big and had to be split up
-        // for better maintainability and understanding. Admin-specific and 
-        // bolg-specific CSS is now loaded on demand using onDemandCss.
-        //
-        // If you wish to remove this line, you must also:
-        //   1. Remove {{ onDemandCss(controller) }} from master.njk
-        //   2. Deregister 'onDemandCss' from application.config.js under view_helpers
-        this.getView().setVariable('controller', this);
+        // No additional logic needed - BaseController handles module name automatically
     }
 
     /**
@@ -44,9 +31,6 @@ class Index extends Controller {
 
             // Calculate pagination
             const totalPages = Math.ceil(totalCount / limit);
-
-            // Set page title
-            this.getPluginManager().get('pageTitle').setTitle('Blog');
 
             // Set view variables
             this.getView()
@@ -101,9 +85,6 @@ class Index extends Controller {
             this.getView().setVariable('nextArticle', nextArticle);
             this.getView().setVariable('prevArticle', prevArticle);
 
-            // Set page title and meta description
-            this.getPluginManager().get('pageTitle').setTitle(post.title + ' - Daily Politics');
-            
             return this.getView();
         } catch (error) {
             console.error('Error in viewAction:', error);

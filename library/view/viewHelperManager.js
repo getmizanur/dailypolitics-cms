@@ -1,13 +1,22 @@
 /**
  * ViewHelperManager - Manages framework and application view helpers
- * 
+ *
  * This class follows the Zend Framework pattern of separating framework-level
  * helpers from application-specific helpers. Framework helpers are pre-registered
  * and protected from accidental modification by developers.
  */
 class ViewHelperManager {
 
-    constructor() {
+    constructor(applicationHelpers = {}) {
+        // Validate application helpers don't override framework helpers
+        const conflicts = this._checkConflicts(applicationHelpers);
+        if (conflicts.length > 0) {
+            throw new Error(`Application helpers cannot override framework helpers. Conflicts: ${conflicts.join(', ')}`);
+        }
+
+        this.applicationHelpers = applicationHelpers;
+        this.instances = {}; // Cache for instantiated helpers
+
         // Framework-level helpers - protected from developer modification
         this.frameworkHelpers = {
             "form": {
@@ -74,6 +83,10 @@ class ViewHelperManager {
                 "class": "/library/view/helper/headLink",
                 "params": ["attributes = null", "mode = 'add'"]
             },
+            "headScript": {
+                "class": "/library/view/helper/headScript",
+                "params": ["scriptOrAttributes = null", "mode = 'append'", "attributes = {}"]
+            },
             "formCsrf": {
                 "class": "/library/view/helper/formCsrf",
                 "params": ["element"]
@@ -133,6 +146,87 @@ class ViewHelperManager {
             }
         });
         return conflicts;
+    }
+
+    /**
+     * Internal method to check for conflicts
+     * @param {Object} applicationHelpers - Application helpers to check
+     * @returns {Array} Array of conflicts
+     */
+    _checkConflicts(applicationHelpers) {
+        const conflicts = [];
+        Object.keys(applicationHelpers).forEach(helperName => {
+            if (this.frameworkHelpers && this.frameworkHelpers.hasOwnProperty(helperName)) {
+                conflicts.push(helperName);
+            }
+        });
+        return conflicts;
+    }
+
+    /**
+     * Get a helper instance by name
+     * Instantiates the helper if not already cached
+     * @param {string} name - Helper name
+     * @returns {object} Helper instance
+     */
+    get(name) {
+        // Return cached instance if available
+        if (this.instances[name]) {
+            return this.instances[name];
+        }
+
+        // Check framework helpers first
+        if (this.frameworkHelpers[name]) {
+            const helperConfig = this.frameworkHelpers[name];
+            const HelperClass = require(global.applicationPath(helperConfig.class));
+            const instance = new HelperClass();
+
+            // Set nunjucks context if available
+            if (global.nunjucksContext) {
+                instance.setContext(global.nunjucksContext);
+            }
+
+            this.instances[name] = instance;
+            return instance;
+        }
+
+        // Check application helpers
+        if (this.applicationHelpers[name]) {
+            const helperConfig = this.applicationHelpers[name];
+            const HelperClass = require(global.applicationPath(helperConfig.class));
+            const instance = new HelperClass();
+
+            // Set nunjucks context if available
+            if (global.nunjucksContext) {
+                instance.setContext(global.nunjucksContext);
+            }
+
+            this.instances[name] = instance;
+            return instance;
+        }
+
+        throw new Error(`Helper '${name}' not found in ViewHelperManager`);
+    }
+
+    /**
+     * Check if a helper exists
+     * @param {string} name - Helper name
+     * @returns {boolean} True if helper exists
+     */
+    has(name) {
+        return this.frameworkHelpers.hasOwnProperty(name) ||
+               this.applicationHelpers.hasOwnProperty(name);
+    }
+
+    /**
+     * Get all available helper names
+     * @returns {Array} Array of helper names
+     */
+    getAvailableHelpers() {
+        return [
+            ...Object.keys(this.frameworkHelpers),
+            ...Object.keys(this.applicationHelpers)
+        ];
     }
 
 }
