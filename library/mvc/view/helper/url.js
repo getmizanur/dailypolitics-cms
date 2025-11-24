@@ -22,8 +22,8 @@ class Url extends AbstractHelper {
 
         // Load routes from Container
         try {
-            const Container = require('../../../core/container');
-            const container = new Container('__framework');
+            const ApplicationContainer = require('../../../core/application-container');
+            const container = new ApplicationContainer();
 
             if (container.has('routesConfig')) {
                 this.routes = container.get('routesConfig');

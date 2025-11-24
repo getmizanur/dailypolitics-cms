@@ -1,4 +1,4 @@
-class Container {
+class SessionContainer {
     /**
      * Create a new session container (namespace)
      * @param {string} name - The name of the container/namespace
@@ -10,16 +10,6 @@ class Container {
         this._fallbackData = {}; // In-memory fallback storage
     }
 
-    /**
-     * Get the data object for this container from the session
-     * Always accesses session directly (not cached) to ensure persistence
-     * @returns {object}
-     */
-    /**
-     * Get the data object for this container from the session
-     * Always accesses session directly (not cached) to ensure persistence
-     * @returns {object}
-     */
     /**
      * Get the data object for this container from the session
      * Always accesses session directly (not cached) to ensure persistence
@@ -163,4 +153,4 @@ class Container {
     }
 }
 
-module.exports = Container;
+module.exports = SessionContainer;

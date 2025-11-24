@@ -1,6 +1,6 @@
 const Controller = require(global.applicationPath('/library/mvc/controller/base-controller'));
 const LoginForm = require(global.applicationPath('/application/form/login-form'));
-const Container = require(global.applicationPath('/library/session/container'));
+const SessionContainer = require(global.applicationPath('/library/session/session-container'));
 const InputFilter = require(
     global.applicationPath('/library/input-filter/input-filter'));
 const DbAdapter = require(global.applicationPath('/library/authentication/adapter/db-adapter'));
@@ -42,7 +42,7 @@ class LoginController extends Controller {
         // Initialize security session container for CSRF token management
         // Pass the express-session object directly to the Container
         const expressSession = this.getSession();
-        const securitySession = new Container('security', expressSession);
+        const securitySession = new SessionContainer('security', expressSession);
 
         console.log('Session ID:', expressSession ? expressSession.id : 'NO SESSION');
         console.log('Session customData:', expressSession ? JSON.stringify(expressSession.customData) : 'NO SESSION');
@@ -73,65 +73,65 @@ class LoginController extends Controller {
 
         const inputFilter = InputFilter.factory({
             'username': {
-                required : true,
-                requiredMessage : "Please enter username",
-                filters : [
-                    { name : 'HtmlEntities' },
-                    { name : 'StringTrim' },
-                    { name : 'StripTags' }
+                required: true,
+                requiredMessage: "Please enter username",
+                filters: [
+                    { name: 'HtmlEntities' },
+                    { name: 'StringTrim' },
+                    { name: 'StripTags' }
                 ],
-                validators : [
+                validators: [
                     {
-                        name : 'EmailAddress',
-                        messages : {
-                            INVALID : `Invalid type given. String expected`,
-                            INVALID_FORMAT : `The username is not a valid email address`
+                        name: 'EmailAddress',
+                        messages: {
+                            INVALID: `Invalid type given. String expected`,
+                            INVALID_FORMAT: `The username is not a valid email address`
                         }
                     }
                 ]
             },
             'password': {
-                required : true,
-                requiredMessage : "Please enter password",
-                filters : [
-                    { name : 'HtmlEntities' },
-                    { name : 'StringTrim' },
-                    { name : 'StripTags' }
+                required: true,
+                requiredMessage: "Please enter password",
+                filters: [
+                    { name: 'HtmlEntities' },
+                    { name: 'StringTrim' },
+                    { name: 'StripTags' }
                 ],
-                validators : [
+                validators: [
                     {
-                        name : 'StringLength',
-                        options : {
-                            name : "password",
-                            max : 50
+                        name: 'StringLength',
+                        options: {
+                            name: "password",
+                            max: 50
                         }
                     }
                 ]
             },
             'csrf': {
-                required : true,
-                filters : [
-                    { name : 'HtmlEntities' },
-                    { name : 'StringTrim' },
-                    { name : 'StripTags' }
+                required: true,
+                filters: [
+                    { name: 'HtmlEntities' },
+                    { name: 'StringTrim' },
+                    { name: 'StripTags' }
                 ],
-                validators : [
+                validators: [
                     {
-                        name : 'StringLength',
-                        options : {
-                            min : 64,
-                            max : 64,
-                            messageTemplate : {
-                                INVALID_TOO_SHORT : 'Invalid CSRF token',
-                                INVALID_TOO_LONG : 'Invalid CSRF token'
+                        name: 'StringLength',
+                        options: {
+                            min: 64,
+                            max: 64,
+                            messageTemplate: {
+                                INVALID_TOO_SHORT: 'Invalid CSRF token',
+                                INVALID_TOO_LONG: 'Invalid CSRF token'
                             }
                         }
                     },
                     {
-                        name : 'AlphaNumeric',
-                        options : {
-                            messageTemplate : {
-                                INVALID_FORMAT : 'CSRF token must contain only alphanumeric characters'
+                        name: 'AlphaNumeric',
+                        options: {
+                            messageTemplate: {
+                                INVALID_FORMAT: 'CSRF token must contain only alphanumeric characters'
                             }
                         }
                     }
@@ -140,11 +140,11 @@ class LoginController extends Controller {
         });
         form.setInputFilter(inputFilter);
 
-        if(super.getRequest().isPost()) {
+        if (super.getRequest().isPost()) {
             const postData = super.getRequest().getPost();
             form.setData(postData);
 
-            if(form.isValid()) {
+            if (form.isValid()) {
                 // Get filtered values
                 const values = form.getData();
 
@@ -267,7 +267,7 @@ class LoginController extends Controller {
 
         // Explicitly save session before redirect
         const expressSession = this.getSession();
-        const securitySession = new Container('security', expressSession);
+        const securitySession = new SessionContainer('security', expressSession);
         await securitySession.save();
         console.log('Session saved after logout');
 

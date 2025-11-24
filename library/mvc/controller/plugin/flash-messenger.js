@@ -4,8 +4,8 @@ const VarUtil
 const BasePlugin
     = require(
         global.applicationPath('/library/mvc/controller/base-plugin'));
-const Container
-    = require(global.applicationPath('/library/core/container'));
+const ApplicationContainer
+    = require(global.applicationPath('/library/core/application-container'));
 
 
 class FlashMessenger extends BasePlugin {
@@ -15,11 +15,11 @@ class FlashMessenger extends BasePlugin {
 
         this.namespace = options.namespace || 'FlashMessenger';
         this.messages = {
-            default : [],
-            success : [],
-            warning : [],
-            error : [],
-            info : []
+            default: [],
+            success: [],
+            warning: [],
+            error: [],
+            info: []
         };
         this.messageAdded = false;
 
@@ -31,7 +31,7 @@ class FlashMessenger extends BasePlugin {
 
         // Use new session namespace instead of Container
         this.sessionNamespace = null;
-        this.container = new Container(this.namespace); 
+        this.container = new ApplicationContainer(this.namespace);
     }
 
     setNamespace(namespace = this.NAMESPACE_DEFAULT) {
@@ -45,11 +45,11 @@ class FlashMessenger extends BasePlugin {
     }
 
     getContainer() {
-        if(this.container instanceof Container) {
+        if (this.container instanceof ApplicationContainer) {
             return this.container;
         }
 
-        this.container = new Container('FlashMessenger');
+        this.container = new ApplicationContainer('FlashMessenger');
         return this.container;
     }
 
@@ -92,7 +92,7 @@ class FlashMessenger extends BasePlugin {
             // Update container for backward compatibility
             this.container.set(namespace, this.messages[namespace]);
 
-            if(this.messageAdded == false) {
+            if (this.messageAdded == false) {
                 this.messageAdded = true;
             }
 
@@ -172,7 +172,7 @@ class FlashMessenger extends BasePlugin {
             // First try to get from session namespace (new system)
             const sessionNs = this.getSessionNamespace();
             const sessionMessages = sessionNs.get(namespace, []);
-            
+
             if (sessionMessages && sessionMessages.length > 0) {
                 messages = [...sessionMessages];
                 foundMessages = true;
@@ -265,7 +265,7 @@ class FlashMessenger extends BasePlugin {
     }
 
     clearMessages(namespace) {
-        if(VarUtil.isString(namespace) 
+        if (VarUtil.isString(namespace)
             || VarUtil.empty(namespace)) {
             namespace = this.getNamespace();
         }
@@ -315,7 +315,7 @@ class FlashMessenger extends BasePlugin {
     }
 
     getMessagesFromContainer() {
-        if(!VarUtil.empty(this.messages)
+        if (!VarUtil.empty(this.messages)
             || this.messageAdded) {
             return;
         }

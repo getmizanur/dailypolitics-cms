@@ -1,7 +1,7 @@
 // library/authentication/storage/session.js
 // Session-based storage for authentication identity using generic SessionContainer
 
-const SessionContainer = require('../../session/container');
+const SessionContainer = require('../../session/session-container');
 
 /**
  * Session Storage

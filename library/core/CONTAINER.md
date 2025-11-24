@@ -1,6 +1,6 @@
-# Container - Application Environment Registry
+# ApplicationContainer - Application Environment Registry
 
-The Container class provides a clean interface to store and retrieve application-level objects from `global.nunjucksEnv.globals.__framework` namespace.
+The ApplicationContainer class provides a clean interface to store and retrieve application-level objects from `global.nunjucksEnv.globals.__framework` namespace.
 
 ## Architecture Overview
 
@@ -100,8 +100,8 @@ global.nunjucksEnv.globals.__framework = {
 ### Basic Container Usage
 
 ```javascript
-const Container = require('./library/core/container');
-const container = new Container('__framework');
+const ApplicationContainer = require('./library/core/application-container');
+const container = new ApplicationContainer('__framework');
 
 // Store values
 container.set('applicationConfig', appConfig);

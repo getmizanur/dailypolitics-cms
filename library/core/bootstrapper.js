@@ -227,6 +227,10 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
             global.locals.expressSession = req.session;
         }
 
+        console.log("===Bootstrapper===");
+        console.log(controller);
+        console.log(action);
+
         let request = new Request();
         request.setModuleName(module);
         request.setControllerName(controller);

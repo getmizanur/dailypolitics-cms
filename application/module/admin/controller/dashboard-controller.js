@@ -1,6 +1,6 @@
 const Controller = require(global.applicationPath('/library/mvc/controller/base-controller'));
 const ArticleForm = require(global.applicationPath('/application/form/article-form'));
-const Container = require(global.applicationPath('/library/session/container'));
+const SessionContainer = require(global.applicationPath('/library/session/session-container'));
 const InputFilter = require(global.applicationPath('/library/input-filter/input-filter'));
 const fs = require('fs');
 
@@ -55,7 +55,7 @@ class DashboardController extends Controller {
             this.getView()
                 .setVariable('posts', posts)
                 .setVariable('pagination', {
-                    mode : 'admin',
+                    mode: 'admin',
                     currentPage: page,
                     totalItems: totalCount,
                     baseUrl: '/admin/dashboard'
@@ -97,7 +97,7 @@ class DashboardController extends Controller {
             log('Form attributes set');
 
             // Initialize form with categories
-            const session = new Container('security');
+            const session = new SessionContainer('security');
             form.init(categories, { session: session });
             log('Form initialized with categories');
 
@@ -127,155 +127,155 @@ class DashboardController extends Controller {
             const categoryIds = categories.map(cat => String(cat.id));
 
             const inputFilter = InputFilter.factory({
-                'id' : {
-                    required : true,
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                'id': {
+                    required: true,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ]
                 },
-                'author_id' : {
-                    required : true,
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                'author_id': {
+                    required: true,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ]
                 },
                 'title': {
-                    required : true,
-                    requiredMessage : "Please enter title",
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    required: true,
+                    requiredMessage: "Please enter title",
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ],
-                    validators : [
+                    validators: [
                         {
-                            name : 'StringLength',
-                            options : {
-                                name : "title",
-                                min : 20,
-                                max : 150,
-                                messageTemplate : {
-                                    INVALID_TOO_SHORT : 'Title must be at least 20 characters long',
-                                    INVALID_TOO_LONG : 'Title must not exceed 150 characters'
+                            name: 'StringLength',
+                            options: {
+                                name: "title",
+                                min: 20,
+                                max: 150,
+                                messageTemplate: {
+                                    INVALID_TOO_SHORT: 'Title must be at least 20 characters long',
+                                    INVALID_TOO_LONG: 'Title must not exceed 150 characters'
                                 }
                             }
                         }
                     ]
                 },
                 'slug': {
-                    required : true,
+                    required: true,
                     requiredMessage: "Required, non-empty field",
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ],
-                    validators : [
+                    validators: [
                         {
-                            name : 'AlphaNumeric',
-                            options : {
-                                name : 'slug',
-                                allowDashAndUnderscore : true,
-                                messageTemplate : {
-                                    INVALID_FORMAT : 'Slug must contain only alphanumeric characters, hyphens, and underscores'
+                            name: 'AlphaNumeric',
+                            options: {
+                                name: 'slug',
+                                allowDashAndUnderscore: true,
+                                messageTemplate: {
+                                    INVALID_FORMAT: 'Slug must contain only alphanumeric characters, hyphens, and underscores'
                                 }
                             }
                         }
                     ]
                 },
                 'excerpt': {
-                    required : false,
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    required: false,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ],
-                    validators : [
+                    validators: [
                         {
-                            name : 'StringLength',
-                            options : {
-                                name : "excerpt",
-                                max : 150,
-                                messageTemplate : {
-                                    INVALID_TOO_LONG : 'Excerpt must not exceed 150 characters'
+                            name: 'StringLength',
+                            options: {
+                                name: "excerpt",
+                                max: 150,
+                                messageTemplate: {
+                                    INVALID_TOO_LONG: 'Excerpt must not exceed 150 characters'
                                 }
                             }
                         }
                     ]
                 },
                 'content': {
-                    required : true,
-                    requiredMessage : "Please enter content",
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    required: true,
+                    requiredMessage: "Please enter content",
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ]
                 },
                 'author_name': {
-                    required : false,
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    required: false,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ]
                 },
                 'category_id': {
-                    required : true,
-                    requiredMessage : "Please select a category",
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    required: true,
+                    requiredMessage: "Please select a category",
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ],
-                    validators : [
+                    validators: [
                         {
-                            name : 'InArray',
-                            options : {
-                                haystack : categoryIds
+                            name: 'InArray',
+                            options: {
+                                haystack: categoryIds
                             },
-                            messages : {
-                                NOT_IN_ARRAY : 'Please select a valid category'
+                            messages: {
+                                NOT_IN_ARRAY: 'Please select a valid category'
                             }
                         }
                     ]
                 },
                 'meta_description': {
-                    required : false,
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    required: false,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ],
-                    validators : [
+                    validators: [
                         {
-                            name : 'StringLength',
-                            options : {
-                                name : "meta_description",
-                                max : 150,
-                                messageTemplate : {
-                                    INVALID_TOO_LONG : 'Meta description must not exceed 150 characters'
+                            name: 'StringLength',
+                            options: {
+                                name: "meta_description",
+                                max: 150,
+                                messageTemplate: {
+                                    INVALID_TOO_LONG: 'Meta description must not exceed 150 characters'
                                 }
                             }
                         }
                     ]
                 },
                 'comment_enabled': {
-                    required : false,
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    required: false,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ],
-                    validators : [
+                    validators: [
                         {
-                            name : 'Callback',
-                            options : {
-                                callback : (value) => {
+                            name: 'Callback',
+                            options: {
+                                callback: (value) => {
                                     // Accept '1', 1, true, 'true', 'on' for checked
                                     // Accept '0', 0, false, 'false', '', null, undefined for unchecked
                                     if (value === '1' || value === 1 || value === true || value === 'true' || value === 'on') {
@@ -286,37 +286,37 @@ class DashboardController extends Controller {
                                     }
                                     return false;
                                 },
-                                messageTemplate : {
-                                    INVALID : 'Invalid value for comment enabled'
+                                messageTemplate: {
+                                    INVALID: 'Invalid value for comment enabled'
                                 }
                             }
                         }
                     ]
                 },
                 'csrf': {
-                    required : true,
-                    filters : [
-                        { name : 'HtmlEntities' },
-                        { name : 'StringTrim' },
-                        { name : 'StripTags' }
+                    required: true,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
                     ],
-                    validators : [
+                    validators: [
                         {
-                            name : 'StringLength',
-                            options : {
-                                min : 64,
-                                max : 64,
-                                messageTemplate : {
-                                    INVALID_TOO_SHORT : 'Invalid CSRF token',
-                                    INVALID_TOO_LONG : 'Invalid CSRF token'
+                            name: 'StringLength',
+                            options: {
+                                min: 64,
+                                max: 64,
+                                messageTemplate: {
+                                    INVALID_TOO_SHORT: 'Invalid CSRF token',
+                                    INVALID_TOO_LONG: 'Invalid CSRF token'
                                 }
                             }
                         },
                         {
-                            name : 'AlphaNumeric',
-                            options : {
-                                messageTemplate : {
-                                    INVALID_FORMAT : 'CSRF token must contain only alphanumeric characters'
+                            name: 'AlphaNumeric',
+                            options: {
+                                messageTemplate: {
+                                    INVALID_FORMAT: 'CSRF token must contain only alphanumeric characters'
                                 }
                             }
                         }
@@ -325,7 +325,7 @@ class DashboardController extends Controller {
             });
             form.setInputFilter(inputFilter);
 
-            if(super.getRequest().isPost()) {
+            if (super.getRequest().isPost()) {
                 const postData = super.getRequest().getPost();
                 log(`Post data received: ${JSON.stringify(postData)}`);
                 form.setData(postData);
@@ -333,9 +333,9 @@ class DashboardController extends Controller {
                 const isFormValid = form.isValid();
                 log(`Form validation result: ${isFormValid}`);
 
-                if(isFormValid) {
+                if (isFormValid) {
                     log('Form is valid - no errors');
-                }else{
+                } else {
                     // After form.isValid() returns false
                     // Get validation messages from form
                     const formMessages = form.getMessages();
@@ -365,7 +365,7 @@ class DashboardController extends Controller {
                         });
                     }
                 }
-            }else{
+            } else {
                 form.populateValues(this.getRequest().getPost());
             }
 

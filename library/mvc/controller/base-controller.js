@@ -1,6 +1,7 @@
+const StringUtil = require('../../util/string-util');
 const ViewModel = require('../view/view-model');
 const ServiceManager = require('../../service/service-manager');
-const Container = require('../../core/container');
+const ApplicationContainer = require('../../core/application-container');
 
 class BaseController {
 
@@ -10,7 +11,7 @@ class BaseController {
 
         this.request = options.req || null;
         this.response = options.res || null;
-		this.method = null;
+        this.method = null;
 
         this.moduleName = null;
         this.controllerName = null;
@@ -34,13 +35,13 @@ class BaseController {
     }
 
     getServiceManager() {
-        if(!this.serviceLocator) {
+        if (!this.serviceLocator) {
             // Always create new instance (configs stored in Container, not instance)
             const serviceManager = new ServiceManager();
             this.setServiceLocator(serviceManager);
 
             // Check if configs already stored in Container
-            const container = new Container('__framework');
+            const container = new ApplicationContainer('__framework');
             if (!container.has('ServiceManager')) {
                 // First time: load config and store merged configs
                 serviceManager.loadConfiguration();
@@ -140,14 +141,14 @@ class BaseController {
     }
 
     getView() {
-		if(this.model == null) {
-			this.model = new ViewModel();
+        if (this.model == null) {
+            this.model = new ViewModel();
             this.model.setTemplate(this.getViewScript());
-		}
+        }
         return this.model;
     }
 
-	getViewScript() {
+    getViewScript() {
         return this.plugin('layout').getTemplate();
     }
 
@@ -174,15 +175,15 @@ class BaseController {
     dispatch(request = null, response = null) {
         let view = null;
 
-        if(request != null) {
+        if (request != null) {
             this.setRequest(request);
-        }else{
+        } else {
             request = this.getRequest();
         }
 
-        if(response != null) {
+        if (response != null) {
             this.setResponse(response);
-        }else{
+        } else {
             response = this.getResponse();
         }
 
@@ -201,7 +202,8 @@ class BaseController {
 
             // Set action name (from route)
             if (typeof request.getActionName === 'function') {
-                viewModel.setVariable('_controllerActionName', request.getActionName());
+                let action = request.getActionName();
+                viewModel.setVariable('_actionName', StringUtil.toKebabCase(action).replace('-action', ''));
             }
 
             // Set route name for convenience
@@ -221,20 +223,20 @@ class BaseController {
         }
 
         this.preDispatch();
-        if(this.getRequest().isDispatched()) {
+        if (this.getRequest().isDispatched()) {
             // Stop dispatch if there is a redirect hook
             //if(!this.getResponse().isRedirect()) {
-                const actionResult = this[this.getRequest().getActionName()]();
-                // Handle async actions that return promises
-                if (actionResult && typeof actionResult.then === 'function') {
-                    // Return the promise so the bootstrapper can await it
-                    return actionResult.then(resolvedView => {
-                        this.postDispatch();
-                        return resolvedView;
-                    });
-                } else {
-                    view = actionResult;
-                }
+            const actionResult = this[this.getRequest().getActionName()]();
+            // Handle async actions that return promises
+            if (actionResult && typeof actionResult.then === 'function') {
+                // Return the promise so the bootstrapper can await it
+                return actionResult.then(resolvedView => {
+                    this.postDispatch();
+                    return resolvedView;
+                });
+            } else {
+                view = actionResult;
+            }
             //}
 
             this.postDispatch();
@@ -269,7 +271,7 @@ class BaseController {
     }
 
     getPluginManager() {
-        if(!this.pluginManager) {
+        if (!this.pluginManager) {
             // Get PluginManager from ServiceManager
             const pluginManager = this.getServiceManager().get('PluginManager');
             this.setPluginManager(pluginManager);
@@ -296,9 +298,9 @@ class BaseController {
         return this.getPluginManager().get(name, options);
     }
 
-    preDispatch() {}
+    preDispatch() { }
 
-    postDispatch() {}
+    postDispatch() { }
 
     /**
      * Helper method to get flash messages for views
@@ -319,18 +321,18 @@ class BaseController {
     trigger404(message = null, error = null) {
         const viewManager = this.getViewManager();
         const errorViewModel = viewManager.createErrorViewModel(404, message, error);
-        
+
         const viewModel = new ViewModel();
         viewModel.setTemplate(errorViewModel.template);
-        
+
         // Set all variables from the view manager
         Object.keys(errorViewModel.variables).forEach(key => {
             viewModel.setVariable(key, errorViewModel.variables[key]);
         });
-        
+
         return viewModel;
     }
-    
+
     /**
      * Programmatically trigger 500 server error page (like ZF's exception handling)
      * @param {string} message - Custom error message
@@ -340,18 +342,18 @@ class BaseController {
     trigger500(message = null, error = null) {
         const viewManager = this.getViewManager();
         const errorViewModel = viewManager.createErrorViewModel(500, message, error);
-        
+
         const viewModel = new ViewModel();
         viewModel.setTemplate(errorViewModel.template);
-        
+
         // Set all variables from the view manager
         Object.keys(errorViewModel.variables).forEach(key => {
             viewModel.setVariable(key, errorViewModel.variables[key]);
         });
-        
+
         return viewModel;
     }
-    
+
 }
 
 module.exports = BaseController;

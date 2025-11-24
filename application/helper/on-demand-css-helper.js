@@ -46,6 +46,7 @@ class OnDemandCssHelper extends AbstractHelper {
             if (fs.existsSync(actionAbsPath)) {
                 try {
                     const cssContent = fs.readFileSync(actionAbsPath, 'utf8');
+                    console.log(cssContent);
                     cssContents.push(cssContent);
                 } catch (err) {
                     console.error(`Error reading action CSS (${moduleName}/${controllerName}/${controllerActionName}):`, err.message);
@@ -75,11 +76,16 @@ class OnDemandCssHelper extends AbstractHelper {
         const controllerName = this.getVariable('_controllerName');
         const actionName = this.getVariable('_actionName');
 
+        console.log('[OnDemandCss] module:', moduleName, 'controller:', controllerName, 'action:', actionName);
+
         if (!moduleName) {
+            console.log('[OnDemandCss] No module name, returning empty');
             return '';
         }
 
-        return this.cssLinkTag(moduleName, controllerName, actionName);
+        const result = this.cssLinkTag(moduleName, controllerName, actionName);
+        console.log('[OnDemandCss] CSS result length:', result.length);
+        return result;
     }
 }
 

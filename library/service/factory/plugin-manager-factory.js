@@ -1,6 +1,6 @@
 const AbstractFactory = require('../abstract-factory');
 const PluginManager = require('../../mvc/controller/plugin-manager');
-const Container = require('../../core/container');
+const ApplicationContainer = require('../../core/application-container');
 
 class PluginManagerFactory extends AbstractFactory {
 
@@ -27,7 +27,7 @@ class PluginManagerFactory extends AbstractFactory {
         }
 
         // Check if configs already stored in Container
-        const container = new Container('__framework');
+        const container = new ApplicationContainer('__framework');
         if (!container.has('PluginManager')) {
             // First time: merge and store configs
             const applicationPlugins = appConfig?.controller_plugins?.invokables || {};

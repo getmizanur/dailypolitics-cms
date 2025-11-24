@@ -1,6 +1,6 @@
 const AbstractFactory = require('../abstract-factory');
 const ViewManager = require('../../mvc/view/view-manager');
-const Container = require('../../core/container');
+const ApplicationContainer = require('../../core/application-container');
 
 class ViewManagerFactory extends AbstractFactory {
 
@@ -25,7 +25,7 @@ class ViewManagerFactory extends AbstractFactory {
         const viewManager = new ViewManager(viewManagerConfig);
 
         // Check if configs already stored in Container
-        const container = new Container('__framework');
+        const container = new ApplicationContainer('__framework');
         if (!container.has('ViewManager')) {
             // First time: store configs only
             container.set('ViewManager', {

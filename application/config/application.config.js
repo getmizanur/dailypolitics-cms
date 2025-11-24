@@ -254,6 +254,10 @@ module.exports = {
                 "class": "/application/helper/on-demand-css-helper",
                 "params": []
             },
+            "onDemandJs": {
+                "class": "/application/helper/on-demand-js-helper",
+                "params": []
+            },
             "newsArticleJsonLd": {
                 "class": "/application/helper/news-article-json-ld-helper",
                 "params": ["data", "options = {}"]

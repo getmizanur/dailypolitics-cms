@@ -56,7 +56,7 @@
  *   container.set('ServiceManager', { configs: { invokables: {...}, factories: {...} } });
  *   container.set('ViewHelperManager', { configs: { invokables: {...}, factories: {} }, helpers: {} });
  */
-class Container {
+class ApplicationContainer {
 
     constructor(namespace = '__framework') {
         this.namespace = namespace;
@@ -139,7 +139,7 @@ class Container {
      * Set a value
      * @param {string} name - The key to store
      * @param {*} value - The value to store
-     * @returns {Container} For method chaining
+     * @returns {ApplicationContainer} For method chaining
      */
     set(name, value) {
         const storage = this._getStorage();
@@ -179,7 +179,7 @@ class Container {
 
     /**
      * Clear all values in this namespace
-     * @returns {Container} For method chaining
+     * @returns {ApplicationContainer} For method chaining
      */
     clear() {
         const storage = this._getStorage();
@@ -201,4 +201,4 @@ class Container {
 
 }
 
-module.exports = Container;
+module.exports = ApplicationContainer;
