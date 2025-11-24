@@ -208,6 +208,16 @@ class BaseController {
             if (typeof request.getRouteName === 'function') {
                 viewModel.setVariable('_routeName', request.getRouteName());
             }
+
+            // Set authentication status for navigation helpers
+            try {
+                const authService = this.getServiceManager().get('AuthenticationService');
+                const isAuthenticated = authService && authService.hasIdentity();
+                viewModel.setVariable('_isAuthenticated', isAuthenticated);
+            } catch (error) {
+                // AuthenticationService may not be available in all contexts
+                viewModel.setVariable('_isAuthenticated', false);
+            }
         }
 
         this.preDispatch();

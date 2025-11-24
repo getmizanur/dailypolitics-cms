@@ -17,9 +17,10 @@ class PluginManagerFactory extends AbstractFactory {
         // Pass configuration to plugin manager if available
         let appConfig = null;
         try {
-            const controller = serviceManager.getController();
-            const configRegistry = controller.getConfig();
-            appConfig = configRegistry.get('application');
+            //const configRegistry = serviceManager.get('config');
+            //appConfig = configRegistry.get('application');
+            appConfig = serviceManager.get('config');
+
             pluginManager.setConfig(appConfig);
         } catch (error) {
             console.warn('Could not load application config for plugin manager:', error.message);

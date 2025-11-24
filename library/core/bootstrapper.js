@@ -252,6 +252,22 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
 
         front.setRequest(request);
 
+        // Create RouteMatch instance and store in ServiceManager
+        const RouteMatch = require(global.applicationPath('/library/mvc/router/route-match'));
+        const routeMatchParams = {
+            module: module,
+            controller: controller,
+            action: action,
+            ...req.params // Include all route parameters (slug, id, etc.)
+        };
+        const routeMatch = new RouteMatch(routeMatchParams, req.routeName);
+
+        // Store RouteMatch in ServiceManager for access throughout the application
+        const serviceManager = front.getServiceManager();
+        if (serviceManager) {
+            serviceManager.setRouteMatch(routeMatch);
+        }
+
         let response = new Response();        
         front.setResponse(response);
 

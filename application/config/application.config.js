@@ -149,10 +149,10 @@ module.exports = {
         "adapter": process.env.DATABASE_ADAPTER || "postgresql",
         "connection": {
             "host": process.env.DATABASE_HOST || "localhost",
-            "port": parseInt(process.env.DATABASE_PORT) || 5432,
+            "port": parseInt(process.env.DATABASE_PORT) || 5433,
             "username": process.env.DATABASE_USER || "postgres",
             "password": process.env.DATABASE_PASSWORD || "",
-            "database": process.env.DATABASE_NAME || "dailypolitics_cms",
+            "database": process.env.DATABASE_NAME || "postgres",
             "ssl": process.env.DATABASE_SSL === 'true' || false,
             "connectionTimeoutMillis": parseInt(process.env.DATABASE_CONNECTION_TIMEOUT) || 30000,
             "idleTimeoutMillis": parseInt(process.env.DATABASE_IDLE_TIMEOUT) || 30000,
@@ -258,6 +258,9 @@ module.exports = {
                 "class": "/application/helper/news-article-json-ld-helper",
                 "params": ["data", "options = {}"]
             }
+        },
+        "factories": {
+            "navigationLink": "/application/helper/factory/navigation-link-helper-factory"
         }
         // Add your custom application helpers here
         // Example:

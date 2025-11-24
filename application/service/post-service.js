@@ -501,7 +501,7 @@ class PostService extends AbstractService {
                       'slug',
                       'description'
                   ])
-                  .order('name', 'ASC');
+                  .order('sort_order', 'ASC');
 
             const result = await select.execute();
             return result.rows || result;

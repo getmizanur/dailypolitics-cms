@@ -12,22 +12,31 @@ class ViewHelperManagerFactory extends AbstractFactory {
      */
     createService(serviceManager) {
         // Always create new instance (configs stored in Container, not instance)
-        let applicationHelpers = {};
+        let applicationHelpersConfig = {
+            invokables: {},
+            factories: {}
+        };
 
         try {
-            const controller = serviceManager.getController();
-            const configRegistry = controller.getConfig();
-            const appConfig = configRegistry.get('application');
+            //const configRegistry = serviceManager.get('config');
+            //const appConfig = configRegistry.get('application');
+            //const configRegistry = serviceManager.get('config');
+            const appConfig = serviceManager.get('config');
 
-            // Get invokables from view_helpers config
-            if (appConfig.view_helpers && appConfig.view_helpers.invokables) {
-                applicationHelpers = appConfig.view_helpers.invokables;
+            // Get invokables and factories from view_helpers config
+            if (appConfig.view_helpers) {
+                if (appConfig.view_helpers.invokables) {
+                    applicationHelpersConfig.invokables = appConfig.view_helpers.invokables;
+                }
+                if (appConfig.view_helpers.factories) {
+                    applicationHelpersConfig.factories = appConfig.view_helpers.factories;
+                }
             }
         } catch (error) {
             console.warn('Could not load view_helpers config:', error.message);
         }
 
-        const viewHelperManager = new ViewHelperManager(applicationHelpers);
+        const viewHelperManager = new ViewHelperManager(applicationHelpersConfig, serviceManager);
 
         // Check if configs already stored in Container
         const container = new Container('__framework');
@@ -36,14 +45,14 @@ class ViewHelperManagerFactory extends AbstractFactory {
             // Merge framework helpers with application helpers (with conflict check)
             const mergedHelpers = this._mergeHelpers(
                 viewHelperManager.frameworkHelpers,
-                applicationHelpers
+                applicationHelpersConfig.invokables
             );
 
             // Store configs in container (no instance, no separate framework/application)
             container.set('ViewHelperManager', {
                 configs: {
                     invokables: mergedHelpers,
-                    factories: {}  // Helpers currently don't have factories, but structure matches ServiceManager
+                    factories: applicationHelpersConfig.factories || {}
                 },
                 helpers: {}  // Runtime storage for helper-specific data (titles, meta tags, links, scripts)
             });

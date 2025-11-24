@@ -7,15 +7,18 @@
  */
 class ViewHelperManager {
 
-    constructor(applicationHelpers = {}) {
+    constructor(applicationHelpers = {}, serviceManager = null) {
         // Validate application helpers don't override framework helpers
         const conflicts = this._checkConflicts(applicationHelpers);
         if (conflicts.length > 0) {
             throw new Error(`Application helpers cannot override framework helpers. Conflicts: ${conflicts.join(', ')}`);
         }
 
-        this.applicationHelpers = applicationHelpers;
+        // Separate invokables and factories from application helpers
+        this.applicationHelpers = applicationHelpers.invokables || applicationHelpers;
+        this.applicationFactories = applicationHelpers.factories || {};
         this.instances = {}; // Cache for instantiated helpers
+        this.serviceManager = serviceManager; // Store reference to ServiceManager
 
         // Framework-level helpers - protected from developer modification
         this.frameworkHelpers = {
@@ -173,12 +176,16 @@ class ViewHelperManager {
     /**
      * Get a helper instance by name
      * Instantiates the helper if not already cached
+     * Factory helpers are NOT cached - created fresh per request
      * @param {string} name - Helper name
      * @returns {object} Helper instance
      */
     get(name) {
-        // Return cached instance if available
-        if (this.instances[name]) {
+        // Check if this is a factory helper - if so, skip cache and create fresh
+        const isFactory = this.applicationFactories.hasOwnProperty(name);
+
+        // Return cached instance if available (not for factories)
+        if (!isFactory && this.instances[name]) {
             return this.instances[name];
         }
 
@@ -197,7 +204,26 @@ class ViewHelperManager {
             return instance;
         }
 
-        // Check application helpers
+        // Check application factories
+        if (this.applicationFactories[name]) {
+            const factoryPath = this.applicationFactories[name];
+            const FactoryClass = require(global.applicationPath(factoryPath));
+            const factory = new FactoryClass();
+
+            // Create helper through factory with ServiceManager
+            // DO NOT CACHE factory helpers - they need fresh ServiceManager state per request
+            const instance = factory.createService(this.serviceManager);
+
+            // Set nunjucks context if available
+            if (global.nunjucksContext) {
+                instance.setContext(global.nunjucksContext);
+            }
+
+            // DO NOT cache: this.instances[name] = instance;
+            return instance;
+        }
+
+        // Check application invokable helpers
         if (this.applicationHelpers[name]) {
             const helperConfig = this.applicationHelpers[name];
             const HelperClass = require(global.applicationPath(helperConfig.class));
@@ -222,7 +248,8 @@ class ViewHelperManager {
      */
     has(name) {
         return this.frameworkHelpers.invokables.hasOwnProperty(name) ||
-               this.applicationHelpers.hasOwnProperty(name);
+               this.applicationHelpers.hasOwnProperty(name) ||
+               this.applicationFactories.hasOwnProperty(name);
     }
 
     /**
@@ -232,8 +259,27 @@ class ViewHelperManager {
     getAvailableHelpers() {
         return [
             ...Object.keys(this.frameworkHelpers.invokables),
-            ...Object.keys(this.applicationHelpers)
+            ...Object.keys(this.applicationHelpers),
+            ...Object.keys(this.applicationFactories)
         ];
+    }
+
+    /**
+     * Get the ServiceManager instance
+     * @returns {ServiceManager|null} ServiceManager instance or null if not set
+     */
+    getServiceManager() {
+        return this.serviceManager;
+    }
+
+    /**
+     * Set the ServiceManager instance
+     * @param {ServiceManager} serviceManager - ServiceManager instance
+     * @returns {ViewHelperManager} For method chaining
+     */
+    setServiceManager(serviceManager) {
+        this.serviceManager = serviceManager;
+        return this;
     }
 
 }

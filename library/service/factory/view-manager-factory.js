@@ -15,8 +15,7 @@ class ViewManagerFactory extends AbstractFactory {
         let viewManagerConfig = {};
 
         try {
-            const controller = serviceManager.getController();
-            const configRegistry = controller.getConfig();
+            const configRegistry = serviceManager.get('config');
             const appConfig = configRegistry.get('application');
             viewManagerConfig = appConfig.view_manager || {};
         } catch (error) {

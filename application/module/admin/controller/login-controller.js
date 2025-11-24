@@ -12,10 +12,10 @@ class LoginController extends Controller {
     }
 
     preDispatch() {
-        // Check authentication for all actions except login
+        // Check authentication for all actions except login and index
         const actionName = this.getRequest().getActionName();
 
-        if (actionName !== 'indexAction') {
+        if (actionName !== 'indexAction' && actionName !== 'loginAction') {
             const authService = this.getServiceManager().get('AuthenticationService');
 
             if (!authService.hasIdentity()) {
@@ -24,7 +24,7 @@ class LoginController extends Controller {
             }
         }
 
-        // Access headTitle helper through the view
+        //Access headTitle helper through the view
         //const viewModel = this.getView();
         //const headTitle = viewModel.getHelper('headTitle');
         //headTitle.append('Admin');
@@ -32,6 +32,10 @@ class LoginController extends Controller {
     }
 
     async indexAction() {
+        return this.loginAction();
+    }
+
+    async loginAction() {
         // Initialize authentication service
         const authService = this.getServiceManager().get('AuthenticationService');
 

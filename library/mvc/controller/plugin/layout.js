@@ -9,13 +9,13 @@ class Layout extends BasePlugin {
 
     getTemplate() {
         let request = super.getController().getRequest();
-        let module = StringUtil.toSnakeCase(request.getModuleName()) || "default";
-        let controller = StringUtil.toSnakeCase(request.getControllerName());
-        let action = StringUtil.toSnakeCase(request.getActionName()).replace('-action', '');
+        let module = StringUtil.toKebabCase(request.getModuleName()) || "default";
+        let controller = StringUtil.toKebabCase(request.getControllerName());
+        let action = StringUtil.toKebabCase(request.getActionName()).replace('-action', '');
         let dir = `application/${module}`;
 
-        return dir + '/' + StringUtil.strReplace('_', '/', controller) 
-            + '/' + action + '.njk'
+        return dir + '/' + StringUtil.strReplace('-', '/', controller)
+            + '/' + action + '.njk';
     }
 
 }

@@ -1,21 +1,26 @@
-const StringUtil = require('../util/string-util');
+const JsonUtil = require('../util/json-util');
+const VarUtil = require('../util/var-util');
 const ErrorResponse = require('../util/error-response');
 const AbstractFactory = require('./abstract-factory');
+const RouteMatch = require('../mvc/router/route-match');
 
 class ServiceManager {
 
-    constructor(options = {}) {
-        this.controller = options.controller || null;
+    constructor(config = {}) {
+        //this.controller = options.controller || null;
 
+        this.config = config || {};
         this.services = {};
         this.invokables = null;
         this.factories = null;
+        this.routeMatch = null; // Store route match information
 
         // Framework-level service factories - protected from developer modification
         this.frameworkFactories = {
             "ViewManager": "/library/service/factory/view-manager-factory",
             "ViewHelperManager": "/library/service/factory/view-helper-manager-factory",
-            "PluginManager": "/library/service/factory/plugin-manager-factory"
+            "PluginManager": "/library/service/factory/plugin-manager-factory",
+            "Application" : "/library/service/factory/application-factory"
         };
     }
 
@@ -30,6 +35,14 @@ class ServiceManager {
     }
 
     get(name) {
+        // Special case: Return application config directly
+        if (name === 'config') {
+            if(VarUtil.empty(this.config))
+                return this.config = require('../../application/config/application.config');
+            
+            return this.config;
+        }
+
         // Lazy load configuration
         if (this.invokables == null || this.factories == null) {
             this.loadConfiguration();
@@ -62,8 +75,7 @@ class ServiceManager {
      * Load service configuration from application config
      */
     loadConfiguration() {
-        let configObj = this.getController().getConfig();
-        let applicationObj = configObj.get('application');
+        let applicationObj = this.get('config');
         let serviceManagerObj = applicationObj.service_manager || {};
         
         this.invokables = serviceManagerObj.invokables || {};
@@ -96,7 +108,7 @@ class ServiceManager {
             // Validate configuration if factory supports it
             if (typeof factory.validateConfiguration === 'function' || 
                 typeof factory.validateRequiredConfig === 'function') {
-                let configObj = this.getController().getConfig();
+                let configObj = this.get('config');
                 
                 // Check required configuration keys first
                 if (typeof factory.validateRequiredConfig === 'function' && 
@@ -191,6 +203,11 @@ class ServiceManager {
      * @returns {boolean}
      */
     has(name) {
+        // Special case: config is always available
+        if (name === 'config') {
+            return true;
+        }
+
         if (this.invokables == null || this.factories == null) {
             this.loadConfiguration();
         }
@@ -265,6 +282,24 @@ class ServiceManager {
      */
     clearAllServices() {
         this.services = {};
+        return this;
+    }
+
+    /**
+     * Get the RouteMatch instance containing matched route information
+     * @returns {RouteMatch|null} RouteMatch instance or null if not set
+     */
+    getRouteMatch() {
+        return this.routeMatch;
+    }
+
+    /**
+     * Set the RouteMatch instance
+     * @param {RouteMatch} routeMatch - RouteMatch instance
+     * @returns {ServiceManager} For method chaining
+     */
+    setRouteMatch(routeMatch) {
+        this.routeMatch = routeMatch;
         return this;
     }
 

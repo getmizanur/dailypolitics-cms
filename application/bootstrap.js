@@ -183,8 +183,12 @@ class Bootstrap extends Bootstrapper {
         const ViewHelperManager = require(global.applicationPath('/library/mvc/view/view-helper-manager'));
         const Container = require(global.applicationPath('/library/core/container'));
 
-        const applicationHelpers = appConfig.view_helpers?.invokables || {};
-        const viewHelperManager = new ViewHelperManager(applicationHelpers);
+        // Get both invokables and factories from view_helpers config
+        const applicationHelpersConfig = {
+            invokables: appConfig.view_helpers?.invokables || {},
+            factories: appConfig.view_helpers?.factories || {}
+        };
+        const viewHelperManager = new ViewHelperManager(applicationHelpersConfig);
 
         // Store the nunjucks env in global for controller access
         global.nunjucksEnv = env;
@@ -201,7 +205,7 @@ class Bootstrap extends Bootstrapper {
         const frameworkHelpers = viewHelperManager.frameworkHelpers;
 
         // Check for conflicts
-        const conflicts = Object.keys(applicationHelpers).filter(key =>
+        const conflicts = Object.keys(applicationHelpersConfig.invokables).filter(key =>
             frameworkHelpers.hasOwnProperty(key)
         );
 
@@ -214,19 +218,20 @@ class Bootstrap extends Bootstrapper {
         }
 
         // Merge: framework helpers first, then application helpers
-        Object.assign(mergedHelpers, frameworkHelpers, applicationHelpers);
+        Object.assign(mergedHelpers, frameworkHelpers, applicationHelpersConfig.invokables);
 
         // Store configs in Container
         container.set('ViewHelperManager', {
             configs: {
                 invokables: mergedHelpers,
-                factories: {}
+                factories: applicationHelpersConfig.factories
             },
             helpers: {}  // Runtime storage for helper-specific data (titles, meta tags, links, scripts)
         });
 
         // Get all available helper names
         const helperNames = viewHelperManager.getAvailableHelpers();
+        console.log('Available helpers:', helperNames);
 
         // Register each helper directly on env.globals for template access
         // Templates can use {{ headTitle() }} directly

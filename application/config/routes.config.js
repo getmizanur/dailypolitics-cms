@@ -8,13 +8,13 @@ module.exports = {
             "route": "/admin",
             "module": "admin",
             "controller": "login",
-            "action": "index"
+            "action": "login"
         },
         "adminDashboardIndex": {
             "route": "/admin/dashboard(/page/:page)?",
             "module": "admin",
             "controller": "dashboard",
-            "action": "index"
+            "action": "list"
         },
          "adminDashboardView": {
             "route": "/admin/dashboard/view/:slug",
@@ -26,7 +26,7 @@ module.exports = {
             "route": "/admin/dashboard/edit/:slug",
             "module": "admin",
             "controller": "dashboard",
-            "action": "edit-article"
+            "action": "edit"
         },
         "adminDashboardDelete": {
             "route": "/admin/dashboard/delete/:slug",

@@ -6,45 +6,80 @@ const AbstractHelper = require(global.applicationPath('/library/mvc/view/helper/
 
 class OnDemandCssHelper extends AbstractHelper {
     /**
-     * Generate inline CSS or link tag for module-specific CSS
+     * Generate inline CSS for module, controller, and action-specific CSS
      * @param {string} moduleName - Module name
-     * @returns {string} HTML style or link tag
+     * @param {string} controllerName - Controller name (optional)
+     * @param {string} controllerActionName - Controller action name (optional)
+     * @returns {string} HTML style tags with CSS content
      */
-    cssLinkTag(moduleName) {
-        const cssPath = `/css/module/${moduleName}.css`;
-        const absPath = path.join(global.applicationPath('/public/css/module'), `${moduleName}.css`);
+    cssLinkTag(moduleName, controllerName = null, controllerActionName = null) {
+        const cssContents = [];
+        const basePath = global.applicationPath('/public/css/module');
 
-        if (fs.existsSync(absPath)) {
-            // Inline critical CSS to avoid render-blocking
+        // 1. Module CSS path: /css/module/{moduleName}.css
+        const moduleAbsPath = path.join(basePath, `${moduleName}.css`);
+        if (fs.existsSync(moduleAbsPath)) {
             try {
-                const cssContent = fs.readFileSync(absPath, 'utf8');
-                return `<style>${cssContent}</style>`;
+                const cssContent = fs.readFileSync(moduleAbsPath, 'utf8');
+                cssContents.push(cssContent);
             } catch (err) {
-                // Fallback to link tag if inline fails
-                return `<link rel="stylesheet" href="${cssPath}" />`;
+                console.error(`Error reading module CSS (${moduleName}):`, err.message);
             }
+        }
+
+        // 2. Controller CSS path: /css/module/{moduleName}/{controllerName}.css
+        if (controllerName) {
+            const controllerAbsPath = path.join(basePath, moduleName, `${controllerName}.css`);
+            if (fs.existsSync(controllerAbsPath)) {
+                try {
+                    const cssContent = fs.readFileSync(controllerAbsPath, 'utf8');
+                    cssContents.push(cssContent);
+                } catch (err) {
+                    console.error(`Error reading controller CSS (${moduleName}/${controllerName}):`, err.message);
+                }
+            }
+        }
+
+        // 3. Action CSS path: /css/module/{moduleName}/{controllerName}/{action}.css
+        if (controllerName && controllerActionName) {
+            const actionAbsPath = path.join(basePath, moduleName, controllerName, `${controllerActionName}.css`);
+            if (fs.existsSync(actionAbsPath)) {
+                try {
+                    const cssContent = fs.readFileSync(actionAbsPath, 'utf8');
+                    cssContents.push(cssContent);
+                } catch (err) {
+                    console.error(`Error reading action CSS (${moduleName}/${controllerName}/${controllerActionName}):`, err.message);
+                }
+            }
+        }
+
+        // Return all CSS contents wrapped in a single <style> tag
+        if (cssContents.length > 0) {
+            return `<style>${cssContents.join('\n')}</style>`;
         }
 
         return '';
     }
 
     /**
-     * Render module-specific CSS
-     * Reads module name from Nunjucks context variables set by BaseController
-     * @returns {string} HTML style or link tag
+     * Render module, controller, and action-specific CSS
+     * Reads module, controller, and action names from Nunjucks context variables set by BaseController
+     * @returns {string} HTML style tags with CSS content
      */
     render(...args) {
         // Extract Nunjucks context from arguments
         this._extractContext(args);
 
-        // Get module name from context (set by BaseController in dispatch)
+        // Get module, controller, and action names from context (set by BaseController in dispatch)
         const moduleName = this.getVariable('_moduleName');
+        const controllerName = this.getVariable('_controllerName');
+        const actionName = this.getVariable('_actionName');
 
         if (!moduleName) {
             return '';
         }
 
-        return this.cssLinkTag(moduleName);
+        return this.cssLinkTag(moduleName, controllerName, actionName);
     }
 }
 

@@ -21,6 +21,10 @@ class DashboardController extends Controller {
     }
 
     async indexAction() {
+        return this.listAction();
+    }
+
+    async listAction() {
         try {
             const postService = this.getServiceManager().get('PostService');
             const page = parseInt(this.getParam('page')) || 1;
@@ -65,7 +69,7 @@ class DashboardController extends Controller {
         }
     }
 
-    async editArticleAction() {
+    async editAction() {
         const logFile = global.applicationPath('/logs/debug.log');
         const log = (msg) => {
             const logMsg = `[${new Date().toISOString()}] ${msg}\n`;
@@ -361,6 +365,8 @@ class DashboardController extends Controller {
                         });
                     }
                 }
+            }else{
+                form.populateValues(this.getRequest().getPost());
             }
 
             log('Returning view with form');

@@ -1,11 +1,16 @@
+const ServiceManager = require('../service/service-manager');
+const VarUtil = require('../util/var-util');
 const express = require('express');
 
 class Application {
     
-    constructor(options = {}) {
+    constructor(config = {}, serviceManager = null) {
         this.app = express(); 
-        
-        this._bootstrap = options.bootstrap || null;
+
+        this.config = config;
+        this.serviceManager = serviceManager;
+
+        this._bootstrap = null;
     }
 
     bootstrap(resource = null) {
@@ -21,6 +26,24 @@ class Application {
         }
 
         return this;
+    }
+
+    getConfig() {
+        if(VarUtil.empty(this.config)) {
+            this.config = require('../../application/config/application.config');
+            return this.config;
+        }
+
+        return this.config;
+    }
+
+    getServiceManager() {
+        if(VarUtil.isNull(this.serviceManager)) {
+            this.serviceManager = new ServiceManager(this.getConfig())
+            return this.serviceManager;
+        }
+
+        return this.serviceManager;
     }
 
     getBootstrap() {
