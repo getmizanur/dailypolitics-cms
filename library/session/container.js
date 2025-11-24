@@ -15,13 +15,27 @@ class Container {
      * Always accesses session directly (not cached) to ensure persistence
      * @returns {object}
      */
-    _getData() {
+    /**
+     * Get the data object for this container from the session
+     * Always accesses session directly (not cached) to ensure persistence
+     * @returns {object}
+     */
+    /**
+     * Get the data object for this container from the session
+     * Always accesses session directly (not cached) to ensure persistence
+     * @param {boolean} create - Whether to create the namespace if it doesn't exist
+     * @returns {object|null} - Returns null if create is false and namespace doesn't exist
+     */
+    _getData(create = true) {
         // First priority: Use express-session if provided directly
         if (this._expressSession) {
             if (!this._expressSession.customData) {
+                if (!create) return null;
                 this._expressSession.customData = {};
             }
-            if (!this._expressSession.customData[this.name]) {
+            // Use hasOwnProperty to check if namespace exists (prevents overwriting existing data)
+            if (!this._expressSession.customData.hasOwnProperty(this.name)) {
+                if (!create) return null;
                 this._expressSession.customData[this.name] = {};
             }
             return this._expressSession.customData[this.name];
@@ -30,9 +44,12 @@ class Container {
         // Second priority: Use express-session from global.locals
         if (typeof global !== 'undefined' && global.locals && global.locals.expressSession) {
             if (!global.locals.expressSession.customData) {
+                if (!create) return null;
                 global.locals.expressSession.customData = {};
             }
-            if (!global.locals.expressSession.customData[this.name]) {
+            // Use hasOwnProperty to check if namespace exists (prevents overwriting existing data)
+            if (!global.locals.expressSession.customData.hasOwnProperty(this.name)) {
+                if (!create) return null;
                 global.locals.expressSession.customData[this.name] = {};
             }
             return global.locals.expressSession.customData[this.name];
@@ -48,7 +65,7 @@ class Container {
      * @param {*} value
      */
     set(key, value) {
-        const data = this._getData();
+        const data = this._getData(true);
         data[key] = value;
 
         // Force express-session to detect modification by touching a top-level property
@@ -68,7 +85,8 @@ class Container {
      * @returns {*}
      */
     get(key, defaultValue = null) {
-        const data = this._getData();
+        const data = this._getData(false);
+        if (!data) return defaultValue;
         return data.hasOwnProperty(key) ? data[key] : defaultValue;
     }
 
@@ -78,7 +96,8 @@ class Container {
      * @returns {boolean}
      */
     has(key) {
-        const data = this._getData();
+        const data = this._getData(false);
+        if (!data) return false;
         return data.hasOwnProperty(key);
     }
 
@@ -87,8 +106,8 @@ class Container {
      * @param {string} key
      */
     remove(key) {
-        const data = this._getData();
-        if (data.hasOwnProperty(key)) {
+        const data = this._getData(false);
+        if (data && data.hasOwnProperty(key)) {
             delete data[key];
         }
 
@@ -105,7 +124,8 @@ class Container {
      * @returns {object}
      */
     all() {
-        const data = this._getData();
+        const data = this._getData(false);
+        if (!data) return {};
         return { ...data };
     }
 
@@ -113,8 +133,10 @@ class Container {
      * Clear all data in the container
      */
     clear() {
-        const data = this._getData();
-        Object.keys(data).forEach(key => delete data[key]);
+        const data = this._getData(false);
+        if (data) {
+            Object.keys(data).forEach(key => delete data[key]);
+        }
         return this;
     }
 

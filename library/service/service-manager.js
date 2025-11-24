@@ -9,11 +9,14 @@ class ServiceManager {
     constructor(config = {}) {
         //this.controller = options.controller || null;
 
+        this._instanceId = Math.random().toString(36).substr(2, 9); // Debug: track instance
         this.config = config || {};
         this.services = {};
         this.invokables = null;
         this.factories = null;
         this.routeMatch = null; // Store route match information
+        this.request = null; // Store request object
+        this.response = null; // Store response object
 
         // Framework-level service factories - protected from developer modification
         this.frameworkFactories = {
@@ -22,6 +25,12 @@ class ServiceManager {
             "PluginManager": "/library/service/factory/plugin-manager-factory",
             "Application" : "/library/service/factory/application-factory"
         };
+
+        // Services that should NOT be cached (request-scoped services)
+        this.nonCacheableServices = [
+            "AuthenticationService", // Depends on Request session data
+            "ViewHelperManager"      // Contains request-scoped helpers and RouteMatch
+        ];
     }
 
     setController(controller) {
@@ -39,8 +48,18 @@ class ServiceManager {
         if (name === 'config') {
             if(VarUtil.empty(this.config))
                 return this.config = require('../../application/config/application.config');
-            
+
             return this.config;
+        }
+
+        // Special case: Return Request object
+        if (name === 'Request') {
+            return this.request;
+        }
+
+        // Special case: Return Response object
+        if (name === 'Response') {
+            return this.response;
         }
 
         // Lazy load configuration
@@ -48,19 +67,22 @@ class ServiceManager {
             this.loadConfiguration();
         }
 
-        // Return cached service if exists
-        if (this.services[name]) {
+        // Check if this service should NOT be cached
+        const isCacheable = !this.nonCacheableServices.includes(name);
+
+        // Return cached service if exists and is cacheable
+        if (isCacheable && this.services[name]) {
             return this.services[name];
         }
 
         // Try framework factories first (highest priority, protected)
         if (this.frameworkFactories.hasOwnProperty(name)) {
-            return this.createFromFactory(name, true);
+            return this.createFromFactory(name, true, isCacheable);
         }
 
         // Try application factories second
         if (this.factories.hasOwnProperty(name)) {
-            return this.createFromFactory(name, false);
+            return this.createFromFactory(name, false, isCacheable);
         }
 
         // Fall back to invokables (direct instantiation)
@@ -86,9 +108,10 @@ class ServiceManager {
      * Create service using factory pattern
      * @param {string} name - Service name
      * @param {boolean} isFramework - Whether this is a framework factory
+     * @param {boolean} cacheable - Whether to cache this service
      * @returns {Object} - Service instance
      */
-    createFromFactory(name, isFramework = false) {
+    createFromFactory(name, isFramework = false, cacheable = true) {
         try {
             // Get factory path from appropriate source
             const factoryPath = isFramework
@@ -96,39 +119,44 @@ class ServiceManager {
                 : global.applicationPath(this.factories[name]);
 
             let FactoryClass = require(factoryPath);
-            
+
             // Validate factory extends AbstractFactory
             if (!this.isValidFactory(FactoryClass)) {
                 throw new Error(`Factory '${factoryPath}' must extend AbstractFactory`);
             }
-            
+
             // Create factory instance
             let factory = new FactoryClass();
-            
+
             // Validate configuration if factory supports it
-            if (typeof factory.validateConfiguration === 'function' || 
+            if (typeof factory.validateConfiguration === 'function' ||
                 typeof factory.validateRequiredConfig === 'function') {
                 let configObj = this.get('config');
-                
+
                 // Check required configuration keys first
-                if (typeof factory.validateRequiredConfig === 'function' && 
+                if (typeof factory.validateRequiredConfig === 'function' &&
                     !factory.validateRequiredConfig(configObj)) {
                     throw new Error(`Required configuration validation failed for factory '${factoryPath}'`);
                 }
-                
+
                 // Then run custom validation
-                if (typeof factory.validateConfiguration === 'function' && 
+                if (typeof factory.validateConfiguration === 'function' &&
                     !factory.validateConfiguration(configObj)) {
                     throw new Error(`Configuration validation failed for factory '${factoryPath}'`);
                 }
             }
-            
+
             // Create service through factory
-            this.services[name] = factory.createService(this);
-            
-            console.log(`Service '${name}' created via factory: ${factoryPath}`);
-            return this.services[name];
-            
+            const service = factory.createService(this);
+
+            // Only cache if cacheable
+            if (cacheable) {
+                this.services[name] = service;
+            }
+
+            console.log(`Service '${name}' created via factory: ${factoryPath}${!cacheable ? ' (not cached)' : ''}`);
+            return service;
+
         } catch (error) {
             throw new Error(`Failed to create service '${name}' via factory: ${error.message}`);
         }
@@ -203,8 +231,8 @@ class ServiceManager {
      * @returns {boolean}
      */
     has(name) {
-        // Special case: config is always available
-        if (name === 'config') {
+        // Special cases: config, Request, Response are always available
+        if (name === 'config' || name === 'Request' || name === 'Response') {
             return true;
         }
 
@@ -300,6 +328,42 @@ class ServiceManager {
      */
     setRouteMatch(routeMatch) {
         this.routeMatch = routeMatch;
+        return this;
+    }
+
+    /**
+     * Get the Request instance
+     * @returns {Request|null} Request instance or null if not set
+     */
+    getRequest() {
+        return this.request;
+    }
+
+    /**
+     * Set the Request instance
+     * @param {Request} request - Request instance
+     * @returns {ServiceManager} For method chaining
+     */
+    setRequest(request) {
+        this.request = request;
+        return this;
+    }
+
+    /**
+     * Get the Response instance
+     * @returns {Response|null} Response instance or null if not set
+     */
+    getResponse() {
+        return this.response;
+    }
+
+    /**
+     * Set the Response instance
+     * @param {Response} response - Response instance
+     * @returns {ServiceManager} For method chaining
+     */
+    setResponse(response) {
+        this.response = response;
         return this;
     }
 

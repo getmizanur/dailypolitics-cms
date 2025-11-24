@@ -46,8 +46,14 @@ class Url extends AbstractHelper {
      * @param {Object} params - Parameters to replace in route pattern
      * @returns {string} Generated URL
      */
-    fromRoute(routeName, params = {}) {
-        const cleanArgs = this._extractContext(arguments);
+    /**
+     * Generate URL from route name and parameters
+     * @param {string} routeName - Name of the route
+     * @param {Object} params - Parameters to replace in route pattern
+     * @returns {string} Generated URL
+     */
+    fromRoute(...args) {
+        const cleanArgs = this._extractContext(args);
         const name = cleanArgs[0];
         const parameters = cleanArgs[1] || {};
 
@@ -82,8 +88,8 @@ class Url extends AbstractHelper {
      * @param {Object} params - Parameters to replace in route pattern
      * @returns {string} Generated URL
      */
-    render(routeName, params = {}) {
-        return this.fromRoute(routeName, params);
+    render(...args) {
+        return this.fromRoute(...args);
     }
 
 }

@@ -186,7 +186,11 @@
             <div class="row">
                 <div class="col-sm-12 text-right" style="padding-left: 0px;padding-right: 0px;">
                     <!--<a href="/bookshop" class="btn nav-font-white">BOOKSHOP</a> |-->
-                    {{ navigationLink() | safe }}
+                    {% if navigationLink() %}
+                        <a href="{{ url('adminLoginLogout') }}" class="btn nav-font-white">LOGOUT</a>
+                    {% else %}
+                        <a href="/contact" class="btn nav-font-white">CONTACT-US</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

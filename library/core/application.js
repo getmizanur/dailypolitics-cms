@@ -16,12 +16,12 @@ class Application {
     bootstrap(resource = null) {
         if(this._bootstrap == null) {
             const Bootstrap = require(global.applicationPath('/application/bootstrap'));
-            this._bootstrap = new Bootstrap(this.app);
+            this._bootstrap = new Bootstrap(this.app, this.serviceManager);
         }
 
         let resources = this._bootstrap.getClassResources(this._bootstrap)
             .filter((item) => item.match(/^init/g));
-        for(const resourceName of resources) { 
+        for(const resourceName of resources) {
             this._bootstrap._executeResources(resourceName);
         }
 

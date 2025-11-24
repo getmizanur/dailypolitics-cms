@@ -22,10 +22,11 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 // It matters the order of init functions. 
 // Please put them in order of how they should be called. 
 class Bootstrap extends Bootstrapper {
-	
-	constructor(app) {
+
+	constructor(app, serviceManager = null) {
         super();
 		this.app = app;
+		this.serviceManager = serviceManager;
 	}
 
     initAppConfig() {
@@ -178,67 +179,29 @@ class Bootstrap extends Bootstrapper {
         });
 
         // register view helpers from configuration using ViewHelperManager
-        const registry = super.getContainer();
-        const appConfig = registry.get('application');
-        const ViewHelperManager = require(global.applicationPath('/library/mvc/view/view-helper-manager'));
-        const Container = require(global.applicationPath('/library/core/container'));
-
-        // Get both invokables and factories from view_helpers config
-        const applicationHelpersConfig = {
-            invokables: appConfig.view_helpers?.invokables || {},
-            factories: appConfig.view_helpers?.factories || {}
-        };
-        const viewHelperManager = new ViewHelperManager(applicationHelpersConfig);
+        // Get ViewHelperManager from ServiceManager (uses factory pattern)
+        const viewHelperManager = this.serviceManager.get('ViewHelperManager');
 
         // Store the nunjucks env in global for controller access
         global.nunjucksEnv = env;
-
-        // Store application environment in Container (__framework namespace)
-        // This separates Daily Politics app env from Nunjucks template engine env
-        const container = new Container('__framework');
-        container.set('applicationConfig', appConfig);
-        container.set('routesConfig', registry.get('routes'));
-
-        // Store configs in Container (configs only, no instance)
-        // Merge framework helpers with application helpers (with conflict check)
-        const mergedHelpers = {};
-        const frameworkHelpers = viewHelperManager.frameworkHelpers;
-
-        // Check for conflicts
-        const conflicts = Object.keys(applicationHelpersConfig.invokables).filter(key =>
-            frameworkHelpers.hasOwnProperty(key)
-        );
-
-        if (conflicts.length > 0) {
-            throw new Error(
-                `Application helpers cannot override framework helpers. ` +
-                `The following keys are already in use by the framework: ${conflicts.join(', ')}. ` +
-                `Please choose different names for your application helpers.`
-            );
-        }
-
-        // Merge: framework helpers first, then application helpers
-        Object.assign(mergedHelpers, frameworkHelpers, applicationHelpersConfig.invokables);
-
-        // Store configs in Container
-        container.set('ViewHelperManager', {
-            configs: {
-                invokables: mergedHelpers,
-                factories: applicationHelpersConfig.factories
-            },
-            helpers: {}  // Runtime storage for helper-specific data (titles, meta tags, links, scripts)
-        });
 
         // Get all available helper names
         const helperNames = viewHelperManager.getAvailableHelpers();
         console.log('Available helpers:', helperNames);
 
+        // Store reference to serviceManager for use in helper closure
+        const serviceManager = this.serviceManager;
+
         // Register each helper directly on env.globals for template access
         // Templates can use {{ headTitle() }} directly
         helperNames.forEach(helperName => {
             env.addGlobal(helperName, function(...args) {
+                // Get FRESH ViewHelperManager from ServiceManager each time
+                // This ensures we get the request-scoped instance with current RouteMatch
+                const currentViewHelperManager = serviceManager.get('ViewHelperManager');
+
                 // Get the helper instance from ViewHelperManager
-                const helperInstance = viewHelperManager.get(helperName);
+                const helperInstance = currentViewHelperManager.get(helperName);
 
                 // Set the nunjucks context on the helper
                 helperInstance.setContext(this);
