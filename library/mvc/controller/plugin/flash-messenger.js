@@ -4,8 +4,6 @@ const VarUtil
 const BasePlugin
     = require(
         global.applicationPath('/library/mvc/controller/base-plugin'));
-const ApplicationContainer
-    = require(global.applicationPath('/library/core/application-container'));
 
 
 class FlashMessenger extends BasePlugin {
@@ -31,7 +29,6 @@ class FlashMessenger extends BasePlugin {
 
         // Use new session namespace instead of Container
         this.sessionNamespace = null;
-        this.container = new ApplicationContainer(this.namespace);
     }
 
     setNamespace(namespace = this.NAMESPACE_DEFAULT) {
@@ -45,12 +42,7 @@ class FlashMessenger extends BasePlugin {
     }
 
     getContainer() {
-        if (this.container instanceof ApplicationContainer) {
-            return this.container;
-        }
-
-        this.container = new ApplicationContainer('FlashMessenger');
-        return this.container;
+        return null;
     }
 
     /**
@@ -88,9 +80,6 @@ class FlashMessenger extends BasePlugin {
                 this.messages[namespace] = [];
             }
             this.messages[namespace].push(message);
-
-            // Update container for backward compatibility
-            this.container.set(namespace, this.messages[namespace]);
 
             if (this.messageAdded == false) {
                 this.messageAdded = true;
@@ -143,14 +132,6 @@ class FlashMessenger extends BasePlugin {
                 return true;
             }
 
-            // Check container
-            if (this.container.has(namespace)) {
-                const containerMessages = this.container.get(namespace, []);
-                if (containerMessages && containerMessages.length > 0) {
-                    return true;
-                }
-            }
-
             // Check local messages
             return this.messages[namespace] && this.messages[namespace].length > 0;
         } catch (error) {
@@ -182,18 +163,7 @@ class FlashMessenger extends BasePlugin {
                 }
             }
 
-            // Fallback to container system
-            if (!foundMessages && this.container.has(namespace)) {
-                const containerMessages = this.container.get(namespace, []);
-                if (containerMessages && containerMessages.length > 0) {
-                    messages = [...containerMessages];
-                    foundMessages = true;
-                    // Clear container messages after reading if clearAfterRead is true
-                    if (clearAfterRead) {
-                        this.clearMessages(namespace);
-                    }
-                }
-            }
+
 
             // Fallback to local messages array
             if (!foundMessages && this.messages[namespace] && this.messages[namespace].length > 0) {
@@ -243,17 +213,7 @@ class FlashMessenger extends BasePlugin {
                 sessionNs.remove(namespace);
             }
 
-            // Clear from container
-            if (this.container.has(namespace)) {
-                // Use the existing clearMessages method or manually clear
-                try {
-                    // Set to empty array instead of undefined to avoid "no entry" errors
-                    this.container.set(namespace, []);
-                } catch (error) {
-                    // Fallback if container doesn't support setting empty arrays
-                    console.warn('Could not clear container namespace:', namespace);
-                }
-            }
+
 
             // Clear from local messages
             if (this.messages[namespace]) {
@@ -315,12 +275,7 @@ class FlashMessenger extends BasePlugin {
     }
 
     getMessagesFromContainer() {
-        if (!VarUtil.empty(this.messages)
-            || this.messageAdded) {
-            return;
-        }
-
-        let container = this.getContainer();
+        // Deprecated
     }
 
     /**

@@ -10,23 +10,31 @@ class HeadTitle extends AbstractHelper {
     }
 
     /**
-     * Get stored titles from Container storage
-     * Structure: global.nunjucksEnv.globals.__framework.ViewHelperManager.helpers.headTitle.titles
+     * Set ServiceManager instance
+     * @param {ServiceManager} serviceManager
+     */
+    setServiceManager(serviceManager) {
+        this.serviceManager = serviceManager;
+    }
+
+    /**
+     * Get stored titles from ServiceManager storage (via ViewHelperManager)
+     * Structure: ServiceManager -> ViewHelperManager -> helpers -> headTitle -> titles
      * @returns {Array} Array of title parts
      */
     _getTitles() {
-        const ApplicationContainer = require('../../../core/application-container');
-        const container = new ApplicationContainer('__framework');
-
-        if (container.has('ViewHelperManager')) {
-            const vhmData = container.get('ViewHelperManager');
-            if (!vhmData.helpers) {
-                vhmData.helpers = {};
+        if (this.serviceManager) {
+            try {
+                const vhm = this.serviceManager.get('ViewHelperManager');
+                if (vhm && vhm.helpers) {
+                    if (!vhm.helpers.headTitle) {
+                        vhm.helpers.headTitle = { titles: [] };
+                    }
+                    return vhm.helpers.headTitle.titles || [];
+                }
+            } catch (e) {
+                // ServiceManager or VHM not available
             }
-            if (!vhmData.helpers.headTitle) {
-                vhmData.helpers.headTitle = { titles: [] };
-            }
-            return vhmData.helpers.headTitle.titles || [];
         }
 
         // Fallback to instance storage
@@ -34,26 +42,25 @@ class HeadTitle extends AbstractHelper {
     }
 
     /**
-     * Set titles to Container storage
+     * Set titles to ServiceManager storage
      * @param {Array} titles - Array of title parts
      */
     _setTitles(titles) {
         // Always store in instance as fallback
         this.titles = titles;
 
-        // Store in Container for persistence across requests
-        const ApplicationContainer = require('../../../core/application-container');
-        const container = new ApplicationContainer('__framework');
-
-        if (container.has('ViewHelperManager')) {
-            const vhmData = container.get('ViewHelperManager');
-            if (!vhmData.helpers) {
-                vhmData.helpers = {};
+        if (this.serviceManager) {
+            try {
+                const vhm = this.serviceManager.get('ViewHelperManager');
+                if (vhm && vhm.helpers) {
+                    if (!vhm.helpers.headTitle) {
+                        vhm.helpers.headTitle = {};
+                    }
+                    vhm.helpers.headTitle.titles = titles;
+                }
+            } catch (e) {
+                // ServiceManager or VHM not available
             }
-            if (!vhmData.helpers.headTitle) {
-                vhmData.helpers.headTitle = {};
-            }
-            vhmData.helpers.headTitle.titles = titles;
         }
     }
 

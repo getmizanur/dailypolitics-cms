@@ -9,6 +9,15 @@ class Url extends AbstractHelper {
     constructor() {
         super();
         this.routes = null;
+        this.serviceManager = null; // Initialize serviceManager
+    }
+
+    /**
+     * Set ServiceManager instance
+     * @param {ServiceManager} serviceManager
+     */
+    setServiceManager(serviceManager) {
+        this.serviceManager = serviceManager;
     }
 
     /**
@@ -20,32 +29,31 @@ class Url extends AbstractHelper {
             return this.routes;
         }
 
-        // Load routes from Container
-        try {
-            const ApplicationContainer = require('../../../core/application-container');
-            const container = new ApplicationContainer();
-
-            if (container.has('routesConfig')) {
-                this.routes = container.get('routesConfig');
-                return this.routes;
+        if (this.serviceManager) {
+            try {
+                const config = this.serviceManager.get('config');
+                if (config && config.router && config.router.routes) {
+                    this.routes = config.router.routes;
+                    return this.routes;
+                }
+            } catch (error) {
+                console.error('Failed to load routes from ServiceManager config:', error.message);
+                // Continue to fallback if serviceManager failed or didn't have routes
             }
+        }
 
-            // Fallback: load from config file if not in Container
+        // Fallback: load from config file if not in Container or ServiceManager
+        try {
             const routesConfig = require(global.applicationPath('/application/config/routes.config.js'));
             this.routes = routesConfig.routes || {};
             return this.routes;
         } catch (error) {
-            console.error('Failed to load routes configuration:', error.message);
+            console.error('Failed to load routes configuration from file:', error.message);
             return {};
         }
     }
 
-    /**
-     * Generate URL from route name and parameters
-     * @param {string} routeName - Name of the route
-     * @param {Object} params - Parameters to replace in route pattern
-     * @returns {string} Generated URL
-     */
+
     /**
      * Generate URL from route name and parameters
      * @param {string} routeName - Name of the route

@@ -75,10 +75,6 @@ class ViewHelperManager {
                     "class": "/library/mvc/view/helper/form-checkbox",
                     "params": ["element", "extraAttribs = {}"]
                 },
-                "headTitle": {
-                    "class": "/library/mvc/view/helper/head-title",
-                    "params": ["title = null", "mode = 'set'"]
-                },
                 "headMeta": {
                     "class": "/library/mvc/view/helper/head-meta",
                     "params": ["nameOrProperty = null", "content = null", "mode = 'add'"]
@@ -95,12 +91,11 @@ class ViewHelperManager {
                     "class": "/library/mvc/view/helper/form-csrf",
                     "params": ["element"]
                 },
-                "url": {
-                    "class": "/library/mvc/view/helper/url",
-                    "params": ["routeName", "params = {}"]
-                }
             },
-            "factories": {}
+            "factories": {
+                "headTitle": "/library/mvc/view/helper/factory/head-title-factory",
+                "url": "/library/mvc/view/helper/factory/url-factory"
+            }
         };
     }
 
@@ -204,6 +199,24 @@ class ViewHelperManager {
             return instance;
         }
 
+        // Check framework factories
+        if (this.frameworkHelpers.factories && this.frameworkHelpers.factories[name]) {
+            const factoryPath = this.frameworkHelpers.factories[name];
+            const FactoryClass = require(global.applicationPath(factoryPath));
+            const factory = new FactoryClass();
+
+            // Create helper through factory with ServiceManager
+            // DO NOT CACHE factory helpers - they need fresh ServiceManager state per request
+            const instance = factory.createService(this.serviceManager);
+
+            // Set nunjucks context if available
+            if (global.nunjucksContext) {
+                instance.setContext(global.nunjucksContext);
+            }
+
+            return instance;
+        }
+
         // Check application factories
         if (this.applicationFactories[name]) {
             const factoryPath = this.applicationFactories[name];
@@ -248,8 +261,9 @@ class ViewHelperManager {
      */
     has(name) {
         return this.frameworkHelpers.invokables.hasOwnProperty(name) ||
-               this.applicationHelpers.hasOwnProperty(name) ||
-               this.applicationFactories.hasOwnProperty(name);
+            (this.frameworkHelpers.factories && this.frameworkHelpers.factories.hasOwnProperty(name)) ||
+            this.applicationHelpers.hasOwnProperty(name) ||
+            this.applicationFactories.hasOwnProperty(name);
     }
 
     /**
@@ -259,6 +273,7 @@ class ViewHelperManager {
     getAvailableHelpers() {
         return [
             ...Object.keys(this.frameworkHelpers.invokables),
+            ...(this.frameworkHelpers.factories ? Object.keys(this.frameworkHelpers.factories) : []),
             ...Object.keys(this.applicationHelpers),
             ...Object.keys(this.applicationFactories)
         ];

@@ -1,7 +1,7 @@
 const StringUtil = require('../../util/string-util');
 const ViewModel = require('../view/view-model');
 const ServiceManager = require('../../service/service-manager');
-const ApplicationContainer = require('../../core/application-container');
+
 
 class BaseController {
 
@@ -40,26 +40,17 @@ class BaseController {
             const serviceManager = new ServiceManager();
             this.setServiceLocator(serviceManager);
 
-            // Check if configs already stored in Container
-            const container = new ApplicationContainer('__framework');
-            if (!container.has('ServiceManager')) {
-                // First time: load config and store merged configs
-                serviceManager.loadConfiguration();
+            // Load configuration
+            serviceManager.loadConfiguration();
 
-                // Merge framework factories with application factories (with conflict check)
-                const mergedFactories = this._mergeFactories(
-                    serviceManager.frameworkFactories,
-                    serviceManager.factories || {}
-                );
+            // Merge framework factories with application factories (with conflict check)
+            const mergedFactories = this._mergeFactories(
+                serviceManager.frameworkFactories,
+                serviceManager.factories || {}
+            );
 
-                // Store configs in container (no instance)
-                container.set('ServiceManager', {
-                    configs: {
-                        invokables: serviceManager.invokables || {},
-                        factories: mergedFactories
-                    }
-                });
-            }
+            // Update service manager with merged factories
+            serviceManager.factories = mergedFactories;
         }
 
         return this.serviceLocator;

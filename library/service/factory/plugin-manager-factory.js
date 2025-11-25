@@ -1,6 +1,6 @@
 const AbstractFactory = require('../abstract-factory');
 const PluginManager = require('../../mvc/controller/plugin-manager');
-const ApplicationContainer = require('../../core/application-container');
+
 
 class PluginManagerFactory extends AbstractFactory {
 
@@ -26,11 +26,11 @@ class PluginManagerFactory extends AbstractFactory {
             console.warn('Could not load application config for plugin manager:', error.message);
         }
 
-        // Check if configs already stored in Container
-        const container = new ApplicationContainer('__framework');
-        if (!container.has('PluginManager')) {
-            // First time: merge and store configs
-            const applicationPlugins = appConfig?.controller_plugins?.invokables || {};
+        // Get config from ServiceManager
+        const config = serviceManager.get('config');
+        if (config && config.controller_plugins) {
+            // Merge configs if needed
+            const applicationPlugins = config.controller_plugins.invokables || {};
 
             // Merge framework plugins with application plugins (with conflict check)
             const mergedPlugins = this._mergePlugins(
@@ -38,13 +38,8 @@ class PluginManagerFactory extends AbstractFactory {
                 applicationPlugins
             );
 
-            // Store configs in container (no instance, no separate framework/application)
-            container.set('PluginManager', {
-                configs: {
-                    invokables: mergedPlugins,
-                    factories: {}  // Plugins currently don't have factories, but structure matches ServiceManager
-                }
-            });
+            // Configs are now managed by ServiceManager directly
+            // No need to store in a separate container
         }
 
         return pluginManager;

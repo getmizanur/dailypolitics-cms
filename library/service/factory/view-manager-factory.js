@@ -1,6 +1,6 @@
 const AbstractFactory = require('../abstract-factory');
 const ViewManager = require('../../mvc/view/view-manager');
-const ApplicationContainer = require('../../core/application-container');
+
 
 class ViewManagerFactory extends AbstractFactory {
 
@@ -24,13 +24,11 @@ class ViewManagerFactory extends AbstractFactory {
 
         const viewManager = new ViewManager(viewManagerConfig);
 
-        // Check if configs already stored in Container
-        const container = new ApplicationContainer('__framework');
-        if (!container.has('ViewManager')) {
-            // First time: store configs only
-            container.set('ViewManager', {
-                configs: viewManagerConfig
-            });
+        // Get config from ServiceManager
+        const config = serviceManager.get('config');
+        if (config && config.view_manager) {
+            // Merge configs if needed, or just rely on what's passed
+            // In this architecture, we assume config is already merged in ServiceManager
         }
 
         return viewManager;
