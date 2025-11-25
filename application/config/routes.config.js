@@ -11,12 +11,18 @@ module.exports = {
             "action": "login"
         },
         "adminDashboardIndex": {
-            "route": "/admin/dashboard(/page/:page)?",
+            "route": "/admin/dashboard",
             "module": "admin",
             "controller": "dashboard",
             "action": "list"
         },
-         "adminDashboardView": {
+        "adminDashboardPage": {
+            "route": "/admin/dashboard/page/:page",
+            "module": "admin",
+            "controller": "dashboard",
+            "action": "list"
+        },
+        "adminDashboardView": {
             "route": "/admin/dashboard/view/:slug",
             "module": "admin",
             "controller": "dashboard",
@@ -43,7 +49,13 @@ module.exports = {
 
         // Blog section routes
         "blogIndexIndex": {
-            "route": "/(page/:page/index.html)?",
+            "route": "/",
+            "module": "blog",
+            "controller": "index",
+            "action": "index"
+        },
+        "blogIndexPage": {
+            "route": "/page/:page/index.html",
             "module": "blog",
             "controller": "index",
             "action": "index"

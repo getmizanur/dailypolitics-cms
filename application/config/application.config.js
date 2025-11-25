@@ -217,12 +217,10 @@ module.exports = {
     // Framework plugins (flashMessenger, layout, params, etc.) are managed by PluginManager
     "controller_plugins": {
         "invokables": {
-            // Add your custom application plugins here
-            // Example:
-            // "customPlugin": {
-            //     "class": "/application/plugin/customPlugin",
-            //     "description": "Your custom plugin description"
-            // }
+            "markdownToHtml": {
+                "class": "/application/plugin/markdown-to-html-plugin",
+                "description": "Converts markdown text to HTML using marked library"
+            }
         }
     },
     

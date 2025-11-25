@@ -5,9 +5,9 @@
     <div class="row">
         {{ sidebar(recentPosts) | safe }}
 
-        <div class="col-sm-8 dailypolitics-!-margin-bottom-8">
+        <div class="col-sm-8 col-md-8">
             {% if post %}
-                <article class="dailypolitics-correction card dailypolitics-!-margin-top-8 story-body" itemscope itemtype="https://schema.org/NewsArticle">
+                <article class="card dailypolitics-!-margin-top-8" itemscope itemtype="https://schema.org/NewsArticle">
                     {# Apply presentation style CSS classes to the article header #}
                     <header>
                         <h1 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'post-header header header--default' }}" itemprop="headline">{{ post.title }}</h1>
@@ -50,12 +50,12 @@
                         <div class="dailypolitics-body" style="padding: 16px;">
                             {# Excerpt/description #}
                             {% if post.excerpt %}
-                            <p class="article-excerpt" itemprop="description" style="padding-top: 0;">{{ post.excerpt }}</p>
+                            <p class="article-excerpt" itemprop="description" style="padding-top: 0;">{{ post.excerpt_html }}</p>
                             {% endif %}
 
                             {# Main article content #}
                             <div itemprop="articleBody">
-                                {{ post.content | safe }}
+                                {{ post.content_html | safe }}
                             </div>
 
                             {# Hidden metadata for schema.org #}

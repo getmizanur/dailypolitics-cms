@@ -91,18 +91,31 @@ class DashboardController extends Controller {
             const form = new ArticleForm();
             log('ArticleForm created');
 
+            // Get article slug
+            const articleSlug = this.getParam('slug');
+
             // Set form attributes
-            form.setAction('/admin/dashboard/edit');
+            form.setAction(`/admin/dashboard/edit/${articleSlug}`);
             form.setMethod('POST');
             log('Form attributes set');
 
             // Initialize form with categories
-            const session = new SessionContainer('security');
-            form.init(categories, { session: session });
+            form.addIdField();
+            form.addSlugField();
+            form.addTitleField();
+            form.addExcerptField();
+            form.addContentField();
+            form.addAuthorIdField();
+            form.addAuthorNameField();
+            form.addCategoryField('category_id', categories);
+            form.addMetaDescriptionField();
+            form.addCommentEnabledField();
+            form.addReviewButton();
+            form.addSubmitButton();
+
             log('Form initialized with categories');
 
             // If editing existing article, fetch and populate data
-            const articleSlug = this.getParam('slug');
             if (articleSlug) {
                 log(`Fetching article with slug: ${articleSlug}`);
                 const article = await postService.getSinglePost(articleSlug, true);
@@ -112,8 +125,8 @@ class DashboardController extends Controller {
                         id: article.id,
                         slug: article.slug,
                         title: article.title,
-                        excerpt: article.excerpt,
-                        content: article.content,
+                        excerpt_markdown: article.excerpt_markdown,
+                        content_markdown: article.content_markdown,
                         author_id: article.author_id,
                         author_name: article.author_name,
                         category_id: article.category_id,
@@ -187,7 +200,7 @@ class DashboardController extends Controller {
                         }
                     ]
                 },
-                'excerpt': {
+                'excerpt_markdown': {
                     required: false,
                     filters: [
                         { name: 'HtmlEntities' },
@@ -207,7 +220,7 @@ class DashboardController extends Controller {
                         }
                     ]
                 },
-                'content': {
+                'content_markdown': {
                     required: true,
                     requiredMessage: "Please enter content",
                     filters: [
@@ -264,7 +277,7 @@ class DashboardController extends Controller {
                         }
                     ]
                 },
-                'comment_enabled': {
+                'comments_enabled': {
                     required: false,
                     filters: [
                         { name: 'HtmlEntities' },
@@ -292,41 +305,16 @@ class DashboardController extends Controller {
                             }
                         }
                     ]
-                },
-                'csrf': {
-                    required: true,
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ],
-                    validators: [
-                        {
-                            name: 'StringLength',
-                            options: {
-                                min: 64,
-                                max: 64,
-                                messageTemplate: {
-                                    INVALID_TOO_SHORT: 'Invalid CSRF token',
-                                    INVALID_TOO_LONG: 'Invalid CSRF token'
-                                }
-                            }
-                        },
-                        {
-                            name: 'AlphaNumeric',
-                            options: {
-                                messageTemplate: {
-                                    INVALID_FORMAT: 'CSRF token must contain only alphanumeric characters'
-                                }
-                            }
-                        }
-                    ]
                 }
             });
             form.setInputFilter(inputFilter);
 
             if (super.getRequest().isPost()) {
                 const postData = super.getRequest().getPost();
+
+                console.log("postData:");
+                console.log(postData);
+
                 log(`Post data received: ${JSON.stringify(postData)}`);
                 form.setData(postData);
 
@@ -335,6 +323,26 @@ class DashboardController extends Controller {
 
                 if (isFormValid) {
                     log('Form is valid - no errors');
+
+                    // Update post by slug
+                    try {
+                        //const updatedPost = await postService.updatePostBySlug(postData.slug, postData);
+                        //log(`Post updated successfully: ${updatedPost.slug}`);
+
+                        console.log("postData: ");
+                        console.log(postData);
+
+                        console.log(this.plugin('markdownToHtml').convert(postData.content_markdown));
+
+                        // Add success message
+                        super.plugin('flashMessenger').addSuccessMessage('Post updated successfully');
+
+                        // Redirect to list or stay on edit page
+                        return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatedPost.slug });
+                    } catch (error) {
+                        log(`Error updating post: ${error.message}`);
+                        super.plugin('flashMessenger').addErrorMessage(`Failed to update post: ${error.message}`);
+                    }
                 } else {
                     // After form.isValid() returns false
                     // Get validation messages from form
@@ -370,8 +378,13 @@ class DashboardController extends Controller {
             }
 
             log('Returning view with form');
+
+            // Get flash messages to display in template
+            const flashMessages = super.plugin('flashMessenger').getAllMessages(true);
+
             return this.getView()
-                .setVariable('f', form);
+                .setVariable('f', form)
+                .setVariable('flashMessages', flashMessages);
 
         } catch (error) {
             const errorMsg = `Error in editAction: ${error.message}\nStack: ${error.stack}`;

@@ -78,3 +78,7 @@ table a {
 table a:hover {
   color: #003078;
 }
+
+table a {
+	color: #1d70b8 !important
+}

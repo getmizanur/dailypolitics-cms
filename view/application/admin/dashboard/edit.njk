@@ -6,8 +6,32 @@
     <div class="row align-items-center admin-dashboard-fix-row">
       <div class="col-sm-12 col-md-12">
         <div class="card admin-dashboard-card dp-pt-0" itemscope itemtype="https://schema.org/Table">
-            {# Include flash messages partial #}
-            {% include "partial/flash-messages.njk" %}
+            {# Error messages #}
+            {% if error_flash_messages.length > 0 %}
+            <div class="dp-error-summary">
+                <h2 class="dp-error-summary__title">There is a problem</h2>
+                <div class="dp-error-summary__body">
+                    <ul class="dp-error-summary__list">
+                        {% for message in error_flash_messages %}
+                        <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            {# Success messages #}
+            {% if success_flash_messages.length > 0 %}
+            <div class="dp-notification-banner dp-notification-banner--success">
+                <div class="dp-notification-banner__header">
+                    <h2 class="dp-notification-banner__title">Success</h2>
+                </div>
+                <div class="dp-notification-banner__content">
+                    <h3 class="dp-notification-banner__heading">Post updated successfully</h3>
+                    <p class="dp-notification-banner__message">Your changes have been saved.</p>
+                </div>
+            </div>
+            {% endif %}
             
             {{ form().openTag(f) }}
                 {{ formCsrf(f.get('csrf')) | safe }}
@@ -27,16 +51,16 @@
                     {{ formText(f.get('slug')) | safe }}
                 </div>
 
-                <div class="form-group{% if errorDecorator(f.get('excerpt')) %} dp-form-group--error{% endif %}">
-                    {{ formLabel(f.get('excerpt')) | safe }}
-                    {{ formError(f.get('excerpt')) | safe }}
-                    {{ formTextarea(f.get('excerpt')) | safe }}
+                <div class="form-group{% if errorDecorator(f.get('excerpt_markdown')) %} dp-form-group--error{% endif %}">
+                    {{ formLabel(f.get('excerpt_markdown')) | safe }}
+                    {{ formError(f.get('excerpt_markdown')) | safe }}
+                    {{ formTextarea(f.get('excerpt_markdown')) | safe }}
                 </div>
 
-                <div class="form-group{% if errorDecorator(f.get('content')) %} dp-form-group--error{% endif %}">
-                    {{ formLabel(f.get('content')) | safe }}
-                    {{ formError(f.get('content')) | safe }}
-                    {{ formTextarea(f.get('content')) | safe }}
+                <div class="form-group{% if errorDecorator(f.get('content_markdown')) %} dp-form-group--error{% endif %}">
+                    {{ formLabel(f.get('content_markdown')) | safe }}
+                    {{ formError(f.get('content_markdown')) | safe }}
+                    {{ formTextarea(f.get('content_markdown')) | safe }}
                 </div>
 
                 <div class="form-group{% if errorDecorator(f.get('author_name')) %} dp-form-group--error{% endif %}">
@@ -57,14 +81,22 @@
                     {{ formTextarea(f.get('meta_description')) | safe }}
                 </div>
 
-                <div class="form-group{% if errorDecorator(f.get('comment_enabled')) %} dp-form-group--error{% endif %}">
-                    {{ formCheckbox(f.get('comment_enabled')) | safe }}
-                    {{ formLabel(f.get('comment_enabled')) | safe }}
-                    {{ formError(f.get('comment_enabled')) | safe }}
+                <div class="form-group{% if errorDecorator(f.get('comments_enabled')) %} dp-form-group--error{% endif %}">
+                    {{ formCheckbox(f.get('comments_enabled')) | safe }}
+                    {{ formLabel(f.get('comments_enabled')) | safe }}
+                    {{ formError(f.get('comments_enabled')) | safe }}
                 </div>
 
                 <div class="form-group">
-                    {{ formSubmit(f.get('submit')) | safe }}
+                    <div class="dp-button-group">
+                        <div class="dp-button-group__left">
+                            {{ formSubmit(f.get('submit')) | safe }}
+                            {{ formSubmit(f.get('review_requested'))}}
+                        </div>
+                        <div class="dp-button-group__right">
+                            <button type="button" class="dp-button dp-button--warning">Delete</button>
+                        </div>
+                    </div>
                 </div>
             {{ form().closeTag() }}
         </div>

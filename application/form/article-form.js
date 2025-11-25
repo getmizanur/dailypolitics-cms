@@ -40,7 +40,7 @@ class ArticleForm extends Form {
         element.setAttributes({
             'class': 'dp-input',
             'id': 'article-slug',
-            'disabled': 'disabled',
+            'readonly': 'readonly',
             'placeholder': 'article-slug-auto-generated'
         });
         element.setLabelAttribute('class', 'dp-label');
@@ -72,7 +72,7 @@ class ArticleForm extends Form {
      * @param {string} name
      * @returns {ArticleForm}
      */
-    addExcerptField(name = 'excerpt') {
+    addExcerptField(name = 'excerpt_markdown') {
         const element = new Textarea(name);
         element.setLabel('Excerpt');
         element.setAttributes({
@@ -92,7 +92,7 @@ class ArticleForm extends Form {
      * @param {string} name
      * @returns {ArticleForm}
      */
-    addContentField(name = 'content') {
+    addContentField(name = 'content_markdown') {
         const element = new Textarea(name);
         element.setLabel('Content');
         element.setAttributes({
@@ -200,7 +200,7 @@ class ArticleForm extends Form {
      * @param {string} name
      * @returns {ArticleForm}
      */
-    addCommentEnabledField(name = 'comment_enabled') {
+    addCommentEnabledField(name = 'comments_enabled') {
         const element = new Checkbox(name);
         element.setLabel('Enable Comments');
         element.setAttributes({
@@ -213,6 +213,22 @@ class ArticleForm extends Form {
         element.setCheckedValue('1');
         element.setUncheckedValue('0');
 
+        this.add(element);
+        return this;
+    }
+
+    /**
+     * Add submit for review
+     * @param {string} name
+     * @param {string} label
+     * @returns {ArticleForm}
+     */
+    addReviewButton(name = 'review_requested', label = 'Submit for Review') {
+        const element = new Submit(name);
+        element.setValue(label);
+        element.setAttributes({
+            'class': 'dp-button'
+        });
         this.add(element);
         return this;
     }

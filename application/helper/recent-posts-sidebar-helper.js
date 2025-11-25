@@ -19,10 +19,10 @@ class RecentPostsSidebarHelper extends AbstractHelper {
         const postsToRender = posts || defaultPosts;
 
         let html = `
-        <div class="col-sm-4 col-md-4 hidden-phone" style="padding-left: 0px !important;">
-            <div class="dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8">
+        <div class="col-sm-4 col-md-4 hidden-phone">
+            <div class="dailypolitics-!-margin-top-8">
                 <div class="card">
-                    <h3 class="card-header">Recent Posts</h3>
+                    <h1 class="dailypolitics-heading-xl post-header" style="background-color: rgba(0,0,0,.03)">Recent Posts</h3>
                     <ul class="list-group" id="recent-posts-list">`;
 
         // Render server-side posts as fallback

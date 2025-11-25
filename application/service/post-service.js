@@ -39,8 +39,10 @@ class PostService extends AbstractService {
                       'posts.id',
                       'posts.title',
                       'posts.slug',
-                      'posts.excerpt',
-                      'posts.content',
+                      'posts.excerpt_markdown',
+                      'posts.excerpt_html',
+                      'posts.content_markdown',
+                      'posts.content_html',
                       'posts.hero_image_url',
                       'posts.presentation_style_id',
                       'posts.header_color_override',
@@ -140,8 +142,10 @@ class PostService extends AbstractService {
                       'posts.id',
                       'posts.title',
                       'posts.slug',
-                      'posts.excerpt',
-                      'posts.content',
+                      'posts.excerpt_markdown',
+                      'posts.excerpt_html',
+                      'posts.content_markdown',
+                      'posts.content_html',
                       'posts.hero_image_url',
                       'posts.presentation_style_id',
                       'posts.header_color_override',
@@ -247,7 +251,8 @@ class PostService extends AbstractService {
                       'posts.id',
                       'posts.title',
                       'posts.slug',
-                      'posts.excerpt',
+                      'posts.excerpt_markdown',
+                      'posts.excerpt_html',
                       'posts.hero_image_url',
                       'posts.published_at',
                       'categories.name as category_name',
@@ -291,7 +296,8 @@ class PostService extends AbstractService {
                       'posts.id',
                       'posts.title',
                       'posts.slug',
-                      'posts.excerpt',
+                      'posts.excerpt_markdown',
+                      'posts.excerpt_html',
                       'posts.hero_image_url',
                       'posts.published_at',
                       'categories.name as category_name',
@@ -346,7 +352,8 @@ class PostService extends AbstractService {
                       'posts.id',
                       'posts.title',
                       'posts.slug',
-                      'posts.excerpt',
+                      'posts.excerpt_markdown',
+                      'posts.excerpt_html',
                       'posts.hero_image_url',
                       'posts.published_at',
                       'categories.name as category_name',
@@ -360,7 +367,7 @@ class PostService extends AbstractService {
             }
 
             select.where('posts.deleted_at IS NULL')
-                  .where(`(posts.title ILIKE '%${searchTerm}%' OR posts.excerpt ILIKE '%${searchTerm}%' OR posts.content ILIKE '%${searchTerm}%')`)
+                  .where(`(posts.title ILIKE '%${searchTerm}%' OR posts.excerpt_markdown ILIKE '%${searchTerm}%' OR posts.content ILIKE '%${searchTerm}%')`)
                   .order('posts.published_at', 'DESC')
                   .limit(limit);
 
@@ -403,7 +410,7 @@ class PostService extends AbstractService {
             }
 
             if (filters.search) {
-                select.where(`(posts.title ILIKE '%${filters.search}%' OR posts.excerpt ILIKE '%${filters.search}%' OR posts.content ILIKE '%${filters.search}%')`);
+                select.where(`(posts.title ILIKE '%${filters.search}%' OR posts.excerpt_markdown ILIKE '%${filters.search}%' OR posts.content ILIKE '%${filters.search}%')`);
             }
 
             const result = await select.execute();
@@ -507,6 +514,34 @@ class PostService extends AbstractService {
             return result.rows || result;
         } catch (error) {
             console.error('Error fetching categories:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update a post by slug
+     * @param {string} slug - Post slug to search by
+     * @param {Object} updateData - Data to update
+     * @returns {Promise<Object>} Updated post object
+     */
+    async updatePostBySlug(slug, updateData) {
+        try {
+            const adapter = await this.initializeDatabase();
+            const Update = require('../../library/db/sql/update');
+            const update = new Update(adapter);
+
+            // Build update query
+            update.table('posts')
+                  .set(updateData)
+                  .where('slug = ?', slug)
+                  .where('deleted_at IS NULL');
+
+            await update.execute();
+
+            // Return the updated post
+            return await this.getSinglePost(slug, true, true);
+        } catch (error) {
+            console.error('Error updating post by slug:', error);
             throw error;
         }
     }

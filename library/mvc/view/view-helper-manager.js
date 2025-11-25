@@ -91,6 +91,10 @@ class ViewHelperManager {
                     "class": "/library/mvc/view/helper/form-csrf",
                     "params": ["element"]
                 },
+                "escapeHtml": {
+                    "class": "/library/mvc/view/helper/escape-html",
+                    "params": ["value"]
+                }
             },
             "factories": {
                 "headTitle": "/library/mvc/view/helper/factory/head-title-factory",

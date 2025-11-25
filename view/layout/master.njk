@@ -122,11 +122,11 @@
     <meta name="twitter:title" content="{% block twitterTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
     <meta name="twitter:description" content="{% block twitterDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
     
-    <!-- Critical CSS inlined for performance -->
-    {{ onDemandCss() | safe }}
-
     <!-- Load main.css reliably to prevent FOUC and missing styles -->
     <link rel="stylesheet" href="/css/main.css">
+
+    <!-- Critical CSS inlined for performance -->
+    {{ onDemandCss() | safe }}
 
     <!-- Load Bootstrap CSS asynchronously (non-critical) -->
     <link rel="preload" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">

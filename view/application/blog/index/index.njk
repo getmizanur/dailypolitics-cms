@@ -12,10 +12,10 @@
     <div class="row">
         {{ sidebar(recentPosts) | safe }}
 
-        <div class="col-sm-8 col-md-8 dailypolitics-!-margin-bottom-8">
+        <div class="col-sm-8 col-md-8">
             {% if posts and posts.length > 0 %}
                 {% for post in posts %}
-                <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">
+                <div class="card dailypolitics-!-margin-top-8">
                     <div itemscope itemtype="https://schema.org/NewsArticle">
                         {# Apply presentation style CSS classes to the header if available #}
                         <h2 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'green' }}" itemprop="headline">
@@ -52,7 +52,7 @@
                                 </div>
 
                                 <div itemprop="articleBody">
-                                    <p itemprop="description">{{ truncate(post.content) }}</p>
+                                    <p itemprop="description">{{ truncate(post.content_html) }}</p>
                                 </div>
                                 <!--<p><a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}" class="btn btn-primary green" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;" aria-label="Read more about {{ post.title }}" target="_blank" rel="noopener noreferrer">Read More</a></p>-->
                             </section>
@@ -89,7 +89,7 @@
                     {{ pager(pagination) | safe }}
                 {% endif %}
             {% else %}
-                <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">
+                <div class="card dailypolitics-!-margin-top-8">
                     <div class="card-body text-center">
                         <h3>No articles found</h3>
                         <p>There are currently no published articles to display.</p>

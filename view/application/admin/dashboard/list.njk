@@ -13,31 +13,32 @@
           </caption>
           <thead>
             <tr>
+              <th scope="col" style="width:120px">Type</th>
               <th scope="col">Title</th>
               <th scope="col" style="width: 150px">Updated By</th>
               <th scope="col" style="width: 120px;">State</th>
-              <th scope="col" class="text-right" style="width: 120px;">&nbsp;</th>
+              <th scope="col" class="text-right" style="width: 60px;">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
             {% for post in posts %}
             <tr>
-              <td>{{ post.title }}</td>
-              <td>{{ post.updated_at | date('yyyy-MM-DD') }}<br>by {{ post.author_name }}</td>
+              <td><strong>{{ post.category_name }}</strong></td>
+              <td><a href="{{ url('adminDashboardEdit', { slug : post.slug }) }}" class="" target="_blank" rel="noopener noreferrer">{{ post.title }}</a></td>
+              <td>{{ post.updated_at | date('yyyy-MM-DD') }}<br>by <strong>{{ post.author_name }}</strong></td>
               <td>
                 {% if post.status == 'published' %}
-                  <span class="dp-tag dp-tag--published dp-tag--small dp-tag--pill">Published</span>
+                  <span class="dp-tag dp-tag--published dp-tag--small dp-tag--pill"><strong>Published</strong></span>
                 {% elseif post.status == 'draft' %}
-                  <span class="dp-tag dp-tag--draft dp-tag--small dp-tag--pill">Draft</span>
+                  <span class="dp-tag dp-tag--draft dp-tag--small dp-tag--pill"><strong>Draft</strong></span>
                 {% elseif post.status == 'archived' %}
-                  <span class="dp-tag dp-tag--orange dp-tag--small dp-tag--pill">Archived</span>
+                  <span class="dp-tag dp-tag--orange dp-tag--small dp-tag--pill"><strong>Archived</strong></span>
                 {% else %}
                   <span class="dp-tag dp-tag--muted dp-tag--small dp-tag--pill">{{ post.status|capitalize }}</span>
                 {% endif %}
               </td>
               <td class="text-right">
-                <a href="{{ url('adminDashboardEdit', { slug : post.slug }) }}" class="" target="_blank" rel="noopener noreferrer">Edit</a> |
-                <a href="{{ url('adminDashboardView', { slug : post.slug }) }}" class="" traget="_blank" rel="noopener noreferrer">View</a>              
+                <a href="{{ url('adminDashboardView', { slug : post.slug }) }}" class="" target="_blank" rel="noopener noreferrer">View</a>              
               </td>
             </tr>
             {% endfor %}

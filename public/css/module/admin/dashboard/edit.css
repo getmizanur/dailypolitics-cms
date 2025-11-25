@@ -272,3 +272,334 @@
         width: 100%;
     }
 }
+
+/* Button Group for Form Actions */
+.dp-button-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.dp-button-group__left {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dp-button-group__right {
+    display: flex;
+    margin-left: auto;
+}
+
+/* Form Button Styles */
+.dp-button {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    background-color: #1d70b8;
+    color: #ffffff !important;
+    border: 2px solid #1d70b8;
+    border-radius: 0;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #1d70b8;
+    transition: background-color 0.15s ease-in-out;
+    /*min-width: auto;*/
+    max-width: 180px;
+}
+
+/*.dp-button:hover {
+    background-color: #005a30;
+}
+
+.dp-button:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #005a30;
+}*/
+
+/* Save Article Button - Keep original green */
+/*button[name="submit"],
+input[name="submit"] {
+    background-color: #00703c !important;
+    box-shadow: 0 2px 0 #002d18 !important;
+}
+
+button[name="submit"]:hover,
+input[name="submit"]:hover {
+    background-color: #005a30 !important;
+}
+
+button[name="submit"]:focus,
+input[name="submit"]:focus {
+    background-color: #005a30 !important;
+}*/
+
+/* Submit for Review Button - Orange */
+button[name="review_requested"],
+input[name="review_requested"] {
+    background-color: #f47738 !important;
+    box-shadow: 0 2px 0 #f47738 !important;
+    border: 2px solid #f47738;
+}
+
+button[name="review_requested"]:hover,
+input[name="review_requested"]:hover {
+    background-color: #b58840 !important;
+    border-color: #b58840 !important;
+}
+
+button[name="review_requested"]:focus,
+input[name="review_requested"]:focus {
+    background-color: #b58840 !important;
+}
+
+/* Secondary Button Style */
+.dp-button--secondary {
+    background-color: #f3f2f1;
+    color: #0b0c0c !important;
+    box-shadow: 0 2px 0 #929191;
+}
+
+.dp-button--secondary:hover {
+    background-color: #dbdad9;
+}
+
+.dp-button--secondary:focus {
+    background-color: #dbdad9;
+}
+
+/* Warning/Delete Button - Red */
+.dp-button--warning {
+    background-color: #d4351c;
+    box-shadow: 0 2px 0 #d4351c;
+    width: 150px !important;
+    border: 2px solid #d4351c !important;
+    margin-top: 16px;
+}
+
+.dp-button--warning:hover {
+    background-color: #d4351c;
+}
+
+.dp-button--warning:focus {
+    background-color: #d4351c;
+}
+
+/* Responsive: Stack buttons on mobile */
+@media (max-width: 640px) {
+    .dp-button-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dp-button-group__left,
+    .dp-button-group__right {
+        width: 100%;
+    }
+
+    .dp-button-group__right {
+        margin-left: 0;
+    }
+
+    .dp-button {
+        width: 100%;
+    }
+}
+
+/* Error Summary - Based on GOV.UK Error Summary */
+.dp-error-summary {
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 5px solid #d4351c;
+    background-color: #ffffff;
+}
+
+.dp-error-summary:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+}
+
+.dp-error-summary__title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #d4351c;
+}
+
+.dp-error-summary__body {
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.dp-error-summary__list {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.dp-error-summary__list li {
+    margin-bottom: 10px;
+}
+
+.dp-error-summary__list li:last-child {
+    margin-bottom: 0;
+}
+
+.dp-error-summary__list a {
+    font-weight: 700;
+    color: #d4351c;
+    text-decoration: underline;
+}
+
+.dp-error-summary__list a:hover {
+    color: #942514;
+}
+
+.dp-error-summary__list a:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    color: #0b0c0c;
+}
+
+/* Success Notification Banner - Based on GOV.UK Notification Banner */
+.dp-notification-banner {
+    padding: 0;
+    margin-bottom: 30px;
+    border: 5px solid #1d70b8;
+    background-color: #1d70b8;
+}
+
+.dp-notification-banner--success {
+    border-color: #00703c;
+    background-color: #00703c;
+}
+
+.dp-notification-banner__header {
+    padding: 10px 20px;
+    background-color: #1d70b8;
+}
+
+.dp-notification-banner--success .dp-notification-banner__header {
+    background-color: #00703c;
+}
+
+.dp-notification-banner__title {
+    margin: 0;
+    padding: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.dp-notification-banner__content {
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+.dp-notification-banner__heading {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #00703c;
+}
+
+.dp-notification-banner__message {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.25;
+    color: #0b0c0c;
+}
+
+.dp-notification-banner__message p {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.dp-notification-banner__message p:last-child {
+    margin-bottom: 0;
+}
+
+.dp-notification-banner__link {
+    font-weight: 700;
+    color: #1d70b8;
+    text-decoration: underline;
+}
+
+.dp-notification-banner__link:hover {
+    color: #003078;
+}
+
+.dp-notification-banner__link:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    color: #0b0c0c;
+}
+
+/* Alert Styles (Alternative simpler version) */
+.alert {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-left: 5px solid;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.alert p {
+    margin: 5px 0;
+}
+
+.alert p:first-child {
+    margin-top: 0;
+}
+
+.alert p:last-child {
+    margin-bottom: 0;
+}
+
+.alert-error {
+    background-color: #fef7f7;
+    border-color: #d4351c;
+    color: #0b0c0c;
+}
+
+.alert-error::before {
+    content: "!";
+    display: inline-block;
+    margin-right: 10px;
+    padding: 2px 8px;
+    background-color: #d4351c;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 50%;
+}
+
+.alert-success {
+    background-color: #f3fef7;
+    border-color: #00703c;
+    color: #0b0c0c;
+}
+
+.alert-success::before {
+    content: "✓";
+    display: inline-block;
+    margin-right: 10px;
+    padding: 2px 8px;
+    background-color: #00703c;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 50%;
+}
+
