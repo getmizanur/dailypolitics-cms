@@ -305,6 +305,10 @@ class BaseController {
         return this.getPluginManager().get(name, options);
     }
 
+    helper(name, options = {}) {
+        return this.getViewHelperManager().get(name, options);
+    }
+
     preDispatch() { }
 
     postDispatch() { }

@@ -2,6 +2,7 @@ const Controller = require(global.applicationPath('/library/mvc/controller/base-
 const ArticleForm = require(global.applicationPath('/application/form/article-form'));
 const SessionContainer = require(global.applicationPath('/library/session/session-container'));
 const InputFilter = require(global.applicationPath('/library/input-filter/input-filter'));
+const VarUtil = require(global.applicationPath('/library/util/var-util'));
 const fs = require('fs');
 
 class DashboardController extends Controller {
@@ -158,7 +159,7 @@ class DashboardController extends Controller {
                 },
                 'title': {
                     required: true,
-                    requiredMessage: "Please enter title",
+                    requiredMessage: "<strong>Title</strong> is required. Please enter a title.",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -214,7 +215,7 @@ class DashboardController extends Controller {
                                 name: "excerpt",
                                 max: 150,
                                 messageTemplate: {
-                                    INVALID_TOO_LONG: 'Excerpt must not exceed 150 characters'
+                                    INVALID_TOO_LONG: '<strong>Excerpt</strong> must not exceed 150 characters'
                                 }
                             }
                         }
@@ -222,7 +223,7 @@ class DashboardController extends Controller {
                 },
                 'content_markdown': {
                     required: true,
-                    requiredMessage: "Please enter content",
+                    requiredMessage: "<strong>Content</strong> is required. Please enter content",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -239,7 +240,7 @@ class DashboardController extends Controller {
                 },
                 'category_id': {
                     required: true,
-                    requiredMessage: "Please select a category",
+                    requiredMessage: "<strong>Category</strong> is required. Please select a category",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -271,7 +272,7 @@ class DashboardController extends Controller {
                                 name: "meta_description",
                                 max: 150,
                                 messageTemplate: {
-                                    INVALID_TOO_LONG: 'Meta description must not exceed 150 characters'
+                                    INVALID_TOO_LONG: '<strong>Meta description</strong> must not exceed 150 characters'
                                 }
                             }
                         }
@@ -335,10 +336,11 @@ class DashboardController extends Controller {
                         console.log(this.plugin('markdownToHtml').convert(postData.content_markdown));
 
                         // Add success message
-                        super.plugin('flashMessenger').addSuccessMessage('Post updated successfully');
+                        super.plugin('flashMessenger').addSuccessMessage(
+                            `Post saved successfully. Return back to Dashboard`);
                         
                         // Redirect to list or stay on edit page
-                        return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: this.getParam('slug') });
+                        return this.plugin('redirect').toRoute('adminDashboardSummary');
                         //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
                     } catch (error) {
                         log(`Error updating post: ${error.message}`);
@@ -390,6 +392,22 @@ class DashboardController extends Controller {
             fs.appendFileSync(logFile, errorMsg + '\n');
             throw error;
         }
+    }
+
+    summaryAction() {
+        // Check if there are any flash messages to display
+        const flashMessenger = this.plugin('flashMessenger');
+        const hasSuccess = flashMessenger.hasMessages('success');
+        const hasError = flashMessenger.hasMessages('error');
+        const hasWarning = flashMessenger.hasMessages('warning');
+        const hasInfo = flashMessenger.hasMessages('info');
+
+        // If no messages at all, redirect to dashboard
+        if (!hasSuccess && !hasError && !hasWarning && !hasInfo) {
+            return this.plugin('redirect').toRoute('adminDashboardIndex');
+        }
+
+        return this.getView();
     }
 }
 

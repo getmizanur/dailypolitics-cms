@@ -34,6 +34,12 @@ module.exports = {
             "controller": "dashboard",
             "action": "edit"
         },
+        "adminDashboardSummary": {
+            "route": "/admin/dashboard/summary",
+            "module": "admin",
+            "controller": "dashboard",
+            "action": "summary"
+        },
         "adminDashboardDelete": {
             "route": "/admin/dashboard/delete/:slug",
             "module": "admin",

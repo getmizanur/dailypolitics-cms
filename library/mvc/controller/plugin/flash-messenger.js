@@ -149,15 +149,23 @@ class FlashMessenger extends BasePlugin {
 
     hasMessages(namespace = this.NAMESPACE_DEFAULT) {
         try {
-            // ZF1 Logic: Check 'current' queue
             const sessionNs = this.getSessionNamespace();
-            const currentMessages = sessionNs.get('current', {});
 
-            if (currentMessages[namespace] && currentMessages[namespace].length > 0) {
+            // Check 'next' queue first (messages added in current request)
+            const keyNext = `${namespace}_next`;
+            const nextMessages = sessionNs.get(keyNext, []);
+            if (Array.isArray(nextMessages) && nextMessages.length > 0) {
                 return true;
             }
 
-            // Check local messages (if we are supporting them)
+            // Check 'current' queue (messages from previous request that hopped)
+            const keyCurrent = `${namespace}_current`;
+            const currentMessages = sessionNs.get(keyCurrent, []);
+            if (Array.isArray(currentMessages) && currentMessages.length > 0) {
+                return true;
+            }
+
+            // Check local messages (backward compatibility)
             return this.messages[namespace] && this.messages[namespace].length > 0;
         } catch (error) {
             return false;
@@ -232,8 +240,6 @@ class FlashMessenger extends BasePlugin {
             if (sessionNs.has(namespace)) {
                 sessionNs.remove(namespace);
             }
-
-
 
             // Clear from local messages
             if (this.messages[namespace]) {
@@ -360,6 +366,11 @@ class FlashMessenger extends BasePlugin {
      */
     _promoteNextToCurrent() {
         try {
+            /*const req = this.getController()?.getRequest();
+            if (req && req.method === 'GET') {
+                return; // skip promoting on GET
+            }*/
+
             const sessionNs = this.getSessionNamespace();
             const allNamespaces = [
                 this.NAMESPACE_DEFAULT,

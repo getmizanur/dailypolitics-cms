@@ -1,0 +1,195 @@
+.dp-pt-0 {
+    padding-top: 0px !important
+}
+
+/* Error Summary - Based on GOV.UK Error Summary */
+.dp-error-summary {
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 5px solid #d4351c;
+    background-color: #ffffff;
+}
+
+.dp-error-summary:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+}
+
+.dp-error-summary__title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #d4351c;
+}
+
+.dp-error-summary__body {
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.dp-error-summary__list {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.dp-error-summary__list li {
+    margin-bottom: 10px;
+}
+
+.dp-error-summary__list li:last-child {
+    margin-bottom: 0;
+}
+
+.dp-error-summary__list a {
+    font-weight: 700;
+    color: #d4351c;
+    text-decoration: underline;
+}
+
+.dp-error-summary__list a:hover {
+    color: #942514;
+}
+
+.dp-error-summary__list a:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    color: #0b0c0c;
+}
+
+/* Success Notification Banner - Based on GOV.UK Notification Banner */
+.dp-notification-banner {
+    padding: 0;
+    margin-bottom: 30px;
+    border: 5px solid #1d70b8;
+    background-color: #1d70b8;
+}
+
+.dp-notification-banner--success {
+    border-color: #00703c;
+    background-color: #00703c;
+}
+
+.dp-notification-banner__header {
+    padding: 10px 20px;
+    background-color: #1d70b8;
+}
+
+.dp-notification-banner--success .dp-notification-banner__header {
+    background-color: #00703c;
+}
+
+.dp-notification-banner__title {
+    margin: 0;
+    padding: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.dp-notification-banner__content {
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+.dp-notification-banner__heading {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #00703c;
+}
+
+.dp-notification-banner__message {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.25;
+    color: #0b0c0c;
+}
+
+.dp-notification-banner__message p {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.dp-notification-banner__message p:last-child {
+    margin-bottom: 0;
+}
+
+.dp-notification-banner__link {
+    font-weight: 700;
+    color: #1d70b8;
+    text-decoration: underline;
+}
+
+.dp-notification-banner__link:hover {
+    color: #003078;
+}
+
+.dp-notification-banner__link:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    color: #0b0c0c;
+}
+
+/* Alert Styles (Alternative simpler version) */
+.alert {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-left: 5px solid;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.alert p {
+    margin: 5px 0;
+}
+
+.alert p:first-child {
+    margin-top: 0;
+}
+
+.alert p:last-child {
+    margin-bottom: 0;
+}
+
+.alert-error {
+    background-color: #fef7f7;
+    border-color: #d4351c;
+    color: #0b0c0c;
+}
+
+.alert-error::before {
+    content: "!";
+    display: inline-block;
+    margin-right: 10px;
+    padding: 2px 8px;
+    background-color: #d4351c;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 50%;
+}
+
+.alert-success {
+    background-color: #f3fef7;
+    border-color: #00703c;
+    color: #0b0c0c;
+}
+
+.alert-success::before {
+    content: "✓";
+    display: inline-block;
+    margin-right: 10px;
+    padding: 2px 8px;
+    background-color: #00703c;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 50%;
+}
+

@@ -262,7 +262,8 @@ module.exports = {
             }
         },
         "factories": {
-            "navigationLink": "/application/helper/factory/navigation-link-helper-factory"
+            "navigationLink": "/application/helper/factory/navigation-link-helper-factory",
+            "flashBanner": "/application/helper/factory/flash-banner-helper-factory"
         }
         // Add your custom application helpers here
         // Example:

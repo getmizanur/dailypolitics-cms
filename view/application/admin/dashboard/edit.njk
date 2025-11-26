@@ -19,19 +19,6 @@
                 </div>
             </div>
             {% endif %}
-
-            {# Success messages #}
-            {% if success_flash_messages.length > 0 %}
-            <div class="dp-notification-banner dp-notification-banner--success">
-                <div class="dp-notification-banner__header">
-                    <h2 class="dp-notification-banner__title">Success</h2>
-                </div>
-                <div class="dp-notification-banner__content">
-                    <h3 class="dp-notification-banner__heading">Post updated successfully</h3>
-                    <p class="dp-notification-banner__message">Your changes have been saved.</p>
-                </div>
-            </div>
-            {% endif %}
             
             {{ form().openTag(f) }}
                 {{ formCsrf(f.get('csrf')) | safe }}
