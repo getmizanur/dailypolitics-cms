@@ -1,3 +1,240 @@
+/* =========================================
+   TAG COMPONENT (Daily Politics)
+   Used by: blog/index/index.njk, blog/index/view.njk, admin/dashboard/list.njk
+   ========================================= */
+
+.dp-tag {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px; /* rectagular */
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+  background-color: #f3f2f1;
+  color: #222222;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Space tags when multiple are shown together */
+.dp-tag + .dp-tag {
+  margin-left: 0.25rem;
+}
+
+/* Neutral / default tag (e.g. "Opinion", "Analysis") */
+.dp-tag--neutral {
+  background-color: #f3f2f1;
+  border-color: #d0d0d0;
+  color: #444444;
+}
+
+/* Primary / attention tag (e.g. "Breaking") */
+.dp-tag--primary {
+  background-color: #0050b3;
+  border-color: #003a82;
+  color: #ffffff;
+}
+
+/* Positive tag (e.g. "Passed", "Approved") */
+.dp-tag--positive {
+  background-color: #0f8243;
+  border-color: #0a5c30;
+  color: #ffffff;
+}
+
+/* Warning tag (e.g. "Delayed", "At risk") */
+.dp-tag--warning {
+  background-color: #f3a800;
+  border-color: #c68600;
+  color: #222222;
+}
+
+/* Negative / danger tag (e.g. "Rejected", "Urgent") */
+.dp-tag--negative {
+  background-color: #c52a1a;
+  border-color: #8f1f13;
+  color: #ffffff;
+}
+
+/* Muted / low emphasis tag (e.g. "Archived", "Draft") */
+.dp-tag--muted {
+  background-color: #e5e5e5;
+  border-color: #cccccc;
+  color: #555555;
+}
+
+
+.dp-tag--breaking {
+    background-color: #c0392b;
+	color:#fff;
+}
+
+.dp-tag--red {
+	background-color: #d4351c;
+	color:#fff !important;
+}
+
+.dp-tag--red a {
+	color:#fff !important;
+}
+
+.dp-tag--yellow {
+	background-color: #ffdd00;
+	color:#000 !important;
+}
+
+.dp-tag--yellow a {
+	color:#000 !important;
+}
+
+.dp-tag--green {
+	background-color: #00703c;
+	color:#fff !important;
+}
+
+.dp-tag--green a {
+	color:#fff !important;
+}
+
+.dp-tag--blue {
+	background-color: #1d70b8;
+	color:#fff !important;
+}
+
+.dp-tag--blue a {
+	color:#fff !important;
+}
+
+.dp-tag--dark-blue {
+	background-color: #003078;
+	color:#fff !important;
+}
+
+.dp-tag--dark-blue a {
+	color:#fff !important;
+}
+
+.dp-tag--light-blue {
+	background-color: #5694ca;
+	color:#000 !important;
+}
+
+.dp-tag--light-blue a {
+	color:#000 !important;
+}
+
+.dp-tag--purple {
+	background-color:#4c2c92;
+	color:#fff !important;
+}
+
+.dp-tag--purple a {
+	color:#fff !important;
+}
+
+.dp-tag--black {
+	background-color: #0b0c0c;
+	color:#000 !important;
+}
+
+.dp-tag--black a{
+	color:#000 !important;
+}
+
+.dp-tag--dark-grey {
+	background-color: #626a6e;
+	color:#fff !important;
+}
+
+.dp-tag--dark-grey a {
+	color:#fff !important;
+}
+
+.dp-tag--mid-grey {
+	background-color: #b1b4b6;
+	color:#000 !important;
+}
+
+.dp-tag--mid-grey a {
+	color:#000 !important;
+}
+
+.dp-tag--light-purple {
+	background-color:#6f72af;
+	color:#000 !important;
+}
+
+.dp-tag--light-purple a {
+	color:#000 !important;
+}
+
+.dp-tag--bright-purple {
+	background-color:#912b88;
+	color:#fff !important;
+}
+
+.dp-tag--bright-purple a {
+	color:#fff !important;
+}
+
+.dp-tag--pink {
+	background-color:#d53880;
+	color:#000 !important;
+}
+
+.dp-tag--pink a {
+	color:#000 !important;
+}
+
+.light-pink {
+	background-color:#f499be;
+	color:#000 !important;
+}
+
+.dp-tag--light-pink a {
+	color:#000 !important;
+}
+
+.dp-tag--orange {
+	background-color:#f47738;
+	color:#000 !important;
+}
+
+.dp-tag--orange a {
+	color:#000 !important;
+}
+
+.dp-tag--brown {
+	background-color:#b58840;
+	color:#000 !important;
+}
+
+.dp-tag--brown a {
+	color:#000 !important;
+}
+
+.dp-tag--light-green {
+	background-color:#85994b;
+	color:#000 !important;
+}
+
+.dp-tag--light-green a {
+	color:#000 !important;
+}
+
+.dp-tag--turquoise {
+	background-color:#28a197;
+	color:#000 !important;
+}
+
+.dp-tag--turquoise a {
+	color:#000 !important;
+}
+
 /* Table caption style based on ONS Design System */
 .dp-table__caption {
 	font-weight: 700;
@@ -278,7 +515,7 @@
 	min-width: 2.75rem;
 	height: 2.75rem;
 	padding: 0.5rem 0.75rem;
-	font-family: "Roboto", Arial, sans-serif;
+	font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 	font-size: 1rem;
 	font-weight: 400;
 	line-height: 1.25;
@@ -350,7 +587,7 @@
 .admin-login-form .dp-label,
 .admin-login-form .dp-input,
 .admin-login-form .dp-input::placeholder {
-	font-family: "nta", Arial, sans-serif !important;
+	font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important;
 }
 .admin-login-form .dp-input,
 .admin-login-form .dp-button {
@@ -474,7 +711,7 @@
 /* GOV.UK Design System inspired link buttons for admin actions */
 .dp-link-button {
 	display: inline-block;
-	font-family: "Roboto", Arial, sans-serif;
+	font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 	font-size: 1rem;
 	font-weight: 600;
 	line-height: 1.1875;
@@ -564,7 +801,7 @@
 
 /* Roboto font for admin dashboard table */
 .admin-dashboard-card .table {
-	font-family: Roboto, sans-serif;
+	font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 }
 
 /* Alternating row colors for admin dashboard table (WCAG AA 2.2 compliant) */
