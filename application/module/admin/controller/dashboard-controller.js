@@ -336,9 +336,10 @@ class DashboardController extends Controller {
 
                         // Add success message
                         super.plugin('flashMessenger').addSuccessMessage('Post updated successfully');
-
+                        
                         // Redirect to list or stay on edit page
-                        return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatedPost.slug });
+                        return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: this.getParam('slug') });
+                        //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
                     } catch (error) {
                         log(`Error updating post: ${error.message}`);
                         super.plugin('flashMessenger').addErrorMessage(`Failed to update post: ${error.message}`);
@@ -379,12 +380,9 @@ class DashboardController extends Controller {
 
             log('Returning view with form');
 
-            // Get flash messages to display in template
-            const flashMessages = super.plugin('flashMessenger').getAllMessages(true);
-
             return this.getView()
-                .setVariable('f', form)
-                .setVariable('flashMessages', flashMessages);
+                .setVariable('f', form);
+            //.setVariable('flashMessages', flashMessages);
 
         } catch (error) {
             const errorMsg = `Error in editAction: ${error.message}\nStack: ${error.stack}`;

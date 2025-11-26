@@ -29,6 +29,33 @@ class FlashMessenger extends BasePlugin {
 
         // Use new session namespace instead of Container
         this.sessionNamespace = null;
+
+        // Initialize session and perform hop
+        this._init();
+    }
+
+    _init() {
+        try {
+            const sessionNs = this.getSessionNamespace();
+
+            // ZF1 Logic: Move 'next' messages to 'current' (the hop)
+            // We use a specific key structure in the session namespace:
+            // {
+            //    'next': { 'error': [], 'success': [], ... },
+            //    'current': { 'error': [], 'success': [], ... }
+            // }
+
+            const nextMessages = sessionNs.get('next', {});
+
+            // Move next -> current
+            sessionNs.set('current', nextMessages);
+
+            // Clear next
+            sessionNs.set('next', {});
+
+        } catch (error) {
+            console.warn('FlashMessenger init error:', error.message);
+        }
     }
 
     setNamespace(namespace = this.NAMESPACE_DEFAULT) {
@@ -63,33 +90,28 @@ class FlashMessenger extends BasePlugin {
 
     addMessage(message, namespace = this.NAMESPACE_DEFAULT) {
         try {
-            // Use new session namespace system for better persistence
             const sessionNs = this.getSessionNamespace();
-            let messages = sessionNs.get(namespace, []);
 
-            // Ensure messages is an array
+            // Use "next" bucket ZF1-style
+            const keyNext = `${namespace}_next`;
+            let messages = sessionNs.get(keyNext, []);
+
             if (!Array.isArray(messages)) {
                 messages = [];
             }
 
             messages.push(message);
-            sessionNs.set(namespace, messages);
+            sessionNs.set(keyNext, messages);
 
-            // Also update local messages for backward compatibility
+            // local cache for debug/backward compat
             if (!this.messages[namespace]) {
                 this.messages[namespace] = [];
             }
             this.messages[namespace].push(message);
 
-            if (this.messageAdded == false) {
-                this.messageAdded = true;
-            }
-
-            // Immediately inject updated messages into template variables
-            this._injectTemplateVariables();
+            this.messageAdded = true;
         } catch (error) {
             console.warn('FlashMessenger addMessage error:', error.message);
-            // Fallback to local storage
             if (!this.messages[namespace]) {
                 this.messages[namespace] = [];
             }
@@ -118,21 +140,24 @@ class FlashMessenger extends BasePlugin {
     }
 
     addErrorMessage(message) {
-        this.addMessage(message, this.NAMESPACE_ERROR);
+        // If we’re adding an error, any pending SUCCESS is no longer valid.
+        this._clearNamespacePair(this.NAMESPACE_SUCCESS);
 
+        this.addMessage(message, this.NAMESPACE_ERROR);
         return this;
     }
 
     hasMessages(namespace = this.NAMESPACE_DEFAULT) {
         try {
-            // Check session namespace first
+            // ZF1 Logic: Check 'current' queue
             const sessionNs = this.getSessionNamespace();
-            const sessionMessages = sessionNs.get(namespace, []);
-            if (sessionMessages && sessionMessages.length > 0) {
+            const currentMessages = sessionNs.get('current', {});
+
+            if (currentMessages[namespace] && currentMessages[namespace].length > 0) {
                 return true;
             }
 
-            // Check local messages
+            // Check local messages (if we are supporting them)
             return this.messages[namespace] && this.messages[namespace].length > 0;
         } catch (error) {
             return false;
@@ -148,36 +173,31 @@ class FlashMessenger extends BasePlugin {
     getMessages(namespace = this.NAMESPACE_DEFAULT, clearAfterRead = true) {
         try {
             let messages = [];
-            let foundMessages = false;
 
-            // First try to get from session namespace (new system)
             const sessionNs = this.getSessionNamespace();
-            const sessionMessages = sessionNs.get(namespace, []);
 
-            if (sessionMessages && sessionMessages.length > 0) {
-                messages = [...sessionMessages];
-                foundMessages = true;
-                // Clear messages after reading if clearAfterRead is true
+            // First check 'next' (messages added during this request)
+            const nextMessages = sessionNs.get('next', {});
+            if (nextMessages[namespace] && nextMessages[namespace].length > 0) {
+                messages = [...nextMessages[namespace]];
+
+                // Clear from next if clearAfterRead is true
                 if (clearAfterRead) {
-                    sessionNs.remove(namespace);
+                    nextMessages[namespace] = [];
+                    sessionNs.set('next', nextMessages);
                 }
-            }
+            } else {
+                // If no messages in 'next', check 'current' (messages from previous request)
+                const currentMessages = sessionNs.get('current', {});
+                if (currentMessages[namespace] && currentMessages[namespace].length > 0) {
+                    messages = [...currentMessages[namespace]];
 
-
-
-            // Fallback to local messages array
-            if (!foundMessages && this.messages[namespace] && this.messages[namespace].length > 0) {
-                messages = [...this.messages[namespace]];
-                foundMessages = true;
-                // Clear local messages after reading if clearAfterRead is true
-                if (clearAfterRead) {
-                    this.messages[namespace] = [];
+                    // Clear messages after reading if clearAfterRead is true
+                    if (clearAfterRead) {
+                        currentMessages[namespace] = [];
+                        sessionNs.set('current', currentMessages);
+                    }
                 }
-            }
-
-            // Clear from all storage locations if clearAfterRead is true
-            if (foundMessages && clearAfterRead) {
-                this._clearAllStorageForNamespace(namespace);
             }
 
             return messages;
@@ -279,6 +299,20 @@ class FlashMessenger extends BasePlugin {
     }
 
     /**
+     * Prepare flash messages for the current request:
+     * - promote "next" messages into "current"
+     * - inject into view variables
+     * - clear "current" so they only show once
+     */
+    prepareForView() {
+        // ZF1-style promotion (we'll define this helper below)
+        this._promoteNextToCurrent();
+
+        // Inject current messages into the view + clear them
+        this._injectTemplateVariables();
+    }
+
+    /**
      * Auto-inject flash message arrays into template variables
      * This is called automatically when messages are added
      * Private method - use underscore prefix to indicate internal use
@@ -286,28 +320,90 @@ class FlashMessenger extends BasePlugin {
     _injectTemplateVariables() {
         try {
             const controller = this.getController();
-            if (!controller) {
-                // Controller not set yet, skip injection
-                return;
-            }
+            if (!controller) return;
 
             const view = controller.getView();
-            if (!view || typeof view.setVariable !== 'function') {
-                // View not ready yet, skip injection
-                return;
-            }
+            if (!view || typeof view.setVariable !== 'function') return;
 
-            // Get current messages from session without clearing
             const sessionNs = this.getSessionNamespace();
 
-            // Inject each message type as a separate array variable
-            view.setVariable('error_flash_messages', sessionNs.get(this.NAMESPACE_ERROR, []));
-            view.setVariable('success_flash_messages', sessionNs.get(this.NAMESPACE_SUCCESS, []));
-            view.setVariable('warning_flash_messages', sessionNs.get(this.NAMESPACE_WARNING, []));
-            view.setVariable('info_flash_messages', sessionNs.get(this.NAMESPACE_INFO, []));
+            const errorsCurrent   = sessionNs.get(`${this.NAMESPACE_ERROR}_current`,   []);
+            let   successCurrent  = sessionNs.get(`${this.NAMESPACE_SUCCESS}_current`, []);
+            const warningCurrent  = sessionNs.get(`${this.NAMESPACE_WARNING}_current`, []);
+            const infoCurrent     = sessionNs.get(`${this.NAMESPACE_INFO}_current`,    []);
+
+            // If we have errors, suppress success banners
+            if (errorsCurrent && errorsCurrent.length > 0) {
+                successCurrent = [];
+                this._clearNamespacePair(this.NAMESPACE_SUCCESS);
+            }
+
+            view.setVariable('error_flash_messages',   errorsCurrent   || []);
+            view.setVariable('success_flash_messages', successCurrent  || []);
+            view.setVariable('warning_flash_messages', warningCurrent  || []);
+            view.setVariable('info_flash_messages',    infoCurrent     || []);
+
+            // Clear "current" buckets after injection (one-time display)
+            sessionNs.set(`${this.NAMESPACE_ERROR}_current`,   []);
+            sessionNs.set(`${this.NAMESPACE_SUCCESS}_current`, []);
+            sessionNs.set(`${this.NAMESPACE_WARNING}_current`, []);
+            sessionNs.set(`${this.NAMESPACE_INFO}_current`,    []);
         } catch (error) {
-            // Silently fail - template variables will just be empty arrays
-            // This is expected during initialization or when controller isn't set
+            // swallow – no flash is fine
+        }
+    }
+
+    /**
+     * Promote "next" messages into "current" for all namespaces.
+     * This should be called once per request before we inject into the view.
+     * Mirrors ZF1 behaviour (next → current).
+     */
+    _promoteNextToCurrent() {
+        try {
+            const sessionNs = this.getSessionNamespace();
+            const allNamespaces = [
+                this.NAMESPACE_DEFAULT,
+                this.NAMESPACE_SUCCESS,
+                this.NAMESPACE_WARNING,
+                this.NAMESPACE_ERROR,
+                this.NAMESPACE_INFO,
+            ];
+
+            allNamespaces.forEach(ns => {
+                const keyCurrent = `${ns}_current`;
+                const keyNext    = `${ns}_next`;
+
+                const nextMessages = sessionNs.get(keyNext, []);
+
+                // Move "next" to "current"
+                if (Array.isArray(nextMessages) && nextMessages.length > 0) {
+                    sessionNs.set(keyCurrent, nextMessages);
+                    sessionNs.set(keyNext, []); // clear next bucket
+                }
+            });
+        } catch (error) {
+            console.warn('FlashMessenger _promoteNextToCurrent error:', error.message);
+        }
+    }
+
+    /**
+     * Clear both "current" and "next" buckets for a namespace.
+     */
+    _clearNamespacePair(namespace) {
+        try {
+            const sessionNs = this.getSessionNamespace();
+
+            const keyCurrent = `${namespace}_current`;
+            const keyNext    = `${namespace}_next`;
+
+            sessionNs.set(keyCurrent, []);
+            sessionNs.set(keyNext, []);
+
+            if (this.messages[namespace]) {
+                this.messages[namespace] = [];
+            }
+        } catch (err) {
+            console.warn('FlashMessenger _clearNamespacePair error:', namespace, err.message);
         }
     }
 

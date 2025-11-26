@@ -7,7 +7,7 @@ class BasePlugin {
     }
 
     setController(controller) {
-        if(!(controller instanceof BaseController)) {
+        if (!(controller instanceof BaseController)) {
             throw new Error('The class is not a BaseController instance.');
         }
 
@@ -16,6 +16,13 @@ class BasePlugin {
 
     getController() {
         return this.controller;
+    }
+
+    /**
+     * Hook called after controller action execution
+     */
+    postDispatch() {
+        // Override in subclasses
     }
 
 }

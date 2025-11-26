@@ -362,7 +362,8 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
                         });
                     }
                 }
-
+                // BEFORE you render the view, prepare flash messages:
+                front.prepareFlashMessenger();
                 return res.render(view.getTemplate(), view.getVariables());
             }
         }

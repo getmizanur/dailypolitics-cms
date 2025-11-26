@@ -163,6 +163,22 @@ class BaseController {
         return this.returnResponse;
     }
 
+    /**
+     * Central hook to prepare flash messages before rendering.
+     * Call this once per request, e.g. at the end of your main dispatch method,
+     * just before you render the view.
+     */
+    prepareFlashMessenger() {
+        try {
+            const flash = this.plugin('flashMessenger');
+            if (flash && typeof flash.prepareForView === 'function') {
+                flash.prepareForView();
+            }
+        } catch (e) {
+            // swallow – no flash messages is fine
+        }
+    }
+
     dispatch(request = null, response = null) {
         let view = null;
 
@@ -292,6 +308,7 @@ class BaseController {
     preDispatch() { }
 
     postDispatch() { }
+
 
     /**
      * Helper method to get flash messages for views
