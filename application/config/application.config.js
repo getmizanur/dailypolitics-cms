@@ -220,6 +220,10 @@ module.exports = {
             "markdownToHtml": {
                 "class": "/application/plugin/markdown-to-html-plugin",
                 "description": "Converts markdown text to HTML using marked library"
+            },
+            "opaqueId": {
+                "class": "/application/plugin/opaque-id-plugin",
+                "description": "Generates unique opaque IDs (e.g., c874nw4g2zzo, w7mz3d1e4kvu)"
             }
         }
     },

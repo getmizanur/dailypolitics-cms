@@ -1,193 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="author" content="Daily Politics">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta charset="utf-8">
+  <meta name="author" content="Daily Politics">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Primary Meta Tags -->
-    <title>{{ headTitle('Daily Politics', 'prepend') }}</title>
-    <meta name="title" content="{{ headTitle() }}">
-    <meta name="description" content="{% block metaDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
+  {# ---------- Titles & descriptions ---------- #}
+  {% set defaultDescription = 'Latest news, comments and analysis from the UK and around the world.' %}
 
-    <!-- Preconnect to font origins for faster DNS resolution -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>{{ headTitle('Daily Politics', 'prepend') }}</title>
+  <meta name="title" content="{{ headTitle() }}">
+  <meta name="description" content="{% block metaDescription %}{{ defaultDescription }}{% endblock %}">
 
-    <!-- Load fonts asynchronously with font-display: swap for consistent rendering -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap" rel="stylesheet"></noscript>
+  {# ---------- Open Graph / Facebook ---------- #}
+  <meta property="fb:app_id" content="1505589612955663">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:type" content="{% block ogType %}article{% endblock %}">
+  <meta property="og:url"
+        content="{% block ogUrl %}{{ request.url | default('https://www.dailypolitics.com/') }}{% endblock %}">
+  <meta property="og:title"
+        content="{% block ogTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
+  <meta property="og:description"
+        content="{% block ogDescription %}{{ defaultDescription }}{% endblock %}">
+  <meta property="og:image"
+        content="{% block ogImage %}https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png{% endblock %}">
+  <meta property="og:site_name" content="DailyPolitics">
+  <meta property="article:publisher" content="https://www.dailypolitics.com">
 
-    <!-- Fallback font stack while custom fonts load (preserves Roboto/Anton when loaded) -->
-    <style>
-                /* Bootstrap-like grid to prevent CLS before bootstrap.min.css loads */
-        .container {
-            width: 100%;
-            padding-right: 15px;
-            padding-left: 15px;
-            margin-right: auto;
-            margin-left: auto;
-        }
+  {# ---------- Twitter ---------- #}
+  <meta name="twitter:site" content="@DeyleePolitiks">
+  <meta name="twitter:creator" content="@DeyleePolitiks">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title"
+        content="{% block twitterTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
+  <meta name="twitter:description"
+        content="{% block twitterDescription %}{{ defaultDescription }}{% endblock %}">
+  <meta name="twitter:image"
+        content="{% block twitterImage %}https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png{% endblock %}">
 
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: -15px;
-            margin-left: -15px;
-        }
+  {# ---------- Preconnects ---------- #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com">
 
-        /* Basic column behaviour */
-        [class^="col-"], [class*=" col-"] {
-            position: relative;
-            width: 100%;
-            min-height: 1px;
-            padding-right: 15px;
-            padding-left: 15px;
-        }
-        /* Base layout to prevent CLS when main.css loads */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important;
-            background-color: #f3f2f1;
-        }
-
-        main {
-            flex: 1;
-        }
-        /* Prevent layout shift by matching fallback font metrics to web fonts */
-        @font-face {
-            font-family: 'Roboto Fallback';
-            src: local('Arial');
-            size-adjust: 100%;
-            ascent-override: 92.77%;
-            descent-override: 24.34%;
-            line-gap-override: 0%;
-        }
-
-        @font-face {
-            font-family: 'Anton Fallback';
-            src: local('Impact'), local('Arial Black');
-            size-adjust: 107%;
-            ascent-override: 90%;
-            descent-override: 10%;
-            line-gap-override: 0%;
-        }
-
-        .navbar-brand {
-            font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif !important;
-            font-size: 52px !important;
-        }
-
-        .card-header {
-            font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif !important;
-        }
-
-        .post-header {
-            font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif !important;
-        }
-
-        /* Prevent blog layout shift (CLS fix) */
-        /* Reserve space for blog article cards */
-        .dailypolitics-correction.card {
-            margin-bottom: 2rem;
-        }
-
-        /* Reserve space for article headers */
-        .dailypolitics-heading-xl {
-            min-height: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Stabilize story-body figure image containers */
-        .story-body figure {
-            margin-bottom: 1rem;
-        }
-
-        .media-landscape .image-and-copyright-container {
-            display: block;
-            width: 100%;
-            background-color: #f3f2f1;
-        }
-
-        .media-landscape .image-and-copyright-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* Reserve space for article body */
-        .dailypolitics-body {
-            min-height: 100px;
-        }
-
-        /* Reserve space for dailypolitics-footer */
-        .dailypolitics-footer {
-            min-height: 40px;
-            padding: 1rem 0;
-        }
-
-        /* Reserve space for sidebar */
-        .card-header {
-            min-height: 3rem;
-        }
-
-        .list-group {
-            min-height: 200px;
-        }
-    </style>
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="fb:app_id" content="1505589612955663" />
-    <meta property="og:locale" content="en_GB" />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="{{ request.url | default('http://localhost:8080') }}" />
-    <meta property="og:title" content="{% block ogTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}" />
-    <meta property="og:description" content="{% block ogDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}" />
-    <meta property="og:image" content="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png" />
-    <meta property="og:site_name" content="DailyPolitics" />
-    <meta property="article:publisher" content="https://www.dailypolitics.com" />
-    
-    <!-- Twitter -->
-    <meta name="twitter:site" content="@DeyleePolitiks">
-    <meta name="twitter:creator" content="@DeyleePolitiks">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png">
-    <meta property="twitter:url" content="{{ request.url | default('http://localhost:8080') }}" />
-    <meta name="twitter:title" content="{% block twitterTitle %}{{ pageTitle | default('Daily Politics CMS') }}{% endblock %}">
-    <meta name="twitter:description" content="{% block twitterDescription %}Latest news, comments and analysis from the UK and around the world.{% endblock %}">
-    
-    <!-- Load main.css asynchronously to avoid blocking FCP/LCP -->
-    <link rel="preload"
-        href="/css/main.css"
+  {# ---------- Web fonts (async) ---------- #}
+  <link rel="preload"
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap"
         as="style"
         onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap">
+  </noscript>
 
-    <noscript>
-        <link rel="stylesheet" href="/css/main.css">
-    </noscript>
+  {# ---------- Base critical CSS (shared) ---------- #}
+  <style>
+    /* Layout skeleton to avoid CLS */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-size: 16px !important;
+      font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", Arial, sans-serif;
+      background-color: #f3f2f1;
+    }
+    main { flex: 1; }
 
-    <!-- Critical CSS inlined for performance -->
-    {{ onDemandCss() | safe }}
+    /* Fallback font metrics to reduce font-swap shift */
+    @font-face {
+      font-family: 'Roboto Fallback';
+      src: local('Arial');
+      size-adjust: 100%;
+      ascent-override: 92.77%;
+      descent-override: 24.34%;
+      line-gap-override: 0%;
+    }
+    @font-face {
+      font-family: 'Anton Fallback';
+      src: local('Impact'), local('Arial Black');
+      size-adjust: 107%;
+      ascent-override: 90%;
+      descent-override: 10%;
+      line-gap-override: 0%;
+    }
 
-    <!-- Load Bootstrap as a normal stylesheet (prevents CLS from late layout changes) -->
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    .navbar-brand {
+        font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif;
+        font-size: 52px !important;
+    }
     
-    <!-- Icons and Favicons -->
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="canonical" href="{% block canonicalUrl %}{{ canonicalUrl | default('https://www.dailypolitics.com/') }}{% endblock %}">
-    <link rel="apple-touch-icon" href="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png">
+    .card-header,
+    .post-header {
+      font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif;
+    }
 
-    {% block head %}
-    {# Additional head content from child templates #}
-    {% endblock %}
+    /* Reserve space for key content areas */
+    .dailypolitics-heading-xl {
+      min-height: 3rem;
+      margin-bottom: 1rem;
+    }
+    .dailypolitics-body {
+      min-height: 100px;
+    }
+    .dailypolitics-footer {
+      min-height: 40px;
+      padding: 1rem 0;
+    }
+    .list-group {
+      min-height: 200px;
+    }
+
+    .navbar {
+        display: flex;
+        align-items: center;
+        background-color: #003078 !important;
+        min-height: 78px !important;
+        max-height: 78px !important;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        font-family: Anton, 'Anton Fallback', Impact, "Arial Black", sans-serif;
+        font-size: 52px !important;
+        line-height: 1 !important;
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+        margin-right: 1rem;
+    }
+  </style>
+
+  {# ---------- Bootstrap: render-blocking on purpose (prevents CLS) ---------- #}
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+  {# ---------- main.css (async, shared styles) ---------- #}
+  <link rel="stylesheet" href="/css/main.css">
+
+  {# ---------- Page-specific critical CSS (server-side on-demand) ---------- #}
+  {{ onDemandCss() | safe }}
+
+  {# ---------- Icons / canonical ---------- #}
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="canonical"
+        href="{% block canonicalUrl %}{{ canonicalUrl | default('https://www.dailypolitics.com/') }}{% endblock %}">
+  <link rel="apple-touch-icon"
+        href="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/daily-politics.png">
+
+  {# ---------- Extra head content from child templates ---------- #}
+  {% block head %}{% endblock %}
 </head>
 <body>
     <!-- Skip to main content link for accessibility -->

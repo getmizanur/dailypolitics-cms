@@ -11,43 +11,49 @@ module.exports = {
             "action": "login"
         },
         "adminDashboardIndex": {
-            "route": "/admin/dashboard",
+            "route": "/admin/posts",
             "module": "admin",
             "controller": "dashboard",
             "action": "list"
         },
+        "adminDashboardNew": {
+            "route": "/admin/posts/new",
+            "module": "admin",
+            "controller": "dashboard",
+            "action": "new"
+        },
         "adminDashboardPage": {
-            "route": "/admin/dashboard/page/:page",
+            "route": "/admin/posts/page/:page",
             "module": "admin",
             "controller": "dashboard",
             "action": "list"
         },
         "adminDashboardView": {
-            "route": "/admin/dashboard/view/:slug",
+            "route": "/admin/posts/:slug/preview",
             "module": "admin",
             "controller": "dashboard",
             "action": "view"
         },
         "adminDashboardEdit": {
-            "route": "/admin/dashboard/edit/:slug",
+            "route": "/admin/posts/:slug/edit",
             "module": "admin",
             "controller": "dashboard",
             "action": "edit"
         },
-        "adminDashboardSummary": {
-            "route": "/admin/dashboard/summary",
+        "adminDashboardConfirmation": {
+            "route": "/admin/posts/confirmation",
             "module": "admin",
             "controller": "dashboard",
-            "action": "summary"
+            "action": "confirmation"
         },
         "adminDashboardDelete": {
-            "route": "/admin/dashboard/delete/:slug",
+            "route": "/admin/posts/:slug/remove",
             "module": "admin",
             "controller": "dashboard",
             "action": "delete"
         },
         "adminLoginLogout": {
-            "route": "/admin/dashboard/logout",
+            "route": "/admin/posts/logout",
             "module": "admin",
             "controller": "login",
             "action": "logout"

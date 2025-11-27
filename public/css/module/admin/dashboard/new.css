@@ -322,7 +322,27 @@
     background-color: #005a30;
 }*/
 
-/* Save Article Button - Keep original blue */
+
+/* Submit for Review Button - Orange */
+button[name="review_requested"],
+input[name="review_requested"] {
+    background-color: #f47738 !important;
+    box-shadow: 0 2px 0 #f47738 !important;
+    border: 2px solid #f47738;
+}
+
+button[name="review_requested"]:hover,
+input[name="review_requested"]:hover {
+    background-color: #b58840 !important;
+    border-color: #b58840 !important;
+}
+
+button[name="review_requested"]:focus,
+input[name="review_requested"]:focus {
+    background-color: #b58840 !important;
+}
+
+/* Save Article Button - Blue */
 .dp-button--save,
 button[name="submit"],
 input[name="submit"] {
@@ -360,92 +380,6 @@ input[name="submit"]:focus {
     outline: 3px solid #ffdd00 !important;
     outline-offset: 0 !important;
     background-color: #1d70b8 !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-/* Submit for Review Button - Orange */
-.dp-button--review,
-button[name="review_requested"],
-input[name="review_requested"] {
-    background-color: #f47738 !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-    width: auto !important;
-    min-width: auto !important;
-    max-width: none !important;
-}
-
-.dp-button--review:hover,
-button[name="review_requested"]:hover,
-input[name="review_requested"]:hover {
-    background-color: #492310 !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-.dp-button--review:active,
-button[name="review_requested"]:active,
-input[name="review_requested"]:active {
-    background-color: #f47738  !important;
-    color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    top: 2px;
-    position: relative;
-}
-
-.dp-button--review:focus,
-button[name="review_requested"]:focus,
-input[name="review_requested"]:focus {
-    outline: 3px solid #ffdd00 !important;
-    outline-offset: 0 !important;
-    background-color: #f47738 !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-/* Submit for Delete Button - Red */
-.dp-button--delete,
-button[name="delete"],
-input[name="delete"] {
-    background-color: #d4351c !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-    width: auto !important;
-    min-width: auto !important;
-    max-width: none !important;
-}
-
-.dp-button--delete:hover,
-button[name="delete"]:hover,
-input[name="delete"]:hover {
-    background-color: #6f3331 !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-.dp-button--delete:active,
-button[name="delete"]:active,
-input[name="delete"]:active {
-    background-color: #d4351c  !important;
-    color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    top: 2px;
-    position: relative;
-}
-
-.dp-button--delete:focus,
-button[name="delete"]:focus,
-input[name="delete"]:focus {
-    outline: 3px solid #ffdd00 !important;
-    outline-offset: 0 !important;
-    background-color: #d4351c !important;
     color: #ffffff !important;
     border: 2px solid transparent !important;
     box-shadow: 0 2px 0 #003078 !important;
@@ -492,7 +426,6 @@ input[name="publish"]:focus {
     border: 2px solid transparent !important;
     box-shadow: 0 2px 0 #002d18 !important;
 }
-
 
 /* Secondary Button Style */
 .dp-button--secondary {
@@ -736,6 +669,48 @@ input[name="publish"]:focus {
     color: #ffffff;
     font-weight: 700;
     border-radius: 50%;
+}
+
+/* GOV.UK Focus State for Buttons */
+.dp-button:hover {
+    background-color: #003078;
+    border-color: #003078;
+}
+
+.dp-button:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    box-shadow: 0 2px 0 #0b0c0c;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c;
+}
+
+/* Removed conflicting focus state - using definition above at line 390 */
+
+button[name="review_requested"]:focus,
+input[name="review_requested"]:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00 !important;
+    box-shadow: 0 2px 0 #0b0c0c;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c;
+}
+
+.dp-button--secondary:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+}
+
+.dp-button--warning:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    box-shadow: 0 2px 0 #0b0c0c;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c;
 }
 
 .dp-button--cancel {

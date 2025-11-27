@@ -52,6 +52,7 @@ class DashboardController extends Controller {
                 });
             }
 
+            const baseUrl = this.helper('url').fromRoute('adminDashboardIndex');
             // Set view variables
             this.getView()
                 .setVariable('posts', posts)
@@ -59,7 +60,7 @@ class DashboardController extends Controller {
                     mode: 'admin',
                     currentPage: page,
                     totalItems: totalCount,
-                    baseUrl: '/admin/dashboard'
+                    baseUrl: baseUrl
                 });
 
             return this.getView();
@@ -70,6 +71,197 @@ class DashboardController extends Controller {
         }
     }
 
+    async newAction() {
+        // Fetch all categories from database
+        const postService = this.getServiceManager().get('PostService');
+        // Create form
+        const form = new ArticleForm();
+
+        try {
+            const categories = await postService.getAllCategories();
+
+            const actionUrl = this.helper('url').fromRoute('adminDashboardNew');
+            // Set form attributes
+            form.setAction(actionUrl);
+            form.setMethod('POST');
+
+            // Initialize form with categories
+            form.addIdField();
+            form.addTitleField();
+            form.addExcerptField();
+            form.addContentField();
+            form.addAuthorIdField();
+            form.addAuthorNameField();
+            form.addCategoryField('category_id', categories);
+            form.addMetaDescriptionField();
+            form.addCommentEnabledField();
+            form.addPublishButton();
+            form.addSubmitButton();
+
+            // Build category names array for InArray validator
+            const categoryIds = categories.map(cat => String(cat.id));
+
+            const inputFilter = InputFilter.factory({
+                'id': {
+                    required: true,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ]
+                },
+                'author_id': {
+                    required: true,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ]
+                },
+                'title': {
+                    required: true,
+                    requiredMessage: "<strong>Title</strong> is required. Please enter a title.",
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ],
+                    validators: [
+                        {
+                            name: 'StringLength',
+                            options: {
+                                name: "title",
+                                min: 20,
+                                max: 150,
+                                messageTemplate: {
+                                    INVALID_TOO_SHORT: 'Title must be at least 20 characters long',
+                                    INVALID_TOO_LONG: 'Title must not exceed 150 characters'
+                                }
+                            }
+                        }
+                    ]
+                },
+                'excerpt_markdown': {
+                    required: false,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ],
+                    validators: [
+                        {
+                            name: 'StringLength',
+                            options: {
+                                name: "excerpt",
+                                max: 150,
+                                messageTemplate: {
+                                    INVALID_TOO_LONG: '<strong>Excerpt</strong> must not exceed 150 characters'
+                                }
+                            }
+                        }
+                    ]
+                },
+                'content_markdown': {
+                    required: true,
+                    requiredMessage: "<strong>Content</strong> is required. Please enter content",
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ]
+                },
+                'author_name': {
+                    required: false,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ]
+                },
+                'category_id': {
+                    required: true,
+                    requiredMessage: "<strong>Category</strong> is required. Please select a category",
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ],
+                    validators: [
+                        {
+                            name: 'InArray',
+                            options: {
+                                haystack: categoryIds
+                            },
+                            messages: {
+                                NOT_IN_ARRAY: 'Please select a valid category'
+                            }
+                        }
+                    ]
+                },
+                'meta_description': {
+                    required: false,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ],
+                    validators: [
+                        {
+                            name: 'StringLength',
+                            options: {
+                                name: "meta_description",
+                                max: 150,
+                                messageTemplate: {
+                                    INVALID_TOO_LONG: '<strong>Meta description</strong> must not exceed 150 characters'
+                                }
+                            }
+                        }
+                    ]
+                },
+                'comments_enabled': {
+                    required: false,
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ],
+                    validators: [
+                        {
+                            name: 'Callback',
+                            options: {
+                                callback: (value) => {
+                                    // Accept '1', 1, true, 'true', 'on' for checked
+                                    // Accept '0', 0, false, 'false', '', null, undefined for unchecked
+                                    if (value === '1' || value === 1 || value === true || value === 'true' || value === 'on') {
+                                        return true;
+                                    }
+                                    if (value === '0' || value === 0 || value === false || value === 'false' || value === '' || value === null || value === undefined) {
+                                        return true;
+                                    }
+                                    return false;
+                                },
+                                messageTemplate: {
+                                    INVALID: 'Invalid value for comment enabled'
+                                }
+                            }
+                        }
+                    ]
+                }
+            });
+            form.setInputFilter(inputFilter);
+
+            if (super.getRequest().isPost()) {
+            }
+
+        } catch (error) {
+            console.error('Error in indexAction:', error);
+            throw error;
+        }
+
+        return this.getView()
+            .setVariable('f', form);
+    }
+
     async editAction() {
         const logFile = global.applicationPath('/logs/debug.log');
         const log = (msg) => {
@@ -77,6 +269,8 @@ class DashboardController extends Controller {
             console.log(msg);
             fs.appendFileSync(logFile, logMsg);
         };
+
+        let form; // Declare form outside try block so it's accessible in return statement
 
         try {
             log('=== editAction started ===');
@@ -89,14 +283,17 @@ class DashboardController extends Controller {
             log(`Categories fetched: ${categories.length} categories`);
 
             // Create form
-            const form = new ArticleForm();
+            form = new ArticleForm();
             log('ArticleForm created');
 
             // Get article slug
             const articleSlug = this.getParam('slug');
 
+            const actionUrl = this.helper('url')
+                .fromRoute('adminDashboardEdit', {slug: articleSlug});
+
             // Set form attributes
-            form.setAction(`/admin/dashboard/edit/${articleSlug}`);
+            form.setAction(actionUrl);
             form.setMethod('POST');
             log('Form attributes set');
 
@@ -111,7 +308,19 @@ class DashboardController extends Controller {
             form.addCategoryField('category_id', categories);
             form.addMetaDescriptionField();
             form.addCommentEnabledField();
-            form.addReviewButton();
+            form.addDeleteButton();
+
+            // Add role-based button (Review for Authors, Publish for Editors/Admins)
+            const authService = this.getServiceManager().get('AuthenticationService');
+            const identity = authService.getIdentity();
+            const userRole = identity?.role || 'author'; // Default to 'author' if role not found
+
+            if (userRole === 'author') {
+                form.addReviewButton();
+            } else if (userRole === 'editor' || userRole === 'admin') {
+                form.addPublishButton();
+            }
+
             form.addSubmitButton();
 
             log('Form initialized with categories');
@@ -340,7 +549,7 @@ class DashboardController extends Controller {
                             `Post saved successfully. Return back to Dashboard`);
                         
                         // Redirect to list or stay on edit page
-                        return this.plugin('redirect').toRoute('adminDashboardSummary');
+                        return this.plugin('redirect').toRoute('adminDashboardConfirmation');
                         //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
                     } catch (error) {
                         log(`Error updating post: ${error.message}`);
@@ -380,21 +589,20 @@ class DashboardController extends Controller {
                 form.populateValues(this.getRequest().getPost());
             }
 
-            log('Returning view with form');
-
-            return this.getView()
-                .setVariable('f', form);
-            //.setVariable('flashMessages', flashMessages);
-
         } catch (error) {
             const errorMsg = `Error in editAction: ${error.message}\nStack: ${error.stack}`;
             log(errorMsg);
             fs.appendFileSync(logFile, errorMsg + '\n');
             throw error;
         }
+
+        log('Returning view with form');
+        return this.getView()
+                .setVariable('f', form);
+        //.setVariable('flashMessages', flashMessages);
     }
 
-    summaryAction() {
+    confirmationAction() {
         // Check if there are any flash messages to display
         const flashMessenger = this.plugin('flashMessenger');
         const hasSuccess = flashMessenger.hasMessages('success');

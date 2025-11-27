@@ -218,6 +218,38 @@ class ArticleForm extends Form {
     }
 
     /**
+     * Add submit to publish
+     * @param {string} name
+     * @param {string} label
+     * @returns {ArticleForm}
+     */
+    addDeleteButton(name = 'delete', label = 'Delete') {
+        const element = new Submit(name);
+        element.setValue(label);
+        element.setAttributes({
+            'class': 'dp-button dp-button--delete'
+        });
+        this.add(element);
+        return this;
+    }
+
+     /**
+     * Add submit to publish
+     * @param {string} name
+     * @param {string} label
+     * @returns {ArticleForm}
+     */
+    addPublishButton(name = 'publish', label = 'Publish') {
+        const element = new Submit(name);
+        element.setValue(label);
+        element.setAttributes({
+            'class': 'dp-button dp-button--publish'
+        });
+        this.add(element);
+        return this;
+    }
+
+    /**
      * Add submit for review
      * @param {string} name
      * @param {string} label
@@ -227,7 +259,7 @@ class ArticleForm extends Form {
         const element = new Submit(name);
         element.setValue(label);
         element.setAttributes({
-            'class': 'dp-button'
+            'class': 'dp-button dp-button--review'
         });
         this.add(element);
         return this;
@@ -239,11 +271,11 @@ class ArticleForm extends Form {
      * @param {string} label
      * @returns {ArticleForm}
      */
-    addSubmitButton(name = 'submit', label = 'Save Article') {
+    addSubmitButton(name = 'submit', label = 'Save Draft') {
         const element = new Submit(name);
         element.setValue(label);
         element.setAttributes({
-            'class': 'dp-button'
+            'class': 'dp-button dp-button--save'
         });
         this.add(element);
         return this;
@@ -278,8 +310,8 @@ class ArticleForm extends Form {
         this.addCategoryField('category_id', categories);
         this.addMetaDescriptionField();
         this.addCommentEnabledField();
+        this.addPublishButton();
         this.addSubmitButton();
-        this.addCsrfField('csrf', csrfOptions);
 
         return this;
     }

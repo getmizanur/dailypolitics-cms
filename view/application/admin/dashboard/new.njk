@@ -32,12 +32,6 @@
                     {{ formText(f.get('title')) | safe }}
                 </div>
 
-                <div class="form-group{% if errorDecorator(f.get('slug')) %} dp-form-group--error{% endif %}">
-                    {{ formLabel(f.get('slug')) | safe }}
-                    {{ formError(f.get('slug')) | safe }}
-                    {{ formText(f.get('slug')) | safe }}
-                </div>
-
                 <div class="form-group{% if errorDecorator(f.get('excerpt_markdown')) %} dp-form-group--error{% endif %}">
                     {{ formLabel(f.get('excerpt_markdown')) | safe }}
                     {{ formError(f.get('excerpt_markdown')) | safe }}
@@ -78,13 +72,7 @@
                     <div class="dp-button-group">
                         <div class="dp-button-group__left">
                             {{ formSubmit(f.get('submit')) | safe }}
-                            {% if f.get('review_requested') %}
-                                {{ formSubmit(f.get('review_requested')) | safe }}
-                            {% endif %}
-                            {% if f.get('publish') %}
-                                {{ formSubmit(f.get('publish')) | safe }}
-                            {% endif %}
-                            {{ formSubmit(f.get('delete')) | safe }}
+                            {{ formSubmit(f.get('publish'))}}
                         </div>
                         <div class="dp-button-group__right">
                             <a href="{{ url('adminDashboardIndex') }}" class="dp-button--cancel">Cancel</a>

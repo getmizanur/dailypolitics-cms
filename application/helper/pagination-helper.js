@@ -171,7 +171,7 @@ class PaginationHelper extends AbstractHelper {
 
         // Previous button
         if (currentPage > 1) {
-            const prevUrl = currentPage === 2 ? baseUrl || '/admin/dashboard' : `${baseUrl}/page/${currentPage - 1}`;
+            const prevUrl = currentPage === 2 ? baseUrl || '/admin/posts' : `${baseUrl}/page/${currentPage - 1}`;
             html += `\n    <li class="page-item"><a class="page-link" href="${prevUrl}" rel="prev">&laquo; Prev</a></li>`;
         } else {
             html += `\n    <li class="page-item disabled"><span class="page-link">&laquo; Prev</span></li>`;
@@ -179,7 +179,7 @@ class PaginationHelper extends AbstractHelper {
 
         // Numbered page links
         for (let i = 1; i <= totalPages; i++) {
-            let pageUrl = i === 1 ? baseUrl || '/admin' : `${baseUrl}/page/${i}`;
+            let pageUrl = i === 1 ? baseUrl || '/admin/posts' : `${baseUrl}/page/${i}`;
             if (i === currentPage) {
                 html += `\n    <li class="page-item active"><span class="page-link">${i}</span></li>`;
             } else {
