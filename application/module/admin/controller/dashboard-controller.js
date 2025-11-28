@@ -3,7 +3,9 @@ const ArticleForm = require(global.applicationPath('/application/form/article-fo
 const SessionContainer = require(global.applicationPath('/library/session/session-container'));
 const InputFilter = require(global.applicationPath('/library/input-filter/input-filter'));
 const VarUtil = require(global.applicationPath('/library/util/var-util'));
+const JsonUtil = require(global.applicationPath('/library/util/json-util'));
 const fs = require('fs');
+const PostEntity = require('../../../entity/post-entity');
 
 class DashboardController extends Controller {
 
@@ -170,14 +172,6 @@ class DashboardController extends Controller {
                         { name: 'StripTags' }
                     ]
                 },
-                'author_name': {
-                    required: false,
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ]
-                },
                 'category_id': {
                     required: true,
                     requiredMessage: "<strong>Category</strong> is required. Please select a category",
@@ -299,11 +293,11 @@ class DashboardController extends Controller {
 
             // Initialize form with categories
             form.addIdField();
+            form.addAuthorIdField();
             form.addSlugField();
             form.addTitleField();
             form.addExcerptField();
             form.addContentField();
-            form.addAuthorIdField();
             form.addAuthorNameField();
             form.addCategoryField('category_id', categories);
             form.addMetaDescriptionField();
@@ -314,6 +308,8 @@ class DashboardController extends Controller {
             const authService = this.getServiceManager().get('AuthenticationService');
             const identity = authService.getIdentity();
             const userRole = identity?.role || 'author'; // Default to 'author' if role not found
+            // Get current user identity for tracking
+            const currentUserId = identity?.id || null;
 
             if (userRole === 'author') {
                 form.addReviewButton();
@@ -328,7 +324,7 @@ class DashboardController extends Controller {
             // If editing existing article, fetch and populate data
             if (articleSlug) {
                 log(`Fetching article with slug: ${articleSlug}`);
-                const article = await postService.getSinglePost(articleSlug, true);
+                const article = await postService.getSinglePost(articleSlug, true, true);
                 if (article) {
                     log('Article found, populating form');
                     form.setData({
@@ -366,6 +362,27 @@ class DashboardController extends Controller {
                         { name: 'StripTags' }
                     ]
                 },
+                'slug': {
+                    required: true,
+                    requiredMessage: "Required, non-empty field",
+                    filters: [
+                        { name: 'HtmlEntities' },
+                        { name: 'StringTrim' },
+                        { name: 'StripTags' }
+                    ],
+                    validators: [
+                        {
+                            name: 'AlphaNumeric',
+                            options: {
+                                name: 'slug',
+                                allowDashAndUnderscore: true,
+                                messageTemplate: {
+                                    INVALID_FORMAT: 'Slug must contain only alphanumeric characters, hyphens, and underscores'
+                                }
+                            }
+                        }
+                    ]
+                },
                 'title': {
                     required: true,
                     requiredMessage: "<strong>Title</strong> is required. Please enter a title.",
@@ -384,27 +401,6 @@ class DashboardController extends Controller {
                                 messageTemplate: {
                                     INVALID_TOO_SHORT: 'Title must be at least 20 characters long',
                                     INVALID_TOO_LONG: 'Title must not exceed 150 characters'
-                                }
-                            }
-                        }
-                    ]
-                },
-                'slug': {
-                    required: true,
-                    requiredMessage: "Required, non-empty field",
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ],
-                    validators: [
-                        {
-                            name: 'AlphaNumeric',
-                            options: {
-                                name: 'slug',
-                                allowDashAndUnderscore: true,
-                                messageTemplate: {
-                                    INVALID_FORMAT: 'Slug must contain only alphanumeric characters, hyphens, and underscores'
                                 }
                             }
                         }
@@ -433,14 +429,6 @@ class DashboardController extends Controller {
                 'content_markdown': {
                     required: true,
                     requiredMessage: "<strong>Content</strong> is required. Please enter content",
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ]
-                },
-                'author_name': {
-                    required: false,
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -536,21 +524,81 @@ class DashboardController extends Controller {
 
                     // Update post by slug
                     try {
-                        //const updatedPost = await postService.updatePostBySlug(postData.slug, postData);
-                        //log(`Post updated successfully: ${updatedPost.slug}`);
+                        const contentHtml = this.plugin('markdownToHtml').convert(postData.content_markdown);
+                        const excerptHtml = this.plugin('markdownToHtml').convert(postData.excerpt_markdown);
+
+                        const postEntity = new PostEntity(postData);
+                        postEntity
+                            .setSlug(postData.slug)
+                            .setTitle(postData.title)
+                            .setExcerptMarkdown(postData.excerpt_markdown)
+                            .setExcerptHtml(excerptHtml)
+                            .setContentMarkdown(postData.content_markdown)
+                            .setContentHtml(contentHtml)
+                            .setAuthorId(postData.author_id)
+                            .setCategoryId(postData.category_id)
+                            .setCommentsEnabled(postData.comments_enabled === '1' || postData.comments_enabled === true || postData.comments_enabled === 'on')
+                            .setStatus(postData.status || 'draft')
+                            .setRegenerateStatic(postData.regenerate_static || false)
+                            .setReviewRequested(postData.review_requested || false)
+                            .setPublishedAt(postData.published_at)
+                            .setUpdatedAt(postData.updated_at)
+                            .setDeletedAt(postData.deleted_at)
+                            .setApprovedAt(postData.approved_at)
+                            .setUpdatedBy(postData.updated_by)
+                            .setDeletedBy(postData.deleted_by)
+                            .setApprovedBy(postData.approved_by)
+                            .setPublishedBy(postData.published_by);
+
+                        // Check which submit button was clicked and handle accordingly
+                        if (VarUtil.isset(postData.submit) && postData.submit === 'Save Draft') {
+                            // Save Draft button clicked
+                            log('Save Draft button clicked');
+                            postEntity.setDraft();
+                            postEntity.setUpdatedBy(currentUserId);
+
+                        } else if (VarUtil.isset(postData.review_requested) && postData.review_requested === 'Submit for Review') {
+                            // Submit for Review button clicked
+                            log('Submit for Review button clicked');
+                            postEntity.requestReview();
+                            postEntity.setUpdatedBy(currentUserId);
+
+                        } else if (VarUtil.isset(postData.publish) && postData.publish === 'Publish') {
+                            // Publish button clicked
+                            log('Publish button clicked');
+                            postEntity.publish(currentUserId);
+                            postEntity.approve(currentUserId);
+                            postEntity.setUpdatedBy(currentUserId);
+                        } else if (VarUtil.isset(postData.delete) && postData.delete === 'Delete') {
+                            // Delete button clicked
+                            log('Delete button clicked');
+                            postEntity.softDelete(currentUserId);
+                        }
+
+                        const dataForDb = postEntity.getObjectCopy();
+                        JsonUtil.unset(dataForDb, 'id');
+                        JsonUtil.unset(dataForDb, 'created_at');
+                        JsonUtil.unset(dataForDb, 'updated_at');
 
                         console.log("postData: ");
                         console.log(postData);
 
-                        console.log(this.plugin('markdownToHtml').convert(postData.content_markdown));
+                        console.log('dataForDb: ');
+                        console.log(dataForDb);
 
-                        // Add success message
-                        super.plugin('flashMessenger').addSuccessMessage(
-                            `Post saved successfully. Return back to Dashboard`);
-                        
-                        // Redirect to list or stay on edit page
-                        return this.plugin('redirect').toRoute('adminDashboardConfirmation');
-                        //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
+
+                        if(postEntity.isValid()) {
+                            const updatedPost = await postService.updatePostBySlug(postData.slug, dataForDb);
+                            //log(`Post updated successfully: ${updatedPost.slug}`);
+
+                            // Add success message
+                            super.plugin('flashMessenger').addSuccessMessage(
+                                `Post saved successfully. Return back to Dashboard`);
+                            
+                            // Redirect to list or stay on edit page
+                            return this.plugin('redirect').toRoute('adminDashboardConfirmation');
+                            //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
+                        }
                     } catch (error) {
                         log(`Error updating post: ${error.message}`);
                         super.plugin('flashMessenger').addErrorMessage(`Failed to update post: ${error.message}`);

@@ -21,7 +21,6 @@
             {% endif %}
             
             {{ form().openTag(f) }}
-                {{ formCsrf(f.get('csrf')) | safe }}
 
                 {{ formHidden(f.get('id')) | safe }}
                 {{ formHidden(f.get('author_id')) | safe }}
