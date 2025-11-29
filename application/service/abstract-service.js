@@ -7,6 +7,7 @@ class AbstractService {
 
         this.cache = {};
         this.config = null;
+        this.serviceManager = null;
     }
 
     loadApplicationConfig() {
@@ -156,8 +157,26 @@ class AbstractService {
      */
     hasCacheType(type) {
         const config = this.loadApplicationConfig();
-        return config.cache?.enabled && 
+        return config.cache?.enabled &&
                this.getAvailableCacheTypes().includes(type);
+    }
+
+    /**
+     * Get the ServiceManager instance
+     * @returns {Object|null} ServiceManager instance
+     */
+    getServiceManager() {
+        return this.serviceManager;
+    }
+
+    /**
+     * Set the ServiceManager instance
+     * @param {Object} serviceManager - ServiceManager instance
+     * @returns {AbstractService} This instance for chaining
+     */
+    setServiceManager(serviceManager) {
+        this.serviceManager = serviceManager;
+        return this;
     }
 
 }

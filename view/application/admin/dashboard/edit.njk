@@ -76,7 +76,7 @@
                 <div class="form-group">
                     <div class="dp-button-group">
                         <div class="dp-button-group__left">
-                            {{ formSubmit(f.get('submit')) | safe }}
+                            {{ formSubmit(f.get('save')) | safe }}
                             {% if f.get('review_requested') %}
                                 {{ formSubmit(f.get('review_requested')) | safe }}
                             {% endif %}

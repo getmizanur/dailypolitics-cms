@@ -205,11 +205,11 @@ module.exports = {
     // Framework services (ViewManager, ViewHelperManager, PluginManager) are managed by ServiceManager
     "service_manager": {
         "invokables": {
-            "PostService": "/application/service/post-service"
         },
         "factories": {
             "AuthenticationService": "/application/service/factory/authentication-service-factory",
-            "Database": "/application/service/factory/database-factory"
+            "Database": "/application/service/factory/database-factory",
+            "PostService": "/application/service/factory/post-service-factory"
         }
     },
     

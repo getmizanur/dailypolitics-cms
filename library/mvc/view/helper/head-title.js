@@ -18,50 +18,21 @@ class HeadTitle extends AbstractHelper {
     }
 
     /**
-     * Get stored titles from ServiceManager storage (via ViewHelperManager)
-     * Structure: ServiceManager -> ViewHelperManager -> helpers -> headTitle -> titles
+     * Get stored titles from instance
      * @returns {Array} Array of title parts
      */
     _getTitles() {
-        if (this.serviceManager) {
-            try {
-                const vhm = this.serviceManager.get('ViewHelperManager');
-                if (vhm && vhm.helpers) {
-                    if (!vhm.helpers.headTitle) {
-                        vhm.helpers.headTitle = { titles: [] };
-                    }
-                    return vhm.helpers.headTitle.titles || [];
-                }
-            } catch (e) {
-                // ServiceManager or VHM not available
-            }
-        }
-
-        // Fallback to instance storage
+        console.log('[HeadTitle._getTitles] Returning instance titles:', this.titles);
         return this.titles;
     }
 
     /**
-     * Set titles to ServiceManager storage
+     * Set titles to instance storage
      * @param {Array} titles - Array of title parts
      */
     _setTitles(titles) {
-        // Always store in instance as fallback
         this.titles = titles;
-
-        if (this.serviceManager) {
-            try {
-                const vhm = this.serviceManager.get('ViewHelperManager');
-                if (vhm && vhm.helpers) {
-                    if (!vhm.helpers.headTitle) {
-                        vhm.helpers.headTitle = {};
-                    }
-                    vhm.helpers.headTitle.titles = titles;
-                }
-            } catch (e) {
-                // ServiceManager or VHM not available
-            }
-        }
+        console.log('[HeadTitle._setTitles] Setting instance titles to:', titles);
     }
 
     /**
@@ -76,11 +47,15 @@ class HeadTitle extends AbstractHelper {
         const cleanArgs = this._extractContext(args);
         const [title = null, mode = 'set'] = cleanArgs;
 
+        console.log('[HeadTitle.render] Called with title:', title, 'mode:', mode);
+
         // Get stored titles from context
         let titles = this._getTitles();
+        console.log('[HeadTitle.render] Current titles:', titles);
 
         if (title === null) {
             // No title provided - just render what we have
+            console.log('[HeadTitle.render] No title provided, rendering current titles');
             return this._renderTitles(titles);
         }
 
@@ -99,6 +74,8 @@ class HeadTitle extends AbstractHelper {
                 // Just render without modifying
                 return this._renderTitles(titles);
         }
+
+        console.log('[HeadTitle.render] Titles after mode processing:', titles);
 
         // Store updated titles back to context
         this._setTitles(titles);
@@ -139,9 +116,12 @@ class HeadTitle extends AbstractHelper {
      * @returns {HeadTitle} For method chaining
      */
     append(title) {
+        console.log('[HeadTitle.append] Called with title:', title);
         const titles = this._getTitles();
+        console.log('[HeadTitle.append] Current titles before append:', titles);
         titles.push(title);
         this._setTitles(titles);
+        console.log('[HeadTitle.append] Titles after append:', titles);
         return this;
     }
 

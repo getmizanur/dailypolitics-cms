@@ -21,15 +21,15 @@ class Bootstrapper {
     }
 
     getContainer() {
-        if(this.container == null) {
-            return new Registry(); 
+        if (this.container == null) {
+            return new Registry();
         }
 
         return this.container;
     }
 
     setContainer(registry) {
-        if(!(registry instanceof Registry)) {
+        if (!(registry instanceof Registry)) {
             throw Error('Resource containers must be Registry object');
         }
 
@@ -37,11 +37,11 @@ class Bootstrapper {
 
         return this;
     }
-	
-	getResources() {
+
+    getResources() {
         return this.getClassResources(this)
             .filter((item) => item.match(/^init/g));
-	}
+    }
 
     getClassResources(obj) {
         this.classResource = obj;
@@ -50,8 +50,8 @@ class Bootstrapper {
     }
 
     _executeResources(resource) {
-        let className = this.classResource || this; 
-        if(typeof className[resource] === 'function') {
+        let className = this.classResource || this;
+        if (typeof className[resource] === 'function') {
             className[resource]();
         }
     }
@@ -65,12 +65,12 @@ class Bootstrapper {
     resolveErrorTemplate(errorType) {
         let templatePath = null;
         let templateKey = null;
-        
+
         try {
             // Layer 1: Get template key from configuration
             const config = this.getContainer().get('application');
             const viewManager = config?.view_manager;
-            
+
             if (errorType === '404') {
                 templateKey = viewManager?.not_found_template || 'error/404';
             } else if (errorType === '500') {
@@ -78,7 +78,7 @@ class Bootstrapper {
             } else {
                 templateKey = `error/${errorType}`;
             }
-            
+
             // Layer 2: Check template map configuration using the template key
             const templateMap = viewManager?.template_map;
             if (templateMap && templateMap[templateKey]) {
@@ -87,13 +87,13 @@ class Bootstrapper {
         } catch (error) {
             // Config not available, continue to fallback
         }
-        
+
         // Layer 3: Fallback to default location if not in template map
         if (!templatePath) {
             templatePath = global.applicationPath(`/view/error/${errorType}.njk`);
             templateKey = `error/${errorType}`;
         }
-        
+
         // Layer 4: File existence check + helpful error handling
         if (!fs.existsSync(templatePath)) {
             const expectedPath = global.applicationPath(`/view/error/${errorType}.njk`);
@@ -118,28 +118,28 @@ To fix this issue:
 The ${errorType}.njk template should extend your layout and provide user-friendly error messaging.
             `.trim());
         }
-        
+
         return { templatePath, templateKey };
     }
 
     match(path) {
-        let registry = this.getContainer(); 
+        let registry = this.getContainer();
         let router = registry.get('routes');
         let returnValue = null;
-        for(let key in router) {
-            if(router[key].route == path) {
+        for (let key in router) {
+            if (router[key].route == path) {
                 returnValue = router[key];
                 // Also include the route name (key) in the return value
                 returnValue.routeName = key;
             }
         }
 
-        return returnValue; 
+        return returnValue;
     }
 
     async dispatcher(req, res, next) {
         let module, controller, action;
-        
+
         // Handle 404 cases where req.route doesn't exist or custom 404 routing
         if (!req.route || !req.route.path) {
             // Check if this is our custom 404 handler
@@ -176,39 +176,39 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
 
         const FrontController
             = require(global.applicationPath(`/application/module/${module}/controller/${controllerPath}`));
-        
+
         // Inject configuration
         let options = {
-            "container" : this.getContainer()
+            "container": this.getContainer()
         };
         const front = new FrontController(options);
-        if(!(front instanceof BaseController)) {
-            return res.status(400).json({ 
-                success: false, 
+        if (!(front instanceof BaseController)) {
+            return res.status(400).json({
+                success: false,
                 message: 'Controller not found'
             }).send();
         }
 
-        if(action == undefined) {
-            action = 'index'; 
+        if (action == undefined) {
+            action = 'index';
         }
 
         action = action + 'Action';
-        if(front[action] == undefined) {
+        if (front[action] == undefined) {
             // Call notFoundAction() like in Zend Framework
             action = 'notFoundAction';
             // Set a flag to indicate this should be 404
             req._is404 = true;
         }
 
-        if(req.hasOwnProperty('session')) {
+        if (req.hasOwnProperty('session')) {
             Session.start(req);
-            
+
             // Initialize global session if it doesn't exist
             if (!global.locals.session) {
                 global.locals.session = {};
             }
-            
+
             // Merge express-session data with global session data, excluding read-only properties
             const sessionCopy = {};
             Object.keys(req.session).forEach(key => {
@@ -217,12 +217,12 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
                 }
             });
             global.locals.session = Object.assign({}, sessionCopy, global.locals.session);
-            
+
             // Ensure no read-only properties get copied accidentally
             if (global.locals.session.hasOwnProperty('id')) {
                 delete global.locals.session.id;
             }
-            
+
             // Also store a reference to the raw req.session for direct access
             global.locals.expressSession = req.session;
         }
@@ -290,11 +290,11 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         } catch (error) {
             // Handle server errors with framework-level error handling
             console.error('Server error in dispatcher:', error);
-            
+
             try {
                 // Resolve 500 template path using framework-level error handling
                 const { templatePath, templateKey } = this.resolveErrorTemplate('500');
-                
+
                 // Set 500 status and render template directly (no MVC overhead)
                 res.status(500);
                 return res.render(templatePath, {
@@ -315,7 +315,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
                 `);
             }
         }
-        
+
         // Sync any changes from global session back to express-session
         if (global.locals && global.locals.session && global.locals.expressSession) {
             // Only copy custom data, avoid overwriting express-session built-in properties
@@ -329,12 +329,12 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
                 }
             });
         }
-        
-        if(front.getResponse().isRedirect()) {
+
+        if (front.getResponse().isRedirect()) {
             let location = front.getResponse().getHeader('Location');
             res.redirect(location);
-        }else{
-            if(view) {
+        } else {
+            if (view) {
                 // Check for custom status code from view model or request flags
                 let statusCode = null;
                 if (view && typeof view.getVariable === 'function') {
@@ -346,7 +346,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
                 if (statusCode) {
                     res.status(statusCode);
                 }
-                if(Session.isInitialized()) {
+                if (Session.isInitialized()) {
                     // Update session data but don't replace the req.session object
                     const sessionData = Session.all();
                     if (sessionData && typeof sessionData === 'object') {
@@ -372,16 +372,16 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
     getDelimiter() {
         return this.delimiter;
     }
-	
+
     run() {
         const PORT = process.env.PORT || 8080
         const server = this.app.listen(
-            PORT, 
+            PORT,
             console.log(
                 `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
         );
 
-        if(process.env.NODE_ENV === 'test.local'){
+        if (process.env.NODE_ENV === 'test.local') {
             server.close();
         }
 

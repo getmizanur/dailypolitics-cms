@@ -123,6 +123,7 @@ class PostService extends AbstractService {
         return new Select(adapter);
     }
 
+    
     /**
      * Fetch all published posts that are not deleted
      * @param {number} limit - Optional limit for results
@@ -519,6 +520,56 @@ class PostService extends AbstractService {
     }
 
     /**
+     * Create a new post
+     * @param {Object} postData - Post data to insert
+     * @returns {Promise<Object>} Created post object with ID
+     */
+    async createPost(postData) {
+        try {
+            const adapter = await this.initializeDatabase();
+            const Insert = require('../../library/db/sql/insert');
+            const insert = new Insert(adapter);
+
+            // Debug: log the data being inserted
+            console.log('Data being inserted:', JSON.stringify(postData, null, 2));
+
+            // Build insert query with RETURNING clause for PostgreSQL
+            insert.into('posts')
+                  .values(postData)
+                  .returning('id');
+
+            // Debug: log the generated SQL
+            try {
+                const statement = insert.getStatement();
+                console.log('Generated SQL:', statement);
+            } catch (e) {
+                console.log('Error getting statement:', e.message);
+            }
+
+            // Execute the INSERT query directly via adapter
+            const sql = insert.toString();
+            const params = insert.parameters;
+            const result = await adapter.query(sql, params);
+
+            // PostgreSQL adapter returns an array with the result from RETURNING clause
+            let insertedId;
+            if (Array.isArray(result) && result.length > 0 && result[0].id) {
+                insertedId = result[0].id;
+                console.log('Successfully inserted post with ID:', insertedId);
+            } else {
+                console.error('Unexpected result format from INSERT:', result);
+                throw new Error('Failed to retrieve inserted post ID');
+            }
+
+            // Return the newly created post
+            return await this.getSinglePost(insertedId, false, true);
+        } catch (error) {
+            console.error('Error creating post:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Update a post by slug
      * @param {string} slug - Post slug to search by
      * @param {Object} updateData - Data to update
@@ -543,6 +594,45 @@ class PostService extends AbstractService {
         } catch (error) {
             console.error('Error updating post by slug:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Generate a unique slug for a post
+     * Uses the opaqueId plugin to generate random slugs and checks for uniqueness
+     * @returns {Promise<string>} Unique slug
+     * @throws {Error} If unable to generate unique slug after 5 attempts
+     */
+    async generateUniqueSlug() {
+        let slug;
+        let exists = true;
+        let attempts = 0;
+
+        while (exists) {
+            // Generate slug using opaqueId plugin from ServiceManager
+            const opaqueIdPlugin = this.getServiceManager().get('PluginManager').get('opaqueId');
+            slug = opaqueIdPlugin.generate();
+            attempts += 1;
+
+            // Check if slug exists using Select query builder
+            const select = await this.getSelectQuery();
+            select.from('posts')
+                  .columns(['1'])
+                  .where('slug = ?', slug)
+                  .limit(1);
+
+            const result = await select.execute();
+            const rows = result.rows || result;
+
+            exists = rows.length > 0;
+
+            if (!exists) {
+                return slug;
+            }
+
+            if (attempts > 5) {
+                throw new Error('Failed to generate unique slug after 5 attempts');
+            }
         }
     }
 

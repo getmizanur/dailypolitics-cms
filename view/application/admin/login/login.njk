@@ -4,21 +4,21 @@
 <div class="container admin-login-center">
   <div class="row w-100">
     <div class="col-sm-12 col-md-8 offset-md-2 admin-login-form dailypolitics-!-margin-bottom-8">
-      {{ form().openTag(f) }}
-      {{ formCsrf(f.get('csrf')) | safe }}
+      {{ form().openTag(loginForm) }}
+      {{ formCsrf(loginForm.get('csrf')) | safe }}
       <fieldset class="dp-fieldset">
-        <div class="dp-form-group{% if errorDecorator(f.get('username')) %} dp-form-group--error{% endif %}">
-          {{ formLabel(f.get('username')) }}
-          {{ formError(f.get('username')) }}
-          {{ formText(f.get('username'), {class: f.get('username').getAttribute('class') ~ ' ' ~ errorDecorator(f.get('username'), 'dp-input--error') }) | safe }}
+        <div class="dp-form-group{% if errorDecorator(loginForm.get('username')) %} dp-form-group--error{% endif %}">
+          {{ formLabel(loginForm.get('username')) }}
+          {{ formError(loginForm.get('username')) }}
+          {{ formText(loginForm.get('username'), {class: loginForm.get('username').getAttribute('class') ~ ' ' ~ errorDecorator(loginForm.get('username'), 'dp-input--error') }) | safe }}
         </div>
-        <div class="dp-form-group{% if errorDecorator(f.get('password')) %} dp-form-group--error{% endif %}">
-          {{ formLabel(f.get('password')) }}
-          {{ formError(f.get('password')) }}
-          {{ formPassword(f.get('password'), {class: f.get('password').getAttribute('class') ~ ' ' ~ errorDecorator(f.get('password'), 'dp-input--error') }) | safe }}
+        <div class="dp-form-group{% if errorDecorator(loginForm.get('password')) %} dp-form-group--error{% endif %}">
+          {{ formLabel(loginForm.get('password')) }}
+          {{ formError(loginForm.get('password')) }}
+          {{ formPassword(loginForm.get('password'), {class: loginForm.get('password').getAttribute('class') ~ ' ' ~ errorDecorator(loginForm.get('password'), 'dp-input--error') }) | safe }}
         </div>
         <div class="dp-form-group">
-          {{ formSubmit(f.get('submit')) | safe }}
+          {{ formSubmit(loginForm.get('submit')) | safe }}
         </div>
       </fieldset>
       {{ form().closeTag() }}

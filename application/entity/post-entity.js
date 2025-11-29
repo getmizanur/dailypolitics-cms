@@ -740,6 +740,7 @@ class PostEntity extends AbstractEntity {
             this.inputFilter = InputFilter.factory({
                 'author_id': {
                     required: true,
+                    requiredMessage: "author_id",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -792,6 +793,7 @@ class PostEntity extends AbstractEntity {
                 },
                 'excerpt_markdown': {
                     required: false,
+                    requiredMessage: "excerpt_markdown",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -821,6 +823,7 @@ class PostEntity extends AbstractEntity {
                 },
                 'excerpt_html': {
                     required: false,
+                    requiredMessage: "excerpt_html",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -922,6 +925,13 @@ class PostEntity extends AbstractEntity {
         if (!forUpdate) {
             delete data.id;
         }
+
+        // Convert undefined values to null for PostgreSQL compatibility
+        Object.keys(data).forEach(key => {
+            if (data[key] === undefined) {
+                data[key] = null;
+            }
+        });
 
         // Remove computed/read-only fields that shouldn't be manually set
         // (created_at and updated_at are handled by database triggers)

@@ -322,24 +322,47 @@
     background-color: #005a30;
 }*/
 
-
-/* Submit for Review Button - Orange */
-button[name="review_requested"],
-input[name="review_requested"] {
-    background-color: #f47738 !important;
-    box-shadow: 0 2px 0 #f47738 !important;
-    border: 2px solid #f47738;
+/* Submit for Delete Button - Red */
+.dp-button--delete,
+button[name="delete"],
+input[name="delete"] {
+    background-color: #d4351c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
 }
 
-button[name="review_requested"]:hover,
-input[name="review_requested"]:hover {
-    background-color: #b58840 !important;
-    border-color: #b58840 !important;
+.dp-button--delete:hover,
+button[name="delete"]:hover,
+input[name="delete"]:hover {
+    background-color: #6f3331 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 0 #003078 !important;
 }
 
-button[name="review_requested"]:focus,
-input[name="review_requested"]:focus {
-    background-color: #b58840 !important;
+.dp-button--delete:active,
+button[name="delete"]:active,
+input[name="delete"]:active {
+    background-color: #d4351c  !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    top: 2px;
+    position: relative;
+}
+
+.dp-button--delete:focus,
+button[name="delete"]:focus,
+input[name="delete"]:focus {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: 0 !important;
+    background-color: #d4351c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
 }
 
 /* Save Article Button - Blue */

@@ -14,13 +14,16 @@ class DashboardController extends Controller {
     }
 
     preDispatch() {
+        console.log('[DashboardController.preDispatch] Called');
         // Check authentication
         const authService = this.getServiceManager().get('AuthenticationService');
         if (!authService.hasIdentity()) {
             super.plugin('flashMessenger').addErrorMessage('You must be logged in to access this page');
             return this.plugin('redirect').toRoute('adminLoginIndex');
         }
+        console.log('[DashboardController.preDispatch] About to append Admin to headTitle');
         this.getServiceManager().get('ViewHelperManager').get('headTitle').append('Admin');
+        console.log('[DashboardController.preDispatch] Finished');
     }
 
     async indexAction() {
@@ -37,7 +40,7 @@ class DashboardController extends Controller {
             // Fetch posts with all statuses and total count for pagination
             const [posts, totalCount] = await Promise.all([
                 postService.getAllPostsWithStatus(['draft', 'published', 'archived'], limit, offset),
-                postService.getPostCount()
+                postService.getPostCount({ includeDrafts: true })
             ]);
 
             // Get recent posts for sidebar
@@ -76,11 +79,20 @@ class DashboardController extends Controller {
     async newAction() {
         // Fetch all categories from database
         const postService = this.getServiceManager().get('PostService');
+
         // Create form
         const form = new ArticleForm();
 
         try {
             const categories = await postService.getAllCategories();
+
+            // Add role-based button (Review for Authors, Publish for Editors/Admins)
+            const authService = this.getServiceManager().get('AuthenticationService');
+            const identity = authService.getIdentity();
+            const userRole = identity?.role || 'author'; // Default to 'author' if role not found
+            // Get current user identity for tracking
+            const currentUserId = identity?.id || null;
+            const authorName = identity?.name || null;
 
             const actionUrl = this.helper('url').fromRoute('adminDashboardNew');
             // Set form attributes
@@ -98,20 +110,18 @@ class DashboardController extends Controller {
             form.addMetaDescriptionField();
             form.addCommentEnabledField();
             form.addPublishButton();
-            form.addSubmitButton();
+            form.addSaveButton();
+
+            // Pre-populate author fields with current user information
+            form.setData({
+                author_id: currentUserId,
+                author_name: authorName
+            });
 
             // Build category names array for InArray validator
             const categoryIds = categories.map(cat => String(cat.id));
 
             const inputFilter = InputFilter.factory({
-                'id': {
-                    required: true,
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ]
-                },
                 'author_id': {
                     required: true,
                     filters: [
@@ -245,6 +255,109 @@ class DashboardController extends Controller {
             form.setInputFilter(inputFilter);
 
             if (super.getRequest().isPost()) {
+                const postData = super.getRequest().getPost();
+
+                console.log("postData: " + JSON.stringify(postData));
+
+                form.setData(postData);
+
+                const isFormValid = form.isValid();
+                if (isFormValid) {
+                    const contentHtml = this.plugin('markdownToHtml').convert(postData.content_markdown);
+                    const excerptHtml = this.plugin('markdownToHtml').convert(postData.excerpt_markdown);
+
+                    const slug = await postService.generateUniqueSlug();
+
+                    const postEntity = new PostEntity(postData);
+                    const currentTimestamp = new Date().toISOString();
+
+                    postEntity
+                        .setSlug(slug)
+                        .setTitle(postData.title)
+                        .setExcerptMarkdown(postData.excerpt_markdown)
+                        .setExcerptHtml(excerptHtml)
+                        .setContentMarkdown(postData.content_markdown)
+                        .setContentHtml(contentHtml)
+                        .setAuthorId(postData.author_id)
+                        .setCategoryId(postData.category_id)
+                        .setCommentsEnabled(postData.comments_enabled === '1' || postData.comments_enabled === true || postData.comments_enabled === 'on')
+                        .setRegenerateStatic(postData.regenerate_static || false)
+                        .setReviewRequested(postData.review_requested || false)
+                        .setCreatedAt(currentTimestamp)
+                        .setUpdatedAt(currentTimestamp);
+                    // Note: published_at, deleted_at, approved_at, etc. are NOT set here for new posts
+                    // They remain null and will be set when the post is published/deleted/approved
+
+                    if (VarUtil.isset(postData.save) && postData.save === 'Save Draft') {
+                        postEntity.setDraft();
+                        postEntity.setUpdatedBy(currentUserId);
+                    } else if (VarUtil.isset(postData.publish) && postData.publish === 'Publish') {
+                        // Publish button clicked
+                        postEntity.publish(currentUserId);
+                        postEntity.approve(currentUserId);
+                        postEntity.setUpdatedBy(currentUserId);
+                    }
+
+                    const dataForDb = postEntity.getDataForDatabase();
+                    const isValid = postEntity.isValid();
+
+                    if (!isValid) {
+                        const invalidInputs = postEntity.getInputFilter().getInvalidInputs();
+                        console.log("\n=== VALIDATION ERRORS ===");
+                        Object.keys(invalidInputs).forEach((fieldName) => {
+                            const messages = invalidInputs[fieldName].getMessages();
+                            const value = postEntity.get(fieldName);
+                            console.log(`Field: ${fieldName}`);
+                            console.log(`  Value: "${value}"`);
+                            console.log(`  Errors: ${messages.join(', ')}`);
+                        });
+                        console.log("========================\n");
+                    }
+
+                    if (isValid) {
+                        console.log("dataForDb: " + JSON.stringify(dataForDb));
+                        const createPost = await postService.createPost(dataForDb);
+                        //log(`Post updated successfully: ${updatedPost.slug}`);
+
+                        // Add success message
+                        super.plugin('flashMessenger').addSuccessMessage(
+                            `Post saved successfully. Return back to Dashboard`);
+
+                        // Redirect to list or stay on edit page
+                        return this.plugin('redirect').toRoute('adminDashboardConfirmation');
+                        //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
+                    }
+                } else {
+                    // After form.isValid() returns false
+                    // Get validation messages from form
+                    const formMessages = form.getMessages();
+
+                    Object.keys(formMessages).forEach((fieldName) => {
+                        if (form.has(fieldName)) {
+                            console.log("errorMessages: " + formMessages[fieldName]);
+                            console.log("errorFieldName: " + fieldName);
+                            form.get(fieldName).setMessages(formMessages[fieldName]);
+                        }
+                    });
+
+                    // Extract error messages for flash messenger
+                    let errorMessages = [];
+                    Object.keys(formMessages).forEach((fieldName) => {
+                        const fieldMessages = formMessages[fieldName];
+                        if (Array.isArray(fieldMessages)) {
+                            errorMessages = errorMessages.concat(fieldMessages);
+                        } else {
+                            errorMessages.push(fieldMessages);
+                        }
+                    });
+
+                    // Add validation error messages for flash messenger
+                    if (errorMessages.length > 0) {
+                        errorMessages.forEach((message) => {
+                            super.plugin('flashMessenger').addErrorMessage(message);
+                        });
+                    }
+                }
             }
 
         } catch (error) {
@@ -284,7 +397,7 @@ class DashboardController extends Controller {
             const articleSlug = this.getParam('slug');
 
             const actionUrl = this.helper('url')
-                .fromRoute('adminDashboardEdit', {slug: articleSlug});
+                .fromRoute('adminDashboardEdit', { slug: articleSlug });
 
             // Set form attributes
             form.setAction(actionUrl);
@@ -317,7 +430,7 @@ class DashboardController extends Controller {
                 form.addPublishButton();
             }
 
-            form.addSubmitButton();
+            form.addSaveButton();
 
             log('Form initialized with categories');
 
@@ -346,14 +459,6 @@ class DashboardController extends Controller {
             const categoryIds = categories.map(cat => String(cat.id));
 
             const inputFilter = InputFilter.factory({
-                'id': {
-                    required: true,
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ]
-                },
                 'author_id': {
                     required: true,
                     filters: [
@@ -510,9 +615,6 @@ class DashboardController extends Controller {
             if (super.getRequest().isPost()) {
                 const postData = super.getRequest().getPost();
 
-                console.log("postData:");
-                console.log(postData);
-
                 log(`Post data received: ${JSON.stringify(postData)}`);
                 form.setData(postData);
 
@@ -551,18 +653,16 @@ class DashboardController extends Controller {
                             .setPublishedBy(postData.published_by);
 
                         // Check which submit button was clicked and handle accordingly
-                        if (VarUtil.isset(postData.submit) && postData.submit === 'Save Draft') {
+                        if (VarUtil.isset(postData.save) && postData.save === 'Save Draft') {
                             // Save Draft button clicked
                             log('Save Draft button clicked');
                             postEntity.setDraft();
                             postEntity.setUpdatedBy(currentUserId);
-
                         } else if (VarUtil.isset(postData.review_requested) && postData.review_requested === 'Submit for Review') {
                             // Submit for Review button clicked
                             log('Submit for Review button clicked');
                             postEntity.requestReview();
                             postEntity.setUpdatedBy(currentUserId);
-
                         } else if (VarUtil.isset(postData.publish) && postData.publish === 'Publish') {
                             // Publish button clicked
                             log('Publish button clicked');
@@ -572,7 +672,8 @@ class DashboardController extends Controller {
                         } else if (VarUtil.isset(postData.delete) && postData.delete === 'Delete') {
                             // Delete button clicked
                             log('Delete button clicked');
-                            postEntity.softDelete(currentUserId);
+                            postEntity.softDelete(currentUserId)
+                            postEntity.setUpdatedBy(currentUserId);
                         }
 
                         const dataForDb = postEntity.getObjectCopy();
@@ -580,21 +681,14 @@ class DashboardController extends Controller {
                         JsonUtil.unset(dataForDb, 'created_at');
                         JsonUtil.unset(dataForDb, 'updated_at');
 
-                        console.log("postData: ");
-                        console.log(postData);
-
-                        console.log('dataForDb: ');
-                        console.log(dataForDb);
-
-
-                        if(postEntity.isValid()) {
+                        if (postEntity.isValid()) {
                             const updatedPost = await postService.updatePostBySlug(postData.slug, dataForDb);
                             //log(`Post updated successfully: ${updatedPost.slug}`);
 
                             // Add success message
                             super.plugin('flashMessenger').addSuccessMessage(
                                 `Post saved successfully. Return back to Dashboard`);
-                            
+
                             // Redirect to list or stay on edit page
                             return this.plugin('redirect').toRoute('adminDashboardConfirmation');
                             //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
@@ -646,7 +740,7 @@ class DashboardController extends Controller {
 
         log('Returning view with form');
         return this.getView()
-                .setVariable('f', form);
+            .setVariable('f', form);
         //.setVariable('flashMessages', flashMessages);
     }
 

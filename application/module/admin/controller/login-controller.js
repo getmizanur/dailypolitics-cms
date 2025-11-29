@@ -252,7 +252,7 @@ class LoginController extends Controller {
 
         // Pass form and token to the view (adjust as needed for your view system)
         return this.getView()
-            .setVariable('f', form);
+            .setVariable('loginForm', form);
     }
 
     async logoutAction() {

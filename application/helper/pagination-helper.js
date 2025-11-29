@@ -177,13 +177,42 @@ class PaginationHelper extends AbstractHelper {
             html += `\n    <li class="page-item disabled"><span class="page-link">&laquo; Prev</span></li>`;
         }
 
-        // Numbered page links
+        // Numbered page links with ellipsis
+        // Show: 1 ... 4 5 [6] 7 8 ... 20
+        // Logic: Always show first, last, current, and 2 pages on each side of current
+        const delta = 2; // Pages to show on each side of current
+        const range = [];
+        const rangeWithDots = [];
+        let l;
+
         for (let i = 1; i <= totalPages; i++) {
-            let pageUrl = i === 1 ? baseUrl || '/admin/posts' : `${baseUrl}/page/${i}`;
-            if (i === currentPage) {
-                html += `\n    <li class="page-item active"><span class="page-link">${i}</span></li>`;
+            if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+                range.push(i);
+            }
+        }
+
+        for (let i of range) {
+            if (l) {
+                if (i - l === 2) {
+                    rangeWithDots.push(l + 1);
+                } else if (i - l !== 1) {
+                    rangeWithDots.push('...');
+                }
+            }
+            rangeWithDots.push(i);
+            l = i;
+        }
+
+        for (let i of rangeWithDots) {
+            if (i === '...') {
+                html += `\n    <li class="page-item disabled"><span class="page-link">...</span></li>`;
             } else {
-                html += `\n    <li class="page-item"><a class="page-link" href="${pageUrl}">${i}</a></li>`;
+                let pageUrl = i === 1 ? baseUrl || '/admin/posts' : `${baseUrl}/page/${i}`;
+                if (i === currentPage) {
+                    html += `\n    <li class="page-item active"><span class="page-link">${i}</span></li>`;
+                } else {
+                    html += `\n    <li class="page-item"><a class="page-link" href="${pageUrl}">${i}</a></li>`;
+                }
             }
         }
 

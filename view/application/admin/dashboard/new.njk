@@ -21,9 +21,6 @@
             {% endif %}
             
             {{ form().openTag(f) }}
-                {{ formCsrf(f.get('csrf')) | safe }}
-
-                {{ formHidden(f.get('id')) | safe }}
                 {{ formHidden(f.get('author_id')) | safe }}
 
                 <div class="form-group{% if errorDecorator(f.get('title')) %} dp-form-group--error{% endif %}">
@@ -71,8 +68,8 @@
                 <div class="form-group">
                     <div class="dp-button-group">
                         <div class="dp-button-group__left">
-                            {{ formSubmit(f.get('submit')) | safe }}
-                            {{ formSubmit(f.get('publish'))}}
+                            {{ formSubmit(f.get('save')) | safe }}
+                            {{ formSubmit(f.get('publish')) | safe }}
                         </div>
                         <div class="dp-button-group__right">
                             <a href="{{ url('adminDashboardIndex') }}" class="dp-button--cancel">Cancel</a>

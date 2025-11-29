@@ -28,8 +28,8 @@ class ServiceManager {
 
         // Services that should NOT be cached (request-scoped services)
         this.nonCacheableServices = [
-            "AuthenticationService", // Depends on Request session data
-            "ViewHelperManager"      // Contains request-scoped helpers and RouteMatch
+            "AuthenticationService" // Depends on Request session data
+            // ViewHelperManager removed - it should be cached within the request to maintain helper state
         ];
     }
 

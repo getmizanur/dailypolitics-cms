@@ -205,18 +205,25 @@ class ViewHelperManager {
 
         // Check framework factories
         if (this.frameworkHelpers.factories && this.frameworkHelpers.factories[name]) {
+            // Cache factory helpers that need to maintain state across request (like headTitle)
+            if (this.instances[name]) {
+                return this.instances[name];
+            }
+
             const factoryPath = this.frameworkHelpers.factories[name];
             const FactoryClass = require(global.applicationPath(factoryPath));
             const factory = new FactoryClass();
 
             // Create helper through factory with ServiceManager
-            // DO NOT CACHE factory helpers - they need fresh ServiceManager state per request
             const instance = factory.createService(this.serviceManager);
 
             // Set nunjucks context if available
             if (global.nunjucksContext) {
                 instance.setContext(global.nunjucksContext);
             }
+
+            // Cache the instance for reuse within the same request
+            this.instances[name] = instance;
 
             return instance;
         }

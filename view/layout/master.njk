@@ -9,7 +9,7 @@
   {% set defaultDescription = 'Latest news, comments and analysis from the UK and around the world.' %}
 
   <title>{{ headTitle('Daily Politics', 'prepend') }}</title>
-  <meta name="title" content="{{ headTitle() }}">
+  <meta name="title" content="{{ headTitle('Daily Politics', 'prepend') }}">
   <meta name="description" content="{% block metaDescription %}{{ defaultDescription }}{% endblock %}">
 
   {# ---------- Open Graph / Facebook ---------- #}

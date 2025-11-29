@@ -218,67 +218,65 @@ class ArticleForm extends Form {
     }
 
     /**
-     * Add submit to publish
+     * Add a submit button with auto-generated style class
+     * @param {string} name - Button name (e.g., 'delete', 'publish', 'submit', 'review_requested')
+     * @param {string} label - Button label text
+     * @param {string} [styleClass] - Optional custom style class. If not provided, auto-generates from name
+     * @returns {ArticleForm}
+     */
+    addSubmitButton(name, label, styleClass = null) {
+        const element = new Submit(name);
+        element.setValue(label);
+
+        // Auto-generate style class from button name if not provided
+        // Examples: 'delete' -> 'dp-button--delete', 'review_requested' -> 'dp-button--review-requested'
+        const generatedClass = styleClass || `dp-button--${name.replace(/_/g, '-')}`;
+
+        element.setAttributes({
+            'class': `dp-button ${generatedClass}`
+        });
+        this.add(element);
+        return this;
+    }
+
+    /**
+     * Add delete button - convenience method
      * @param {string} name
      * @param {string} label
      * @returns {ArticleForm}
      */
     addDeleteButton(name = 'delete', label = 'Delete') {
-        const element = new Submit(name);
-        element.setValue(label);
-        element.setAttributes({
-            'class': 'dp-button dp-button--delete'
-        });
-        this.add(element);
-        return this;
+        return this.addSubmitButton(name, label, 'dp-button--delete');
     }
 
-     /**
-     * Add submit to publish
+    /**
+     * Add publish button - convenience method
      * @param {string} name
      * @param {string} label
      * @returns {ArticleForm}
      */
     addPublishButton(name = 'publish', label = 'Publish') {
-        const element = new Submit(name);
-        element.setValue(label);
-        element.setAttributes({
-            'class': 'dp-button dp-button--publish'
-        });
-        this.add(element);
-        return this;
+        return this.addSubmitButton(name, label, 'dp-button--publish');
     }
 
     /**
-     * Add submit for review
+     * Add review button - convenience method
      * @param {string} name
      * @param {string} label
      * @returns {ArticleForm}
      */
     addReviewButton(name = 'review_requested', label = 'Submit for Review') {
-        const element = new Submit(name);
-        element.setValue(label);
-        element.setAttributes({
-            'class': 'dp-button dp-button--review'
-        });
-        this.add(element);
-        return this;
+        return this.addSubmitButton(name, label, 'dp-button--review');
     }
 
     /**
-     * Add submit button
+     * Add save button - convenience method
      * @param {string} name
      * @param {string} label
      * @returns {ArticleForm}
      */
-    addSubmitButton(name = 'submit', label = 'Save Draft') {
-        const element = new Submit(name);
-        element.setValue(label);
-        element.setAttributes({
-            'class': 'dp-button dp-button--save'
-        });
-        this.add(element);
-        return this;
+    addSaveButton(name = 'save', label = 'Save Draft') {
+        return this.addSubmitButton(name, label, 'dp-button--save');
     }
 
     /**
@@ -311,7 +309,7 @@ class ArticleForm extends Form {
         this.addMetaDescriptionField();
         this.addCommentEnabledField();
         this.addPublishButton();
-        this.addSubmitButton();
+        this.addSaveButton();
 
         return this;
     }
