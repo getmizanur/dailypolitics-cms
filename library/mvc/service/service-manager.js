@@ -43,7 +43,7 @@ class ServiceManager {
 
     get(name) {
         // Special case: Return application config directly
-        if (name === 'Config') {
+        if (name === 'Config' || name === 'config') {
             return this.getConfig();
         }
 

@@ -7,7 +7,7 @@ const VarUtil = require('../util/var-util');
  */
 class Request {
 
-    constructor(options = {}){
+    constructor(options = {}) {
         this.HTTP_METHODS = [
             'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH'
         ];
@@ -43,7 +43,7 @@ class Request {
      * @returns {Request} For method chaining
      */
     setMethod(value) {
-        if(!this.HTTP_METHODS.includes(StringUtil.strtoupper(value))) {
+        if (!this.HTTP_METHODS.includes(StringUtil.strtoupper(value))) {
             throw new Error('Invalid HTTP method passed');
         }
         this.method = value;
@@ -138,11 +138,11 @@ class Request {
             return key === null ? {} : defaultValue;
         }
 
-        if(VarUtil.hasKey(this.post, key)) {
+        if (VarUtil.hasKey(this.post, key)) {
             return this.post[key];
         }
 
-        if(key == null) {
+        if (key == null) {
             return this.post;
         }
 
@@ -171,11 +171,11 @@ class Request {
             return key === null ? {} : defaultValue;
         }
 
-        if(VarUtil.hasKey(this.query, key)) {
+        if (VarUtil.hasKey(this.query, key)) {
             return this.query[key];
         }
 
-        if(key == null) {
+        if (key == null) {
             return this.query;
         }
 
@@ -204,11 +204,11 @@ class Request {
             return key === null ? {} : defaultValue;
         }
 
-        if(VarUtil.hasKey(this.headers, key)) {
+        if (VarUtil.hasKey(this.headers, key)) {
             return this.headers[key];
         }
 
-        if(key == null) {
+        if (key == null) {
             return this.headers;
         }
 
@@ -303,11 +303,11 @@ class Request {
             return key === null ? {} : defaultValue;
         }
 
-        if(VarUtil.hasKey(this.params, key)) {
+        if (VarUtil.hasKey(this.params, key)) {
             return this.params[key];
         }
 
-        if(key == null) {
+        if (key == null) {
             return this.params;
         }
 
@@ -420,6 +420,24 @@ class Request {
      */
     getSession() {
         return this.session;
+    }
+
+    /**
+     * Set raw Express request object
+     * @param {Object} req - Express request object
+     * @returns {Request} For method chaining
+     */
+    setExpressRequest(req) {
+        this.expressRequest = req;
+        return this;
+    }
+
+    /**
+     * Get raw Express request object
+     * @returns {Object|null} Express request object
+     */
+    getExpressRequest() {
+        return this.expressRequest;
     }
 
 }

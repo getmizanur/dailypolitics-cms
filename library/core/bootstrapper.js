@@ -257,6 +257,8 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         request.setPost(req.body);
         // Set express-session object
         request.setSession(req.session);
+        // Set raw Express request object
+        request.setExpressRequest(req);
 
         // front.setRequest(request);
 
@@ -287,7 +289,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
 
         let view;
         try {
-            const dispatchResult = front.dispatch();
+            const dispatchResult = await front.dispatch();
             // Handle async dispatch results
             if (dispatchResult && typeof dispatchResult.then === 'function') {
                 view = await dispatchResult;
@@ -353,22 +355,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
                 if (statusCode) {
                     res.status(statusCode);
                 }
-                if (Session.isInitialized()) {
-                    // Update session data but don't replace the req.session object
-                    const sessionData = Session.all();
-                    if (sessionData && typeof sessionData === 'object') {
-                        // Only copy custom data, avoid overwriting read-only properties
-                        Object.keys(sessionData).forEach(key => {
-                            if (key !== 'cookie' && key !== 'id') {
-                                try {
-                                    req.session[key] = sessionData[key];
-                                } catch (error) {
-                                    console.warn(`Could not update session property '${key}':`, error.message);
-                                }
-                            }
-                        });
-                    }
-                }
+                
                 // BEFORE you render the view, prepare flash messages:
                 front.prepareFlashMessenger();
 

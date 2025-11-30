@@ -33,7 +33,7 @@ class AuthenticationServiceFactory extends AbstractFactory {
             }
 
             console.log('[AuthServiceFactory] Session ID:', session.id);
-            console.log('[AuthServiceFactory] Session customData:', JSON.stringify(session.customData));
+            console.log('[AuthServiceFactory] Session.AuthIdentity:', JSON.stringify(session.AuthIdentity));
 
             // Create SessionStorage with the session
             const storage = new SessionStorage(session);

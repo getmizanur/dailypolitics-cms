@@ -5,7 +5,7 @@
   <div class="row w-100">
     <div class="col-sm-12 col-md-8 offset-md-2 admin-login-form dailypolitics-!-margin-bottom-8">
       {{ form().openTag(loginForm) }}
-      {{ formCsrf(loginForm.get('csrf')) | safe }}
+      {# CSRF field removed #}
       <fieldset class="dp-fieldset">
         <div class="dp-form-group{% if errorDecorator(loginForm.get('username')) %} dp-form-group--error{% endif %}">
           {{ formLabel(loginForm.get('username')) }}

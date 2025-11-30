@@ -105,17 +105,23 @@ class DbAdapter {
             console.log('Username:', this.username);
             console.log('Active column:', this.activeColumn);
 
-            // Query for user by username and active status using custom query builder
-            const query = this.db.select()
+
+            // Query for user by username and active status using Select query builder
+
+            const Select = require('../../db/sql/select');
+            const select = new Select()
                 .from(this.tableName)
                 .where(`${this.identityColumn} = ?`, this.username)
                 .where(`${this.activeColumn} = ?`, true)
                 .limit(1);
 
-            console.log('SQL Query:', query.toString());
-            console.log('Parameters:', query.getParameters());
+            const sql = select.toString();
+            const params = select.getParameters();
+            console.log('SQL Query:', sql);
+            console.log('Parameters:', params);
 
-            const results = await this.db.fetchAll(query);
+            // Use db.query(sql, params) to fetch results
+            const results = await this.db.query(sql, params);
 
             console.log('Query results:', results);
 

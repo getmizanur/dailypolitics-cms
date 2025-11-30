@@ -1,6 +1,5 @@
 const Controller = require(global.applicationPath('/library/mvc/controller/base-controller'));
 const LoginForm = require(global.applicationPath('/application/form/login-form'));
-const SessionContainer = require(global.applicationPath('/library/session/session-container'));
 const InputFilter = require(
     global.applicationPath('/library/input-filter/input-filter'));
 const DbAdapter = require(global.applicationPath('/library/authentication/adapter/db-adapter'));
@@ -13,7 +12,7 @@ class LoginController extends Controller {
 
     preDispatch() {
         // Check authentication for all actions except login and index
-        const actionName = this.getRequest().getActionName();
+        /*const actionName = this.getRequest().getActionName();
 
         if (actionName !== 'indexAction' && actionName !== 'loginAction') {
             const authService = this.getServiceManager().get('AuthenticationService');
@@ -28,7 +27,7 @@ class LoginController extends Controller {
         //const viewModel = this.getView();
         //const headTitle = viewModel.getHelper('headTitle');
         //headTitle.append('Admin');
-        this.getServiceManager().get('ViewHelperManager').get('headTitle').append('Admin');
+        this.getServiceManager().get('ViewHelperManager').get('headTitle').append('Admin');*/
     }
 
     async indexAction() {
@@ -39,13 +38,11 @@ class LoginController extends Controller {
         // Initialize authentication service
         const authService = this.getServiceManager().get('AuthenticationService');
 
-        // Initialize security session container for CSRF token management
-        // Pass the express-session object directly to the Container
+        // Get express session
         const expressSession = this.getSession();
-        const securitySession = new SessionContainer('security', expressSession);
 
         console.log('Session ID:', expressSession ? expressSession.id : 'NO SESSION');
-        console.log('Session customData:', expressSession ? JSON.stringify(expressSession.customData) : 'NO SESSION');
+        console.log('Session.AuthIdentity:', expressSession ? JSON.stringify(expressSession.AuthIdentity) : 'NO SESSION');
 
         // Check if user is already authenticated - redirect to dashboard
         if (authService.hasIdentity()) {
@@ -59,17 +56,6 @@ class LoginController extends Controller {
         form.addUsernameField();
         form.addPasswordField();
         form.addSubmitButton();
-
-        // Get or generate CSRF token
-        let csrfToken = securitySession.get('csrfToken');
-        if (!csrfToken) {
-            // Only generate new token if one doesn't exist
-            csrfToken = form.addCsrfField();
-            securitySession.set('csrfToken', csrfToken);
-        } else {
-            // Use existing token from session
-            form.addCsrfField('csrf', { token: csrfToken });
-        }
 
         const inputFilter = InputFilter.factory({
             'username': {
@@ -107,116 +93,79 @@ class LoginController extends Controller {
                         }
                     }
                 ]
-            },
-            'csrf': {
-                required: true,
-                filters: [
-                    { name: 'HtmlEntities' },
-                    { name: 'StringTrim' },
-                    { name: 'StripTags' }
-                ],
-                validators: [
-                    {
-                        name: 'StringLength',
-                        options: {
-                            min: 64,
-                            max: 64,
-                            messageTemplate: {
-                                INVALID_TOO_SHORT: 'Invalid CSRF token',
-                                INVALID_TOO_LONG: 'Invalid CSRF token'
-                            }
-                        }
-                    },
-                    {
-                        name: 'AlphaNumeric',
-                        options: {
-                            messageTemplate: {
-                                INVALID_FORMAT: 'CSRF token must contain only alphanumeric characters'
-                            }
-                        }
-                    }
-                ]
             }
         });
         form.setInputFilter(inputFilter);
 
         if (super.getRequest().isPost()) {
+
             const postData = super.getRequest().getPost();
             form.setData(postData);
 
             if (form.isValid()) {
-                // Get filtered values
-                const values = form.getData();
+                try {
+                    const values = form.getData();
+                    console.log('Starting authentication...');
+                    const db = this.getServiceManager().get('Database');
+                    console.log('Database adapter retrieved:', db.constructor.name);
 
-                // Verify CSRF token
-                const storedCsrfToken = securitySession.get('csrfToken');
-
-                console.log('CSRF Check:');
-                console.log('  Submitted CSRF:', values.csrf);
-                console.log('  Stored CSRF:', storedCsrfToken);
-                console.log('  Match:', values.csrf === storedCsrfToken);
-
-                if (values.csrf !== storedCsrfToken) {
-                    console.log('CSRF token mismatch! Regenerating new token...');
-                    // Clear the old token and regenerate on next page load
-                    securitySession.remove('csrfToken');
-                    super.plugin('flashMessenger').addErrorMessage('Invalid CSRF token. Please try again.');
-                } else {
-                    console.log('CSRF token valid, proceeding with authentication');
-                    // Perform authentication
-                    try {
-                        console.log('Starting authentication...');
-                        const db = this.getServiceManager().get('Database');
-                        console.log('Database adapter retrieved:', db.constructor.name);
-
-                        // Connect to database if not already connected
-                        if (!db.connection) {
-                            console.log('Connecting to database...');
-                            await db.connect();
-                            console.log('Database connected successfully');
-                        }
-
-                        const adapter = new DbAdapter(db, 'users', 'email', 'password_hash', 'password_salt');
-                        adapter.setUsername(values.username);
-                        adapter.setPassword(values.password);
-
-                        console.log('Attempting authentication for user:', values.username);
-
-                        authService.setAdapter(adapter);
-                        const result = await authService.authenticate();
-
-                        console.log('Authentication result:', result.getCode(), result.getMessages());
-
-                        if (result.isValid()) {
-                            // Authentication successful
-                            console.log('Authentication successful');
-
-                            // Write identity to session (without regeneration for now)
-                            const identity = result.getIdentity();
-                            const authStorage = authService.getStorage();
-                            authStorage.write(identity);
-                            console.log('Identity written to session');
-                            console.log('Session customData after write:', JSON.stringify(expressSession.customData));
-
-                            // Explicitly save session before redirect
-                            await securitySession.save();
-                            console.log('Session saved successfully');
-
-                            super.plugin('flashMessenger').addSuccessMessage('Login successful');
-                            const redirectResponse = this.plugin('redirect').toRoute('adminDashboardIndex');
-                            console.log('Redirect response created:', redirectResponse ? 'YES' : 'NO');
-                            console.log('Redirect URL:', redirectResponse ? redirectResponse.getHeader('Location') : 'NONE');
-                            console.log('Is redirect?:', redirectResponse ? redirectResponse.isRedirect() : 'NONE');
-                            return redirectResponse;
-                        } else {
-                            // Authentication failed - show generic error
-                            console.log('Authentication failed');
-                            super.plugin('flashMessenger').addErrorMessage('Authentication unsuccessful');
-                        }
-                    } catch (error) {
-                        console.error('Authentication error:', error);
-                        super.plugin('flashMessenger').addErrorMessage('An error occurred during authentication: ' + error.message);
+                    // Connect to database if not already connected
+                    if (!db.connection) {
+                        console.log('Connecting to database...');
+                        await db.connect();
+                        console.log('Database connected successfully');
                     }
+
+                    const adapter = new DbAdapter(db, 'users', 'email', 'password_hash', 'password_salt');
+                    adapter.setUsername(values.username);
+                    adapter.setPassword(values.password);
+
+                    console.log('Attempting authentication for user:', values.username);
+
+                    authService.setAdapter(adapter);
+                    const result = await authService.authenticate();
+
+                    console.log('Authentication result:', result.getCode(), result.getMessages());
+
+                    if (result.isValid()) {
+                        // Authentication successful
+                        console.log('Authentication successful');
+
+                        // Write identity to session (without regeneration for now)
+                        const identity = result.getIdentity();
+                        const authStorage = authService.getStorage();
+                        authStorage.write(identity);
+                        console.log('Identity written to session');
+                        console.log('Session.AuthIdentity after write:', JSON.stringify(expressSession.AuthIdentity));
+
+                        // Explicitly save session before redirect
+                        // IMPORTANT: Must await to ensure session is persisted before redirect
+                        await new Promise((resolve, reject) => {
+                            expressSession.save((err) => {
+                                if (err) {
+                                    console.error('[Login] Session save error:', err);
+                                    reject(err);
+                                } else {
+                                    console.log('[Login] Session saved successfully');
+                                    resolve();
+                                }
+                            });
+                        });
+
+                        super.plugin('flashMessenger').addSuccessMessage('Login successful');
+                        const redirectResponse = this.plugin('redirect').toRoute('adminDashboardIndex');
+                        console.log('Redirect response created:', redirectResponse ? 'YES' : 'NO');
+                        console.log('Redirect URL:', redirectResponse ? redirectResponse.getHeader('Location') : 'NONE');
+                        console.log('Is redirect?:', redirectResponse ? redirectResponse.isRedirect() : 'NONE');
+                        return redirectResponse;
+                    } else {
+                        // Authentication failed - show generic error
+                        console.log('Authentication failed');
+                        super.plugin('flashMessenger').addErrorMessage('Authentication unsuccessful');
+                    }
+                } catch (error) {
+                    console.error('Authentication error:', error);
+                    super.plugin('flashMessenger').addErrorMessage('An error occurred during authentication: ' + error.message);
                 }
             } else {
                 // After form.isValid() returns false
@@ -262,14 +211,23 @@ class LoginController extends Controller {
         // Clear identity
         authService.clearIdentity();
 
+        // Explicitly save session before redirect
+        // IMPORTANT: Must await to ensure session is persisted before redirect
+        const expressSession = this.getSession();
+        await new Promise((resolve, reject) => {
+            expressSession.save((err) => {
+                if (err) {
+                    console.error('[Logout] Session save error:', err);
+                    reject(err);
+                } else {
+                    console.log('[Logout] Session saved successfully after clearing identity');
+                    resolve();
+                }
+            });
+        });
+
         // Add success message
         super.plugin('flashMessenger').addSuccessMessage('You have been logged out successfully');
-
-        // Explicitly save session before redirect
-        const expressSession = this.getSession();
-        const securitySession = new SessionContainer('security', expressSession);
-        await securitySession.save();
-        console.log('Session saved after logout');
 
         // Redirect to login page
         return this.plugin('redirect').toRoute('adminLoginIndex');

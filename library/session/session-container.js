@@ -138,16 +138,21 @@ class SessionContainer {
      */
     async save() {
         if (this._expressSession && typeof this._expressSession.save === 'function') {
+            console.log(`[SessionContainer:${this.name}] Saving session...`);
+            console.log(`[SessionContainer:${this.name}] Current customData:`, JSON.stringify(this._expressSession.customData));
             return new Promise((resolve, reject) => {
                 this._expressSession.save((err) => {
                     if (err) {
+                        console.error(`[SessionContainer:${this.name}] Save error:`, err);
                         reject(err);
                     } else {
+                        console.log(`[SessionContainer:${this.name}] Saved successfully`);
                         resolve();
                     }
                 });
             });
         }
+        console.warn(`[SessionContainer:${this.name}] No express session or save method available`);
         // No-op if no express session available
         return Promise.resolve();
     }
