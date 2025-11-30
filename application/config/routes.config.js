@@ -13,43 +13,43 @@ module.exports = {
         "adminDashboardIndex": {
             "route": "/admin/posts",
             "module": "admin",
-            "controller": "dashboard",
+            "controller": "post",
             "action": "list"
         },
         "adminDashboardNew": {
             "route": "/admin/posts/new",
             "module": "admin",
-            "controller": "dashboard",
+            "controller": "post",
             "action": "new"
         },
         "adminDashboardPage": {
             "route": "/admin/posts/page/:page",
             "module": "admin",
-            "controller": "dashboard",
+            "controller": "post",
             "action": "list"
         },
         "adminDashboardView": {
             "route": "/admin/posts/:slug/preview",
             "module": "admin",
-            "controller": "dashboard",
+            "controller": "post",
             "action": "view"
         },
         "adminDashboardEdit": {
             "route": "/admin/posts/:slug/edit",
             "module": "admin",
-            "controller": "dashboard",
+            "controller": "post",
             "action": "edit"
         },
         "adminDashboardConfirmation": {
             "route": "/admin/posts/confirmation",
             "module": "admin",
-            "controller": "dashboard",
+            "controller": "post",
             "action": "confirmation"
         },
         "adminDashboardDelete": {
             "route": "/admin/posts/:slug/remove",
             "module": "admin",
-            "controller": "dashboard",
+            "controller": "post",
             "action": "delete"
         },
         "adminLoginLogout": {

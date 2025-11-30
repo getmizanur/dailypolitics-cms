@@ -7,15 +7,15 @@ class Url extends BasePlugin {
     }
 
     fromRoute(name, params = {}, options = {}) {
-        let controller = super.getController();
-        let routes = controller.getConfig().get('routes');
+        let config = super.getController().getConfig();
+        let routes = config['router']['routes'];
 
         let route = null;
-        if(routes.hasOwnProperty(name)) {
+        if (routes.hasOwnProperty(name)) {
             route = routes[name].route;
 
             // Replace provided params
-            for(let key in params) {
+            for (let key in params) {
                 let regEx = new RegExp(':' + key, 'g');
                 route = route.replace(regEx, params[key]);
             }

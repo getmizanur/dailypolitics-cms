@@ -17,11 +17,12 @@ class AuthenticationServiceFactory extends AbstractFactory {
      */
     createService(serviceManager) {
         try {
-            // Get the Request object from ServiceManager
-            const request = serviceManager.get('Request');
+            // Get the Request object from Application service
+            const app = serviceManager.get('Application');
+            const request = app.getRequest();
 
             if (!request) {
-                throw new Error('Request not available in service manager');
+                throw new Error('Request not available in Application service');
             }
 
             // Get the session from the Request

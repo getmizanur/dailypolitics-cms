@@ -3,7 +3,7 @@ const Application = require("../../core/application");
 
 class ApplicationFactory extends AbstractFactory {
     createService(serviceManager) {
-        let config = serviceManager.get('config');
+        let config = serviceManager.get('Config');
 
         const app = new Application(config, serviceManager);
 

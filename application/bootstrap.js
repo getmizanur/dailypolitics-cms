@@ -23,11 +23,11 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 // Please put them in order of how they should be called. 
 class Bootstrap extends Bootstrapper {
 
-	constructor(app, serviceManager = null) {
+    constructor(app, serviceManager = null) {
         super();
-		this.app = app;
-		this.serviceManager = serviceManager;
-	}
+        this.app = app;
+        this.serviceManager = serviceManager;
+    }
 
     initAppConfig() {
         // Use Express's built-in body parsing middleware (available since Express 4.16)
@@ -38,7 +38,7 @@ class Bootstrap extends Bootstrapper {
 
     initSession() {
         const session = require('express-session');
-        
+
         // Get session configuration from application config
         let sessionConfig = {};
         try {
@@ -49,15 +49,15 @@ class Bootstrap extends Bootstrapper {
             const appConfig = require('./config/application.config');
             sessionConfig = appConfig.session || {};
         }
-        
+
         // Skip session initialization if disabled
         if (sessionConfig.enabled === false) {
             console.log('Session middleware disabled via configuration');
             return;
         }
-        
+
         this.app.set('trust proxy', 1); // trust first proxy
-        
+
         // Build express-session configuration from our config
         const expressSessionConfig = {
             secret: sessionConfig.secret || 'your-secret-key-change-in-production',
@@ -73,42 +73,42 @@ class Bootstrap extends Bootstrapper {
                 path: '/'
             }
         };
-        
+
         // Add store based on configuration
         const store = this.createSessionStore(sessionConfig);
         if (store) {
             expressSessionConfig.store = store;
         }
-        
+
         // Apply session middleware
         this.app.use(session(expressSessionConfig));
-        
+
         console.log(`Express session middleware initialized with ${sessionConfig.store || 'memory'} store`);
     }
 
     createSessionStore(sessionConfig) {
         const storeType = sessionConfig.store || 'file';
         const storeOptions = sessionConfig.store_options || {};
-        
+
         switch (storeType.toLowerCase()) {
             case 'file':
                 try {
                     const session = require('express-session');
                     const FileStore = require('session-file-store')(session);
-                    
+
                     // Clean up store options - remove logFn if it's not a function
                     const cleanOptions = { ...storeOptions };
                     if (!cleanOptions.logFn || typeof cleanOptions.logFn !== 'function') {
                         delete cleanOptions.logFn;
                     }
-                    
+
                     console.log('Using file-based session store with options:', cleanOptions);
                     return new FileStore(cleanOptions);
                 } catch (error) {
                     console.warn('File store not available, falling back to memory store:', error.message);
                     return null;
                 }
-                
+
             case 'redis':
                 try {
                     const session = require('express-session');
@@ -119,7 +119,7 @@ class Bootstrap extends Bootstrapper {
                     console.warn('Redis store not available, falling back to memory store:', error.message);
                     return null;
                 }
-                
+
             case 'mongodb':
                 try {
                     const MongoStore = require('connect-mongo');
@@ -129,7 +129,7 @@ class Bootstrap extends Bootstrapper {
                     console.warn('MongoDB store not available, falling back to memory store:', error.message);
                     return null;
                 }
-                
+
             case 'mysql':
                 try {
                     const session = require('express-session');
@@ -140,7 +140,7 @@ class Bootstrap extends Bootstrapper {
                     console.warn('MySQL store not available, falling back to memory store:', error.message);
                     return null;
                 }
-                
+
             case 'memory':
             default:
                 console.log('Using memory session store (not recommended for production)');
@@ -149,7 +149,7 @@ class Bootstrap extends Bootstrapper {
         }
     }
 
-    initConfig(){
+    initConfig() {
         let registry = new Registry();
         const appConfig = require('./config/application.config');
         registry.set('application', appConfig);
@@ -157,7 +157,7 @@ class Bootstrap extends Bootstrapper {
         registry.set('routes', appConfig.router.routes);
         super.setContainer(registry);
     }
-    
+
     initView() {
         const nunjucks = require('nunjucks');
         this.app.set('view engine', nunjucks);
@@ -195,7 +195,7 @@ class Bootstrap extends Bootstrapper {
         // Register each helper directly on env.globals for template access
         // Templates can use {{ headTitle() }} directly
         helperNames.forEach(helperName => {
-            env.addGlobal(helperName, function(...args) {
+            env.addGlobal(helperName, function (...args) {
                 // Get FRESH ViewHelperManager from ServiceManager each time
                 // This ensures we get the request-scoped instance with current RouteMatch
                 const currentViewHelperManager = serviceManager.get('ViewHelperManager');
@@ -213,34 +213,34 @@ class Bootstrap extends Bootstrapper {
         });
     }
 
-	initHelper() {
+    initHelper() {
         this.app.use(express.static('public'));
-	}
+    }
 
     initRouter() {
         // Mount routers 
         const registry = super.getContainer();
         const router = registry.get('routes');
-        for(let key in router) {
-            if(router[key].hasOwnProperty('route')) {
+        for (let key in router) {
+            if (router[key].hasOwnProperty('route')) {
                 this.app.all(router[key].route,
                     async (req, res, next) => this.dispatcher(req, res, next));
             }
         }
-        
+
         // Add 404 handler middleware (must be after all other routes)
         this.app.use((req, res, next) => {
             try {
                 // Resolve 404 template path using framework-level error handling
                 const errorTemplateInfo = this.resolveErrorTemplate('404');
                 const templatePath = errorTemplateInfo.templatePath;
-                
+
                 const templateData = {
                     pageTitle: 'Page Not Found',
                     errorCode: 404,
                     errorMessage: 'The page you are looking for could not be found.'
                 };
-                
+
                 // Set 404 status and render template directly (no MVC overhead)
                 res.status(404);
                 res.render(templatePath, templateData);

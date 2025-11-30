@@ -19,7 +19,7 @@ class PluginManagerFactory extends AbstractFactory {
         try {
             //const configRegistry = serviceManager.get('config');
             //appConfig = configRegistry.get('application');
-            appConfig = serviceManager.get('config');
+            appConfig = serviceManager.get('Config');
 
             pluginManager.setConfig(appConfig);
         } catch (error) {
@@ -27,7 +27,7 @@ class PluginManagerFactory extends AbstractFactory {
         }
 
         // Get config from ServiceManager
-        const config = serviceManager.get('config');
+        const config = serviceManager.get('Config');
         if (config && config.controller_plugins) {
             // Merge configs if needed
             const applicationPlugins = config.controller_plugins.invokables || {};

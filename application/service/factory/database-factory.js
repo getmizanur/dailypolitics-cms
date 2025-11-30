@@ -20,9 +20,8 @@ class DatabaseFactory extends AbstractFactory {
      */
     createService(serviceManager) {
         try {
-            const controller = serviceManager.getController();
-            const container = controller.getConfig();
-            const appConfig = container.get('application');
+            // Get configuration directly from ServiceManager
+            const appConfig = serviceManager.get('Config');
             const dbConfig = appConfig.database || {};
 
             if (!dbConfig.enabled) {

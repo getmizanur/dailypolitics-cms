@@ -15,7 +15,7 @@ class ViewHelperManagerFactory extends AbstractFactory {
         };
 
         try {
-            const appConfig = serviceManager.get('config');
+            const appConfig = serviceManager.get('Config');
 
             // Get invokables and factories from view_helpers config
             if (appConfig.view_helpers) {

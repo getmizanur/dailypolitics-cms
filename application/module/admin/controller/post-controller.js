@@ -33,7 +33,7 @@ class DashboardController extends Controller {
     async listAction() {
         try {
             const postService = this.getServiceManager().get('PostService');
-            const page = parseInt(this.getParam('page')) || 1;
+            const page = parseInt(this.plugin('params').fromRoute('page')) || 1;
             const limit = 5;
             const offset = (page - 1) * limit;
 
@@ -370,31 +370,19 @@ class DashboardController extends Controller {
     }
 
     async editAction() {
-        const logFile = global.applicationPath('/logs/debug.log');
-        const log = (msg) => {
-            const logMsg = `[${new Date().toISOString()}] ${msg}\n`;
-            console.log(msg);
-            fs.appendFileSync(logFile, logMsg);
-        };
-
         let form; // Declare form outside try block so it's accessible in return statement
 
         try {
-            log('=== editAction started ===');
-
             const postService = this.getServiceManager().get('PostService');
-            log('PostService retrieved');
 
             // Fetch all categories from database
             const categories = await postService.getAllCategories();
-            log(`Categories fetched: ${categories.length} categories`);
 
             // Create form
             form = new ArticleForm();
-            log('ArticleForm created');
 
             // Get article slug
-            const articleSlug = this.getParam('slug');
+            const articleSlug = this.plugin('params').fromRoute('slug');
 
             const actionUrl = this.helper('url')
                 .fromRoute('adminDashboardEdit', { slug: articleSlug });
@@ -402,7 +390,7 @@ class DashboardController extends Controller {
             // Set form attributes
             form.setAction(actionUrl);
             form.setMethod('POST');
-            log('Form attributes set');
+
 
             // Initialize form with categories
             form.addIdField();
@@ -432,14 +420,10 @@ class DashboardController extends Controller {
 
             form.addSaveButton();
 
-            log('Form initialized with categories');
-
             // If editing existing article, fetch and populate data
             if (articleSlug) {
-                log(`Fetching article with slug: ${articleSlug}`);
                 const article = await postService.getSinglePost(articleSlug, true, true);
                 if (article) {
-                    log('Article found, populating form');
                     form.setData({
                         id: article.id,
                         slug: article.slug,
@@ -615,15 +599,11 @@ class DashboardController extends Controller {
             if (super.getRequest().isPost()) {
                 const postData = super.getRequest().getPost();
 
-                log(`Post data received: ${JSON.stringify(postData)}`);
                 form.setData(postData);
 
                 const isFormValid = form.isValid();
-                log(`Form validation result: ${isFormValid}`);
 
                 if (isFormValid) {
-                    log('Form is valid - no errors');
-
                     // Update post by slug
                     try {
                         const contentHtml = this.plugin('markdownToHtml').convert(postData.content_markdown);
@@ -655,23 +635,19 @@ class DashboardController extends Controller {
                         // Check which submit button was clicked and handle accordingly
                         if (VarUtil.isset(postData.save) && postData.save === 'Save Draft') {
                             // Save Draft button clicked
-                            log('Save Draft button clicked');
                             postEntity.setDraft();
                             postEntity.setUpdatedBy(currentUserId);
                         } else if (VarUtil.isset(postData.review_requested) && postData.review_requested === 'Submit for Review') {
                             // Submit for Review button clicked
-                            log('Submit for Review button clicked');
                             postEntity.requestReview();
                             postEntity.setUpdatedBy(currentUserId);
                         } else if (VarUtil.isset(postData.publish) && postData.publish === 'Publish') {
                             // Publish button clicked
-                            log('Publish button clicked');
                             postEntity.publish(currentUserId);
                             postEntity.approve(currentUserId);
                             postEntity.setUpdatedBy(currentUserId);
                         } else if (VarUtil.isset(postData.delete) && postData.delete === 'Delete') {
                             // Delete button clicked
-                            log('Delete button clicked');
                             postEntity.softDelete(currentUserId)
                             postEntity.setUpdatedBy(currentUserId);
                         }
@@ -694,14 +670,12 @@ class DashboardController extends Controller {
                             //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
                         }
                     } catch (error) {
-                        log(`Error updating post: ${error.message}`);
                         super.plugin('flashMessenger').addErrorMessage(`Failed to update post: ${error.message}`);
                     }
                 } else {
                     // After form.isValid() returns false
                     // Get validation messages from form
                     const formMessages = form.getMessages();
-                    log(`Validation messages: ${JSON.stringify(formMessages)}`);
 
                     Object.keys(formMessages).forEach((fieldName) => {
                         if (form.has(fieldName)) {
@@ -733,12 +707,9 @@ class DashboardController extends Controller {
 
         } catch (error) {
             const errorMsg = `Error in editAction: ${error.message}\nStack: ${error.stack}`;
-            log(errorMsg);
-            fs.appendFileSync(logFile, errorMsg + '\n');
             throw error;
         }
 
-        log('Returning view with form');
         return this.getView()
             .setVariable('f', form);
         //.setVariable('flashMessages', flashMessages);

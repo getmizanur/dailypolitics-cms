@@ -1,6 +1,5 @@
 const JsonUtil = require('../util/json-util');
 const VarUtil = require('../util/var-util');
-const ErrorResponse = require('../util/error-response');
 const AbstractFactory = require('./abstract-factory');
 const RouteMatch = require('../mvc/router/route-match');
 
@@ -8,28 +7,27 @@ class ServiceManager {
 
     constructor(config = {}) {
         //this.controller = options.controller || null;
+        this.config = config || {};
 
         this._instanceId = Math.random().toString(36).substr(2, 9); // Debug: track instance
-        this.config = config || {};
         this.services = {};
         this.invokables = null;
         this.factories = null;
-        this.routeMatch = null; // Store route match information
-        this.request = null; // Store request object
-        this.response = null; // Store response object
+        this.factories = null;
 
         // Framework-level service factories - protected from developer modification
         this.frameworkFactories = {
             "ViewManager": "/library/service/factory/view-manager-factory",
             "ViewHelperManager": "/library/service/factory/view-helper-manager-factory",
             "PluginManager": "/library/service/factory/plugin-manager-factory",
-            "Application" : "/library/service/factory/application-factory"
+            "Application": "/library/service/factory/application-factory"
         };
 
         // Services that should NOT be cached (request-scoped services)
         this.nonCacheableServices = [
-            "AuthenticationService" // Depends on Request session data
-            // ViewHelperManager removed - it should be cached within the request to maintain helper state
+            "AuthenticationService", // Depends on Request session data
+            "ViewHelperManager",     // Must be request-scoped to hold correct RouteMatch/Request
+            "PluginManager"          // Must be request-scoped to hold correct Controller reference
         ];
     }
 
@@ -45,21 +43,8 @@ class ServiceManager {
 
     get(name) {
         // Special case: Return application config directly
-        if (name === 'config') {
-            if(VarUtil.empty(this.config))
-                return this.config = require('../../application/config/application.config');
-
-            return this.config;
-        }
-
-        // Special case: Return Request object
-        if (name === 'Request') {
-            return this.request;
-        }
-
-        // Special case: Return Response object
-        if (name === 'Response') {
-            return this.response;
+        if (name === 'Config') {
+            return this.getConfig();
         }
 
         // Lazy load configuration
@@ -97,9 +82,9 @@ class ServiceManager {
      * Load service configuration from application config
      */
     loadConfiguration() {
-        let applicationObj = this.get('config');
+        let applicationObj = this.getConfig();
         let serviceManagerObj = applicationObj.service_manager || {};
-        
+
         this.invokables = serviceManagerObj.invokables || {};
         this.factories = serviceManagerObj.factories || {};
     }
@@ -131,7 +116,7 @@ class ServiceManager {
             // Validate configuration if factory supports it
             if (typeof factory.validateConfiguration === 'function' ||
                 typeof factory.validateRequiredConfig === 'function') {
-                let configObj = this.get('config');
+                let configObj = this.getConfig();
 
                 // Check required configuration keys first
                 if (typeof factory.validateRequiredConfig === 'function' &&
@@ -171,12 +156,12 @@ class ServiceManager {
         try {
             let path = global.applicationPath(this.invokables[name]);
             let ServiceClass = require(path);
-            
+
             this.services[name] = new ServiceClass();
-            
+
             console.log(`Service '${name}' created via invokable: ${path}`);
             return this.services[name];
-            
+
         } catch (error) {
             throw new Error(`Failed to create service '${name}' via invokable: ${error.message}`);
         }
@@ -189,9 +174,9 @@ class ServiceManager {
      */
     isValidFactory(FactoryClass) {
         // Check if class has static method indicating abstract factory implementation
-        if (typeof FactoryClass.implementsAbstractFactory === 'function' && 
+        if (typeof FactoryClass.implementsAbstractFactory === 'function' &&
             FactoryClass.implementsAbstractFactory()) {
-            
+
             // Additional check: ensure createService method exists
             let instance;
             try {
@@ -200,24 +185,24 @@ class ServiceManager {
                 console.warn(`Cannot instantiate factory class: ${error.message}`);
                 return false;
             }
-            
+
             if (typeof instance.createService !== 'function') {
                 console.warn('Factory class missing createService method');
                 return false;
             }
-            
+
             return true;
         }
-        
+
         // Check if instance extends AbstractFactory
         try {
             let instance = new FactoryClass();
             const isValid = instance instanceof AbstractFactory;
-            
+
             if (!isValid) {
                 console.warn('Factory class must extend AbstractFactory');
             }
-            
+
             return isValid;
         } catch (error) {
             console.warn(`Factory validation error: ${error.message}`);
@@ -231,8 +216,8 @@ class ServiceManager {
      * @returns {boolean}
      */
     has(name) {
-        // Special cases: config, Request, Response are always available
-        if (name === 'config' || name === 'Request' || name === 'Response') {
+        // Special cases: config is always available
+        if (name === 'config') {
             return true;
         }
 
@@ -241,8 +226,8 @@ class ServiceManager {
         }
 
         return this.frameworkFactories.hasOwnProperty(name) ||
-               this.factories.hasOwnProperty(name) ||
-               this.invokables.hasOwnProperty(name);
+            this.factories.hasOwnProperty(name) ||
+            this.invokables.hasOwnProperty(name);
     }
 
     /**
@@ -285,7 +270,7 @@ class ServiceManager {
         if (this.invokables == null || this.factories == null) {
             this.loadConfiguration();
         }
-        
+
         return [
             ...Object.keys(this.factories),
             ...Object.keys(this.invokables)
@@ -313,58 +298,13 @@ class ServiceManager {
         return this;
     }
 
-    /**
-     * Get the RouteMatch instance containing matched route information
-     * @returns {RouteMatch|null} RouteMatch instance or null if not set
-     */
-    getRouteMatch() {
-        return this.routeMatch;
-    }
+    getConfig() {
+        if (VarUtil.empty(this.config)) {
+            this.config = require('../../application/config/application.config');
+            return this.config;
+        }
 
-    /**
-     * Set the RouteMatch instance
-     * @param {RouteMatch} routeMatch - RouteMatch instance
-     * @returns {ServiceManager} For method chaining
-     */
-    setRouteMatch(routeMatch) {
-        this.routeMatch = routeMatch;
-        return this;
-    }
-
-    /**
-     * Get the Request instance
-     * @returns {Request|null} Request instance or null if not set
-     */
-    getRequest() {
-        return this.request;
-    }
-
-    /**
-     * Set the Request instance
-     * @param {Request} request - Request instance
-     * @returns {ServiceManager} For method chaining
-     */
-    setRequest(request) {
-        this.request = request;
-        return this;
-    }
-
-    /**
-     * Get the Response instance
-     * @returns {Response|null} Response instance or null if not set
-     */
-    getResponse() {
-        return this.response;
-    }
-
-    /**
-     * Set the Response instance
-     * @param {Response} response - Response instance
-     * @returns {ServiceManager} For method chaining
-     */
-    setResponse(response) {
-        this.response = response;
-        return this;
+        return this.config;
     }
 
     getClass() {

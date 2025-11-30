@@ -7,10 +7,13 @@ class BaseController {
 
     constructor(options = {}) {
         this.container = options.container || null;
-        this.serviceLocator = options.serviceLocator || null;
+        this.serviceManager = options.serviceManager || null;
 
-        this.request = options.req || null;
-        this.response = options.res || null;
+        if (this.serviceManager) {
+            this.serviceManager.setController(this);
+        }
+
+
         this.method = null;
 
         this.moduleName = null;
@@ -27,103 +30,44 @@ class BaseController {
         this.view = null;
     }
 
-    setServiceLocator(serviceLocator) {
-        this.serviceLocator = serviceLocator;
-        this.serviceLocator.setController(this);
+    setServiceManager(serviceManager) {
+        this.serviceManager = serviceManager;
+        this.serviceManager.setController(this);
 
         return this;
     }
 
     getServiceManager() {
-        if (!this.serviceLocator) {
-            // Always create new instance (configs stored in Container, not instance)
-            const serviceManager = new ServiceManager();
-            this.setServiceLocator(serviceManager);
-
-            // Load configuration
-            serviceManager.loadConfiguration();
-
-            // Merge framework factories with application factories (with conflict check)
-            const mergedFactories = this._mergeFactories(
-                serviceManager.frameworkFactories,
-                serviceManager.factories || {}
-            );
-
-            // Update service manager with merged factories
-            serviceManager.factories = mergedFactories;
+        if (!this.serviceManager) {
+            throw new Error('ServiceManager not injected into Controller');
         }
-
-        return this.serviceLocator;
-    }
-
-    /**
-     * Merge framework factories with application factories
-     * Throws error if application tries to override framework factory
-     * @private
-     */
-    _mergeFactories(frameworkFactories, applicationFactories) {
-        // Check for conflicts
-        const conflicts = Object.keys(applicationFactories).filter(key =>
-            frameworkFactories.hasOwnProperty(key)
-        );
-
-        if (conflicts.length > 0) {
-            throw new Error(
-                `Application factories cannot override framework factories. ` +
-                `The following keys are already in use by the framework: ${conflicts.join(', ')}. ` +
-                `Please choose different names for your application factories.`
-            );
-        }
-
-        // Merge: framework factories first, then application factories
-        return {
-            ...frameworkFactories,
-            ...applicationFactories
-        };
-    }
-
-    // Backward compatibility alias - deprecated, use getServiceManager() instead
-    getServiceLocator() {
-        console.warn('getServiceLocator() is deprecated, use getServiceManager() instead');
-        return this.getServiceManager();
+        return this.serviceManager;
     }
 
     getConfig() {
-        return this.container;
-    }
-
-    setConfig(container) {
-        this.config = container;
+        return this.getServiceManager().get('Config');
     }
 
     getRequest() {
-        return this.request;
-    }
-
-    setRequest(req) {
-        this.request = req;
+        return this.getServiceManager().get('Application').getRequest();
     }
 
     getResponse() {
-        return this.response;
-    }
-
-    setResponse(res) {
-        this.response = res;
+        return this.getServiceManager().get('Application').getResponse();
     }
 
     getSession() {
-        if (!this.request) {
+        if (!this.getRequest()) {
             throw new Error('Request object not available');
         }
-        return this.request.session;
+        return this.getRequest().session;
     }
 
     setSession(session) {
-        if (!this.request) {
+        if (!this.getRequest()) {
             throw new Error('Request object not available');
         }
-        this.request.session = session;
+        this.getRequest().session = session;
         return this;
     }
 
@@ -182,40 +126,31 @@ class BaseController {
     dispatch(request = null, response = null) {
         let view = null;
 
-        if (request != null) {
-            this.setRequest(request);
-        } else {
-            request = this.getRequest();
-        }
-
-        if (response != null) {
-            this.setResponse(response);
-        } else {
-            response = this.getResponse();
-        }
+        // request and response arguments are ignored as we use the Application service source of truth
 
         // Set module and controller metadata as template variables (before preDispatch to ensure availability)
         const viewModel = this.getView();
-        if (viewModel && request) {
+        const req = this.getRequest();
+        if (viewModel && req) {
             // Set module name (from route)
-            if (typeof request.getModuleName === 'function') {
-                viewModel.setVariable('_moduleName', request.getModuleName());
+            if (typeof req.getModuleName === 'function') {
+                viewModel.setVariable('_moduleName', req.getModuleName());
             }
 
             // Set controller name (from route)
-            if (typeof request.getControllerName === 'function') {
-                viewModel.setVariable('_controllerName', request.getControllerName());
+            if (typeof req.getControllerName === 'function') {
+                viewModel.setVariable('_controllerName', req.getControllerName());
             }
 
             // Set action name (from route)
-            if (typeof request.getActionName === 'function') {
-                let action = request.getActionName();
+            if (typeof req.getActionName === 'function') {
+                let action = req.getActionName();
                 viewModel.setVariable('_actionName', StringUtil.toKebabCase(action).replace('-action', ''));
             }
 
             // Set route name for convenience
-            if (typeof request.getRouteName === 'function') {
-                viewModel.setVariable('_routeName', request.getRouteName());
+            if (typeof req.getRouteName === 'function') {
+                viewModel.setVariable('_routeName', req.getRouteName());
             }
 
             // Set authentication status for navigation helpers
@@ -270,35 +205,26 @@ class BaseController {
         return this.trigger500();
     }
 
-    setPluginManager(pluginManager) {
-        // Type checking removed since we're getting it from ServiceManager
-        // which ensures proper instantiation
-        this.pluginManager = pluginManager;
-        this.pluginManager.setController(this)
-    }
-
     getPluginManager() {
         if (!this.pluginManager) {
-            // Get PluginManager from ServiceManager
-            const pluginManager = this.getServiceManager().get('PluginManager');
-            this.setPluginManager(pluginManager);
+            this.pluginManager = this.getServiceManager().get('PluginManager');
+            this.pluginManager.setController(this);
         }
-
         return this.pluginManager;
     }
 
     getViewManager() {
         if (!this.viewManager) {
-            // Get ViewManager from ServiceManager
             this.viewManager = this.getServiceManager().get('ViewManager');
         }
-
         return this.viewManager;
     }
 
     getViewHelperManager() {
-        // Get ViewHelperManager from ServiceManager
-        return this.getServiceManager().get('ViewHelperManager');
+        if (!this.viewHelperManager) {
+            this.viewHelperManager = this.getServiceManager().get('ViewHelperManager');
+        }
+        return this.viewHelperManager;
     }
 
     plugin(name, options = {}) {

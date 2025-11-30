@@ -16,7 +16,7 @@ class Bootstrapper {
         this.frontController = null;
         this.delimiter = "_";
         this.classResource = {};
-
+        this.serviceManager = null;
         this.container = null;
     }
 
@@ -177,9 +177,13 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         const FrontController
             = require(global.applicationPath(`/application/module/${module}/controller/${controllerPath}`));
 
+        console.log('[Bootstraper.dispatcher]:');
+        console.log(this.getContainer());
+
         // Inject configuration
         let options = {
-            "container": this.getContainer()
+            "container": this.getContainer(),
+            "serviceManager": this.serviceManager
         };
         const front = new FrontController(options);
         if (!(front instanceof BaseController)) {
@@ -237,7 +241,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         request.setActionName(action);
         request.setMethod(req.method);
         request.setDispatched(true);
-        //request.setHeaders(req.headers);
+        request.setHeaders(req.headers);
         request.setQuery(req.query || {});
         request.setRoutePath(req.route ? req.route.path : req.path);
         request.setPath(req.path);
@@ -254,7 +258,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         // Set express-session object
         request.setSession(req.session);
 
-        front.setRequest(request);
+        // front.setRequest(request);
 
         // Create RouteMatch instance and store in ServiceManager
         const RouteMatch = require(global.applicationPath('/library/mvc/router/route-match'));
@@ -267,15 +271,18 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         const routeMatch = new RouteMatch(routeMatchParams, req.routeName);
 
         let response = new Response();
-        front.setResponse(response);
+        // front.setResponse(response);
 
-        // Store RouteMatch, Request, and Response in ServiceManager for access throughout the application
+        // Store RouteMatch, Request, and Response in Application service for access throughout the application
         const serviceManager = front.getServiceManager();
         if (serviceManager) {
-            console.log('[Dispatcher] Setting Request on ServiceManager:', serviceManager._instanceId);
-            serviceManager.setRouteMatch(routeMatch);
-            serviceManager.setRequest(request);
-            serviceManager.setResponse(response);
+            const app = serviceManager.get('Application');
+            if (app) {
+                console.log('[Dispatcher] Setting Request on Application service');
+                app.setRouteMatch(routeMatch);
+                app.setRequest(request);
+                app.setResponse(response);
+            }
         }
 
         let view;
@@ -364,6 +371,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
                 }
                 // BEFORE you render the view, prepare flash messages:
                 front.prepareFlashMessenger();
+
                 return res.render(view.getTemplate(), view.getVariables());
             }
         }
