@@ -1,7 +1,7 @@
-const JsonUtil = require('../util/json-util');
-const VarUtil = require('../util/var-util');
+const JsonUtil = require('../../util/json-util');
+const VarUtil = require('../../util/var-util');
 const AbstractFactory = require('./abstract-factory');
-const RouteMatch = require('../mvc/router/route-match');
+const RouteMatch = require('../router/route-match');
 
 class ServiceManager {
 
@@ -17,10 +17,10 @@ class ServiceManager {
 
         // Framework-level service factories - protected from developer modification
         this.frameworkFactories = {
-            "ViewManager": "/library/service/factory/view-manager-factory",
-            "ViewHelperManager": "/library/service/factory/view-helper-manager-factory",
-            "PluginManager": "/library/service/factory/plugin-manager-factory",
-            "Application": "/library/service/factory/application-factory"
+            "ViewManager": "/library/mvc/service/factory/view-manager-factory",
+            "ViewHelperManager": "/library/mvc/service/factory/view-helper-manager-factory",
+            "PluginManager": "/library/mvc/service/factory/plugin-manager-factory",
+            "Application": "/library/mvc/service/factory/application-factory"
         };
 
         // Services that should NOT be cached (request-scoped services)
@@ -300,7 +300,7 @@ class ServiceManager {
 
     getConfig() {
         if (VarUtil.empty(this.config)) {
-            this.config = require('../../application/config/application.config');
+            this.config = require('../../../application/config/application.config');
             return this.config;
         }
 

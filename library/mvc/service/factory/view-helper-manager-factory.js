@@ -1,5 +1,5 @@
 const AbstractFactory = require('../abstract-factory');
-const ViewHelperManager = require('../../mvc/view/view-helper-manager');
+const ViewHelperManager = require('../../view/view-helper-manager');
 
 class ViewHelperManagerFactory extends AbstractFactory {
 

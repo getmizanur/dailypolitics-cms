@@ -1,7 +1,7 @@
 // application/service/factory/post-service-factory.js
 // Factory for creating PostService with ServiceManager injected
 
-const AbstractFactory = require(global.applicationPath('/library/service/abstract-factory'));
+const AbstractFactory = require(global.applicationPath('/library/mvc/service/abstract-factory'));
 const PostService = require(global.applicationPath('/application/service/post-service'));
 
 /**

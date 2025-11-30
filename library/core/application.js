@@ -1,4 +1,4 @@
-const ServiceManager = require('../service/service-manager');
+const ServiceManager = require('../mvc/service/service-manager');
 const VarUtil = require('../util/var-util');
 const express = require('express');
 

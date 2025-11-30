@@ -9,7 +9,7 @@
  *   const posts = await db.fetchAll('SELECT * FROM posts WHERE status = $1', ['published']);
  */
 
-const AbstractFactory = require(global.applicationPath('/library/service/abstract-factory'));
+const AbstractFactory = require(global.applicationPath('/library/mvc/service/abstract-factory'));
 
 class DatabaseFactory extends AbstractFactory {
 

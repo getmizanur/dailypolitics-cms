@@ -1,7 +1,7 @@
-const ServiceManager = require('../library/service/service-manager');
+const ServiceManager = require('../library/mvc/service/service-manager');
 const path = require('path');
 
-global.applicationPath = function(filePath) {
+global.applicationPath = function (filePath) {
     return path.resolve(__dirname) + '/..' + filePath;
 }
 

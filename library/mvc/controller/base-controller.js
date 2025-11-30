@@ -1,6 +1,6 @@
 const StringUtil = require('../../util/string-util');
 const ViewModel = require('../view/view-model');
-const ServiceManager = require('../../service/service-manager');
+const ServiceManager = require('../service/service-manager');
 
 
 class BaseController {

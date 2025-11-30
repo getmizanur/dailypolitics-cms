@@ -1,5 +1,5 @@
 const AbstractFactory = require("../abstract-factory");
-const Application = require("../../core/application");
+const Application = require("../../../core/application");
 
 class ApplicationFactory extends AbstractFactory {
     createService(serviceManager) {
