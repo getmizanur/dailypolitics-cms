@@ -77,18 +77,36 @@ module.exports = {
             "sameSite": process.env.SESSION_SAME_SITE || 'lax',
             "path": process.env.SESSION_COOKIE_PATH || '/'
         },
-        // Store options for current store type (file store - session-file-store)
-        "store_options": {
-            "path": process.env.FILE_SESSION_PATH || global.applicationPath('/tmp/sessions'),
-            "ttl": parseInt(process.env.FILE_SESSION_TTL) || 3600, // 1 hour
-            "retries": parseInt(process.env.FILE_SESSION_RETRIES) || 5,
-            "factor": parseInt(process.env.FILE_SESSION_FACTOR) || 1,
-            "minTimeout": parseInt(process.env.FILE_SESSION_MIN_TIMEOUT) || 50,
-            "maxTimeout": parseInt(process.env.FILE_SESSION_MAX_TIMEOUT) || 100,
-            "fileExtension": process.env.FILE_SESSION_EXTENSION || '.json',
-            "encoding": process.env.FILE_SESSION_ENCODING || 'utf8',
-            "logFn": process.env.NODE_ENV === 'development' ? console.log : undefined // Logging only in development
-        },
+        // Store options - dynamically selected based on SESSION_STORE env variable
+        "store_options": (function() {
+            const storeType = process.env.SESSION_STORE || "file";
+
+            switch (storeType.toLowerCase()) {
+                case 'redis':
+                    return {
+                        "host": process.env.REDIS_HOST || "localhost",
+                        "port": parseInt(process.env.REDIS_PORT) || 6379,
+                        "password": process.env.REDIS_PASSWORD || undefined,
+                        "db": parseInt(process.env.REDIS_DB) || 0,
+                        "prefix": process.env.REDIS_SESSION_PREFIX || "sess:",
+                        "ttl": parseInt(process.env.REDIS_SESSION_TTL) || 3600
+                    };
+
+                case 'file':
+                default:
+                    return {
+                        "path": process.env.FILE_SESSION_PATH || global.applicationPath('/tmp/sessions'),
+                        "ttl": parseInt(process.env.FILE_SESSION_TTL) || 3600, // 1 hour
+                        "retries": parseInt(process.env.FILE_SESSION_RETRIES) || 5,
+                        "factor": parseInt(process.env.FILE_SESSION_FACTOR) || 1,
+                        "minTimeout": parseInt(process.env.FILE_SESSION_MIN_TIMEOUT) || 50,
+                        "maxTimeout": parseInt(process.env.FILE_SESSION_MAX_TIMEOUT) || 100,
+                        "fileExtension": process.env.FILE_SESSION_EXTENSION || '.json',
+                        "encoding": process.env.FILE_SESSION_ENCODING || 'utf8',
+                        "logFn": process.env.NODE_ENV === 'development' ? console.log : undefined // Logging only in development
+                    };
+            }
+        })(),
         // Security options for session management
         "security": {
             "enabled": process.env.SESSION_SECURITY_ENABLED !== 'false',

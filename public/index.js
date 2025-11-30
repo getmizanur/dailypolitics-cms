@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+
 const ServiceManager = require('../library/mvc/service/service-manager');
 const path = require('path');
 

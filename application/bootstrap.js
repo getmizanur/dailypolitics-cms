@@ -111,12 +111,56 @@ class Bootstrap extends Bootstrapper {
 
             case 'redis':
                 try {
-                    const session = require('express-session');
-                    const RedisStore = require('connect-redis')(session);
-                    console.log('Using Redis session store with options:', storeOptions);
-                    return new RedisStore(storeOptions);
+                    const { RedisStore } = require('connect-redis');
+                    const { createClient } = require('redis');
+
+                    // Create Redis client
+                    const redisClient = createClient({
+                        url: storeOptions.url || `redis://${storeOptions.host || 'localhost'}:${storeOptions.port || 6379}`,
+                        password: storeOptions.password || undefined,
+                        database: storeOptions.db || 0,
+                        socket: {
+                            connectTimeout: storeOptions.connectTimeout || 10000,
+                            reconnectStrategy: (retries) => {
+                                if (retries > 10) {
+                                    console.error('Redis connection failed after 10 retries');
+                                    return new Error('Redis connection failed');
+                                }
+                                return Math.min(retries * 100, 3000);
+                            }
+                        }
+                    });
+
+                    // Connect to Redis
+                    redisClient.connect().catch((err) => {
+                        console.error('Redis connection error:', err);
+                    });
+
+                    redisClient.on('connect', () => {
+                        console.log('Redis client connected successfully');
+                    });
+
+                    redisClient.on('error', (err) => {
+                        console.error('Redis client error:', err);
+                    });
+
+                    // Create RedisStore instance
+                    const store = new RedisStore({
+                        client: redisClient,
+                        prefix: storeOptions.prefix || 'sess:',
+                        ttl: storeOptions.ttl || 3600, // 1 hour in seconds
+                    });
+
+                    console.log('Using Redis session store with options:', {
+                        url: storeOptions.url || `redis://${storeOptions.host || 'localhost'}:${storeOptions.port || 6379}`,
+                        prefix: storeOptions.prefix || 'sess:',
+                        ttl: storeOptions.ttl || 3600
+                    });
+
+                    return store;
                 } catch (error) {
                     console.warn('Redis store not available, falling back to memory store:', error.message);
+                    console.warn('Error stack:', error.stack);
                     return null;
                 }
 

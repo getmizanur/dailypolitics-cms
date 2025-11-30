@@ -19,30 +19,23 @@ class SessionContainer {
     _getData(create = true) {
         // First priority: Use express-session if provided directly
         if (this._expressSession) {
-            if (!this._expressSession.customData) {
+            // Store namespace data directly at session root level for Redis/file store persistence
+            // Use namespace name as key (e.g., session.AuthIdentity = {...})
+            if (!this._expressSession.hasOwnProperty(this.name)) {
                 if (!create) return null;
-                this._expressSession.customData = {};
+                this._expressSession[this.name] = {};
             }
-            // Use hasOwnProperty to check if namespace exists (prevents overwriting existing data)
-            if (!this._expressSession.customData.hasOwnProperty(this.name)) {
-                if (!create) return null;
-                this._expressSession.customData[this.name] = {};
-            }
-            return this._expressSession.customData[this.name];
+            return this._expressSession[this.name];
         }
 
         // Second priority: Use express-session from global.locals
         if (typeof global !== 'undefined' && global.locals && global.locals.expressSession) {
-            if (!global.locals.expressSession.customData) {
+            // Store namespace data directly at session root level
+            if (!global.locals.expressSession.hasOwnProperty(this.name)) {
                 if (!create) return null;
-                global.locals.expressSession.customData = {};
+                global.locals.expressSession[this.name] = {};
             }
-            // Use hasOwnProperty to check if namespace exists (prevents overwriting existing data)
-            if (!global.locals.expressSession.customData.hasOwnProperty(this.name)) {
-                if (!create) return null;
-                global.locals.expressSession.customData[this.name] = {};
-            }
-            return global.locals.expressSession.customData[this.name];
+            return global.locals.expressSession[this.name];
         }
 
         // Fallback: Use in-memory storage (not persisted)
@@ -138,21 +131,17 @@ class SessionContainer {
      */
     async save() {
         if (this._expressSession && typeof this._expressSession.save === 'function') {
-            console.log(`[SessionContainer:${this.name}] Saving session...`);
-            console.log(`[SessionContainer:${this.name}] Current customData:`, JSON.stringify(this._expressSession.customData));
             return new Promise((resolve, reject) => {
                 this._expressSession.save((err) => {
                     if (err) {
                         console.error(`[SessionContainer:${this.name}] Save error:`, err);
                         reject(err);
                     } else {
-                        console.log(`[SessionContainer:${this.name}] Saved successfully`);
                         resolve();
                     }
                 });
             });
         }
-        console.warn(`[SessionContainer:${this.name}] No express session or save method available`);
         // No-op if no express session available
         return Promise.resolve();
     }
