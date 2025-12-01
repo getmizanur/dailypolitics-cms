@@ -3,7 +3,7 @@
 
 const AbstractFactory = require(global.applicationPath('/library/mvc/service/abstract-factory'));
 const AuthenticationService = require(global.applicationPath('/library/authentication/authentication-service'));
-const SessionStorage = require(global.applicationPath('/library/authentication/storage/session'));
+const SessionStorage = require(global.applicationPath('/library/authentication/storage/session-storage'));
 
 /**
  * AuthenticationServiceFactory

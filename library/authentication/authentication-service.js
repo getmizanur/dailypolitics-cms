@@ -1,7 +1,7 @@
 // library/authentication/authenticationService.js
 // Authentication service based on Zend Framework Authentication\AuthenticationService
 
-const SessionStorage = require('./storage/session');
+const SessionStorage = require('./storage/session-storage');
 
 /**
  * Authentication Service

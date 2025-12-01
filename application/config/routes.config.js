@@ -53,7 +53,7 @@ module.exports = {
             "action": "delete"
         },
         "adminLoginLogout": {
-            "route": "/admin/posts/logout",
+            "route": "/admin/logout",
             "module": "admin",
             "controller": "login",
             "action": "logout"

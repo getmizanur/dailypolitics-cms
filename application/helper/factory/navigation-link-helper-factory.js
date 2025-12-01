@@ -11,10 +11,12 @@ class NavigationLinkHelperFactory extends AbstractViewHelperFactory {
      * Create NavigationLinkHelper
      * @returns {NavigationLinkHelper} NavigationLinkHelper instance
      */
-    createService() {
-        // Create NavigationLinkHelper instance
-        // No dependencies needed - it checks authentication directly from global.locals.expressSession
-        return new NavigationLinkHelper();
+    createService(serviceManager) {
+        // Get AuthenticationService
+        const authService = serviceManager.get('AuthenticationService');
+
+        // Create NavigationLinkHelper instance with dependency
+        return new NavigationLinkHelper(authService);
     }
 
 }

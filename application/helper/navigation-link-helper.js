@@ -7,8 +7,9 @@ const AbstractHelper = require(global.applicationPath('/library/mvc/view/helper/
  */
 class NavigationLinkHelper extends AbstractHelper {
 
-    constructor() {
+    constructor(authService) {
         super();
+        this.authService = authService;
     }
 
     /**
@@ -20,16 +21,8 @@ class NavigationLinkHelper extends AbstractHelper {
         this._extractContext(args);
 
         try {
-            // Check directly in global.locals.expressSession which is set during requests
-            if (typeof global !== 'undefined' && global.locals && global.locals.expressSession) {
-                const session = global.locals.expressSession;
-
-                // Check if AuthIdentity exists and has an identity
-                if (session.customData &&
-                    session.customData.AuthIdentity &&
-                    session.customData.AuthIdentity.identity) {
-                    return true;
-                }
+            if (this.authService && this.authService.hasIdentity()) {
+                return true;
             }
 
             return false;
