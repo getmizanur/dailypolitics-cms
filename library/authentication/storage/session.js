@@ -1,36 +1,31 @@
 // library/authentication/storage/session.js
-// Session-based storage for authentication identity using generic SessionContainer
-
-const SessionContainer = require('../../session/session-container');
+// Session-based storage for authentication identity
+// Stores directly in express-session for maximum compatibility
 
 /**
  * Session Storage
- * Stores authentication identity in session using the generic SessionContainer
- * This is a specialized adapter that provides authentication-specific interface
- * while delegating storage to the reusable SessionContainer class
+ * Stores authentication identity directly in express-session
+ * Simple and reliable approach that works with both file and Redis stores
  */
 class Session {
     /**
-     * Session namespace for authentication
+     * Session key for storing identity
      * @type {string}
      */
-    static NAMESPACE = 'AuthIdentity';
-
-    /**
-     * Key for storing identity data within the namespace
-     * @type {string}
-     */
-    static IDENTITY_KEY = 'identity';
+    static IDENTITY_KEY = 'authIdentity';
 
     /**
      * Constructor
-     * @param {Object} session - Express-session req.session instance (optional)
+     * @param {Object} expressSession - Express-session req.session instance
      */
-    constructor(session = null) {
-        // Use SessionContainer for actual storage management
-        // If session not provided, Container will use global.locals.expressSession
-        /** @type {SessionContainer} */
-        this.container = new SessionContainer(Session.NAMESPACE, session);
+    constructor(expressSession = null) {
+        // Store the express session reference directly
+        this.expressSession = expressSession;
+
+        // Fallback to global.locals.expressSession if not provided
+        if (!this.expressSession && global.locals && global.locals.expressSession) {
+            this.expressSession = global.locals.expressSession;
+        }
     }
 
     /**
@@ -38,7 +33,21 @@ class Session {
      * @returns {boolean}
      */
     isEmpty() {
-        return !this.container.has(Session.IDENTITY_KEY);
+        if (!this.expressSession) {
+            console.log(`[SessionStorage.isEmpty] No express session available, returning: true`);
+            return true;
+        }
+
+        const hasIdentity = this.expressSession.hasOwnProperty(Session.IDENTITY_KEY) &&
+                           this.expressSession[Session.IDENTITY_KEY] !== null &&
+                           this.expressSession[Session.IDENTITY_KEY] !== undefined;
+
+        console.log(`[SessionStorage.isEmpty] session.${Session.IDENTITY_KEY} exists: ${hasIdentity}, returning: ${!hasIdentity}`);
+        if (hasIdentity) {
+            console.log(`[SessionStorage.isEmpty] Identity value:`, JSON.stringify(this.expressSession[Session.IDENTITY_KEY]));
+        }
+
+        return !hasIdentity;
     }
 
     /**
@@ -46,7 +55,14 @@ class Session {
      * @returns {*|null}
      */
     read() {
-        return this.container.get(Session.IDENTITY_KEY, null);
+        if (!this.expressSession) {
+            console.log(`[SessionStorage.read] No express session available`);
+            return null;
+        }
+
+        const identity = this.expressSession[Session.IDENTITY_KEY] || null;
+        console.log(`[SessionStorage.read] Returning identity:`, identity ? 'EXISTS' : 'NULL');
+        return identity;
     }
 
     /**
@@ -54,14 +70,53 @@ class Session {
      * @param {*} contents - Data to store
      */
     write(contents) {
-        this.container.set(Session.IDENTITY_KEY, contents);
+        if (!this.expressSession) {
+            console.error(`[SessionStorage.write] No express session available!`);
+            return;
+        }
+
+        console.log(`[SessionStorage.write] *** IDENTITY BEING WRITTEN ***`);
+        console.log(`[SessionStorage.write] Session ID:`, this.expressSession.id);
+        console.log(`[SessionStorage.write] Writing identity to session.${Session.IDENTITY_KEY}`);
+        console.log(`[SessionStorage.write] Identity data:`, JSON.stringify(contents));
+        console.log(`[SessionStorage.write] Call stack:`);
+        console.trace();
+
+        this.expressSession[Session.IDENTITY_KEY] = contents;
+
+        // Touch the session to mark it as modified
+        this.expressSession._modifiedAt = Date.now();
+
+        console.log(`[SessionStorage.write] Identity written, session.${Session.IDENTITY_KEY}:`,
+                   this.expressSession[Session.IDENTITY_KEY] ? 'EXISTS' : 'NULL');
     }
 
     /**
      * Clears contents from storage
      */
     clear() {
-        this.container.remove(Session.IDENTITY_KEY);
+        if (!this.expressSession) {
+            console.log(`[SessionStorage.clear] No express session available`);
+            return;
+        }
+
+        console.log(`[SessionStorage.clear] Clearing identity from session.${Session.IDENTITY_KEY}`);
+        console.log(`[SessionStorage.clear] Session before delete:`, JSON.stringify(this.expressSession));
+
+        delete this.expressSession[Session.IDENTITY_KEY];
+
+        // CRITICAL: Force express-session to recognize this as a modification
+        // With resave:false, we must explicitly touch the session
+        if (typeof this.expressSession.touch === 'function') {
+            this.expressSession.touch();
+            console.log(`[SessionStorage.clear] Session touched via touch() method`);
+        }
+
+        // Also set a modification timestamp as backup
+        this.expressSession._modifiedAt = Date.now();
+
+        console.log(`[SessionStorage.clear] Session after delete:`, JSON.stringify(this.expressSession));
+        console.log(`[SessionStorage.clear] authIdentity should be undefined:`, this.expressSession[Session.IDENTITY_KEY]);
     }
 }
 

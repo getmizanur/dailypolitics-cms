@@ -31,7 +31,7 @@ class LoginController extends Controller {
     }
 
     async indexAction() {
-        return this.loginAction();
+        return await this.loginAction();
     }
 
     async loginAction() {
@@ -205,29 +205,31 @@ class LoginController extends Controller {
     }
 
     async logoutAction() {
-        // Initialize authentication service
-        const authService = this.getServiceManager().get('AuthenticationService');
+        console.log('==========================================');
+        console.log('[LogoutAction] START - User attempting to logout');
+        console.log('==========================================');
 
-        // Clear identity
-        authService.clearIdentity();
+        const expressRequest = this.getRequest().getExpressRequest();
+        const oldSessionId = expressRequest.session.id;
+        console.log('[LogoutAction] Current session ID:', oldSessionId);
 
-        // Explicitly save session before redirect
-        // IMPORTANT: Must await to ensure session is persisted before redirect
-        const expressSession = this.getSession();
+        // Destroy the session completely
         await new Promise((resolve, reject) => {
-            expressSession.save((err) => {
+            expressRequest.session.destroy((err) => {
                 if (err) {
-                    console.error('[Logout] Session save error:', err);
+                    console.error('[LogoutAction] Session destroy error:', err);
                     reject(err);
                 } else {
-                    console.log('[Logout] Session saved successfully after clearing identity');
+                    console.log('[LogoutAction] Session destroyed successfully, ID was:', oldSessionId);
                     resolve();
                 }
             });
         });
 
-        // Add success message
-        super.plugin('flashMessenger').addSuccessMessage('You have been logged out successfully');
+        console.log('[LogoutAction] Redirecting to login page...');
+        console.log('==========================================');
+        console.log('[LogoutAction] END');
+        console.log('==========================================');
 
         // Redirect to login page
         return this.plugin('redirect').toRoute('adminLoginIndex');

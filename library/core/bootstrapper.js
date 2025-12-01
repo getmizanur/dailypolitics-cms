@@ -208,27 +208,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
         if (req.hasOwnProperty('session')) {
             Session.start(req);
 
-            // Initialize global session if it doesn't exist
-            if (!global.locals.session) {
-                global.locals.session = {};
-            }
-
-            // Merge express-session data with global session data, excluding read-only properties
-            const sessionCopy = {};
-            Object.keys(req.session).forEach(key => {
-                if (key !== 'id' && key !== 'cookie') {
-                    sessionCopy[key] = req.session[key];
-                }
-            });
-            global.locals.session = Object.assign({}, sessionCopy, global.locals.session);
-
-            // Ensure no read-only properties get copied accidentally
-            if (global.locals.session.hasOwnProperty('id')) {
-                delete global.locals.session.id;
-            }
-
-            // Also store a reference to the raw req.session for direct access
-            global.locals.expressSession = req.session;
+            //Session.start(req);
         }
 
         console.log("===Bootstrapper===");
@@ -325,19 +305,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
             }
         }
 
-        // Sync any changes from global session back to express-session
-        if (global.locals && global.locals.session && global.locals.expressSession) {
-            // Only copy custom data, avoid overwriting express-session built-in properties
-            Object.keys(global.locals.session).forEach(key => {
-                if (key !== 'cookie' && key !== 'id') {
-                    try {
-                        global.locals.expressSession[key] = global.locals.session[key];
-                    } catch (error) {
-                        console.warn(`Could not sync session property '${key}':`, error.message);
-                    }
-                }
-            });
-        }
+
 
         if (front.getResponse().isRedirect()) {
             let location = front.getResponse().getHeader('Location');
@@ -355,7 +323,7 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
                 if (statusCode) {
                     res.status(statusCode);
                 }
-                
+
                 // BEFORE you render the view, prepare flash messages:
                 front.prepareFlashMessenger();
 

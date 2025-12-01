@@ -130,7 +130,15 @@ class AuthenticationService {
      * @returns {void}
      */
     clearIdentity() {
-        this.getStorage().clear();
+        console.log('[AuthenticationService.clearIdentity] Called');
+        console.log('[AuthenticationService.clearIdentity] Has identity before clear:', this.hasIdentity());
+
+        const storage = this.getStorage();
+        console.log('[AuthenticationService.clearIdentity] Storage obtained:', storage.constructor.name);
+
+        storage.clear();
+        console.log('[AuthenticationService.clearIdentity] Storage.clear() called');
+        console.log('[AuthenticationService.clearIdentity] Has identity after clear:', this.hasIdentity());
     }
 }
 

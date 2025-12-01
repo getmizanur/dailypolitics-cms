@@ -116,10 +116,30 @@ class SessionContainer {
      * Clear all data in the container
      */
     clear() {
+        console.log(`[SessionContainer:${this.name}] clear() called`);
+        console.log(`[SessionContainer:${this.name}] _expressSession exists:`, !!this._expressSession);
+        console.log(`[SessionContainer:${this.name}] global.locals.expressSession exists:`, !!(global.locals && global.locals.expressSession));
+
         const data = this._getData(false);
+        console.log(`[SessionContainer:${this.name}] Data before clear:`, JSON.stringify(data));
+
         if (data) {
-            Object.keys(data).forEach(key => delete data[key]);
+            const keys = Object.keys(data);
+            console.log(`[SessionContainer:${this.name}] Clearing ${keys.length} keys:`, keys);
+            keys.forEach(key => {
+                console.log(`[SessionContainer:${this.name}] Deleting key: ${key}`);
+                delete data[key];
+            });
         }
+
+        console.log(`[SessionContainer:${this.name}] Data after clear:`, JSON.stringify(data));
+
+        if (this._expressSession) {
+            console.log(`[SessionContainer:${this.name}] Session[${this.name}] after clear:`, JSON.stringify(this._expressSession[this.name]));
+            this._expressSession._modifiedAt = Date.now();
+            console.log(`[SessionContainer:${this.name}] Touched _modifiedAt:`, this._expressSession._modifiedAt);
+        }
+
         return this;
     }
 
