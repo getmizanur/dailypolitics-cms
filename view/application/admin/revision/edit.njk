@@ -30,7 +30,7 @@
                 </div>
             </div>
             {% endif %}
-            test
+            
             {{ form().openTag(f) }}
 
                 {{ formHidden(f.get('id')) | safe }}
@@ -87,12 +87,7 @@
                 <div class="form-group">
                     <div class="dp-button-group">
                         <div class="dp-button-group__left">
-                            {% if f.get('create_revision_draft') %}
-                                {{ formSubmit(f.get('create_revision_draft')) | safe }}
-                            {% endif %}
-                            {% if f.get('continue_revision_draft') %}
-                                {{ formSubmit(f.get('continue_revision_draft')) | safe }}
-                            {% endif %}
+                            {{ formSubmit(f.get('create_revision_draft')) | safe }}
                             {% if f.get('unpublish') %}
                                 {{ formSubmit(f.get('unpublish')) | safe }}
                             {% endif %}

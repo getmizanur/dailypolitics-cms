@@ -7,13 +7,14 @@
       <div class="col-sm-12 col-md-12">
         <div class="card admin-dashboard-card dp-pt-0" itemscope itemtype="https://schema.org/Table">
             {# Inset text #}
-            <div class="dp-inset-text dp-inset-text--success">
+            <div class="dp-inset-text dp-inset-text--yellow">
                 <p>
-                    You’re viewing a <strong class="key-term">published post</strong>.
-                    Any changes must be made in a
-                    <strong class="key-term">revision draft</strong>.
-                    Create a <strong class="key-term">revision draft</strong> to update the
-                    <strong class="key-term">live version</strong>.
+                    You’re working on a
+                    <strong class="key-term__2">revision draft</strong>.
+                    Changes here will not affect the
+                    <strong class="key-term__2">live post</strong>
+                    until you
+                    <strong class="key-term__2">publish the revision</strong>.
                 </p>
             </div>
 
@@ -30,22 +31,14 @@
                 </div>
             </div>
             {% endif %}
-            test
+            
             {{ form().openTag(f) }}
-
-                {{ formHidden(f.get('id')) | safe }}
                 {{ formHidden(f.get('author_id')) | safe }}
 
                 <div class="form-group{% if errorDecorator(f.get('title')) %} dp-form-group--error{% endif %}">
                     {{ formLabel(f.get('title')) | safe }}
                     {{ formError(f.get('title')) | safe }}
                     {{ formText(f.get('title')) | safe }}
-                </div>
-
-                <div class="form-group{% if errorDecorator(f.get('slug')) %} dp-form-group--error{% endif %}">
-                    {{ formLabel(f.get('slug')) | safe }}
-                    {{ formError(f.get('slug')) | safe }}
-                    {{ formText(f.get('slug')) | safe }}
                 </div>
 
                 <div class="form-group{% if errorDecorator(f.get('excerpt_markdown')) %} dp-form-group--error{% endif %}">
@@ -87,15 +80,9 @@
                 <div class="form-group">
                     <div class="dp-button-group">
                         <div class="dp-button-group__left">
-                            {% if f.get('create_revision_draft') %}
-                                {{ formSubmit(f.get('create_revision_draft')) | safe }}
-                            {% endif %}
-                            {% if f.get('continue_revision_draft') %}
-                                {{ formSubmit(f.get('continue_revision_draft')) | safe }}
-                            {% endif %}
-                            {% if f.get('unpublish') %}
-                                {{ formSubmit(f.get('unpublish')) | safe }}
-                            {% endif %}
+                            {{ formSubmit(f.get('save_revision_draft')) | safe }}
+                            {{ formSubmit(f.get('publish_revision')) | safe }}
+                            {{ formSubmit(f.get('delete_draft')) | safe }}
                         </div>
                         <div class="dp-button-group__right">
                             <a href="{{ url('adminDashboardIndex') }}" class="dp-button--cancel">Cancel</a>

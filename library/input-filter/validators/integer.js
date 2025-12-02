@@ -45,7 +45,27 @@ class Integer extends AbstractValidator {
     }
 
     isValid(value) {
-        if(!Number.isInteger(parseInt(value))) {
+        // Check if value is null or undefined
+        if (value === null || value === undefined) {
+            this.message = this.messageTemplate.NOT_INT;
+            return false;
+        }
+
+        // Convert to string and trim whitespace
+        const stringValue = String(value).trim();
+
+        // Check if the string matches integer pattern (optional negative sign followed by digits)
+        const integerPattern = /^-?\d+$/;
+        if (!integerPattern.test(stringValue)) {
+            this.message = this.messageTemplate.NOT_INT;
+            return false;
+        }
+
+        // Parse to integer for range validation
+        const intValue = parseInt(stringValue, 10);
+
+        // Additional check: ensure parseInt didn't produce NaN
+        if (!Number.isInteger(intValue)) {
             this.message = this.messageTemplate.NOT_INT;
             return false;
         }
@@ -58,12 +78,12 @@ class Integer extends AbstractValidator {
             this.setMax(this.max);
         }
 
-        if(this.min &&  value < this.min) {
+        if(this.min && intValue < this.min) {
             this.message = this.messageTemplate.NOT_GREATER;
             return false;
         }
 
-        if(this.max && value > this.max) {
+        if(this.max && intValue > this.max) {
             this.message = this.messageTemplate.NOT_LESS;
             return false;
         }

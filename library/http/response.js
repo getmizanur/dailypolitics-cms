@@ -27,7 +27,7 @@ class Response {
 
         let filtered = StringUtil.strReplace('/-/_/gi', ' ', name);
         filtered = StringUtil.ucwords(StringUtil.strtolower(filtered));
-	    filtered = StringUtil.strReplace(' ', '-', filtered);
+        filtered = StringUtil.strReplace(' ', '-', filtered);
 
         return filtered;
     }
@@ -44,12 +44,12 @@ class Response {
 
         name = this._normalizeHeaders(name);
 
-        if(replace) {
-           Object.keys(this.headers).forEach((key) => {
-               if(name === key) {
-                   delete this.headers[key];
-               }
-           });
+        if (replace) {
+            Object.keys(this.headers).forEach((key) => {
+                if (name === key) {
+                    delete this.headers[key];
+                }
+            });
         }
 
         this.headers[name] = value;
@@ -134,13 +134,13 @@ class Response {
      * @returns {Response} For method chaining
      */
     setHttpResponseCode(code) {
-        if(!VarUtil.isInt(code) || (100 > code) || (599 < code)) {
+        if (!VarUtil.isInt(code) || (100 > code) || (599 < code)) {
             throw new Error('Invalid HTTP response code');
         }
 
-        if((300 <= code) && (307 >= code)) {
+        if ((300 <= code) && (307 >= code)) {
             this.redirected = true;
-        }else{
+        } else {
             this.redirected = false;
         }
 
@@ -163,12 +163,14 @@ class Response {
      * @returns {boolean} True if headers already sent
      */
     canSendHeaders(headersSent = false) {
-        if(this.sendHeaders === false && headersSent === true) {
+        if (this.sendHeaders === false && headersSent === true) {
             this.sendHeaders = headersSent;
         }
 
         return this.sendHeaders;
     }
+
+
 
 }
 

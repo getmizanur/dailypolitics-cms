@@ -35,7 +35,13 @@ module.exports = {
             "action": "view"
         },
         "adminDashboardEdit": {
-            "route": "/admin/posts/:slug/edit",
+            "route": "/admin/posts/:id/edit",
+            "module": "admin",
+            "controller": "post",
+            "action": "edit"
+        },
+        "adminDashboardEdit": {
+            "route": "/admin/posts/:id/edit",
             "module": "admin",
             "controller": "post",
             "action": "edit"
@@ -58,6 +64,22 @@ module.exports = {
             "controller": "login",
             "action": "logout"
         },
+
+
+        "adminRevisionNew": {
+            "route": "/admin/posts/:post_id/revisions/new",
+            "module": "admin",
+            "controller": "revision",
+            "action": "new"
+        },
+
+         "adminRevisionEdit": {
+            "route": "/admin/posts/:post_id/revisions/:id/edit",
+            "module": "admin",
+            "controller": "revision",
+            "action": "edit"
+        },
+
 
         // Blog section routes
         "blogIndexIndex": {

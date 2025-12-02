@@ -227,7 +227,8 @@ module.exports = {
         "factories": {
             "AuthenticationService": "/application/service/factory/authentication-service-factory",
             "Database": "/application/service/factory/database-factory",
-            "PostService": "/application/service/factory/post-service-factory"
+            "PostService": "/application/service/factory/post-service-factory",
+            "PostRevisionService": "/application/service/factory/post-revision-service-factory"
         }
     },
     

@@ -10,12 +10,27 @@ const Submit = require(
 const Csrf = require(
     global.applicationPath('/library/form/element/csrf'));
 
-
+/**
+ * LoginForm - Form for user authentication
+ * Extends the base Form class to provide login functionality
+ * with username/email, password, and CSRF protection
+ */
 class LoginForm extends Form {
+    /**
+     * Constructor
+     * @param {Object} options - Form options (action, method, etc.)
+     */
     constructor(options = {}) {
         super(options);
     }
 
+    /**
+     * Add username field (text input)
+     * Creates a text input field for username or email address
+     * Styled with 'dp-input' class for consistent appearance
+     * @param {string} name - Field name (default: 'username')
+     * @returns {void}
+     */
     addUsernameField(name = 'username') {
         const element = new Text(name);
         element.setLabel('Username');
@@ -27,6 +42,13 @@ class LoginForm extends Form {
         this.add(element);
     }
 
+    /**
+     * Add password field (password input)
+     * Creates a password input field with masked character display
+     * Styled with 'dp-input' class for consistent appearance
+     * @param {string} name - Field name (default: 'password')
+     * @returns {void}
+     */
     addPasswordField(name = 'password') {
         const element = new Password(name);
         element.setLabel('Password');
@@ -38,6 +60,13 @@ class LoginForm extends Form {
         this.add(element);
     }
 
+    /**
+     * Add submit button
+     * Creates a submit button with "Login" label
+     * Styled with 'dp-button' class for consistent appearance
+     * @param {string} name - Button name (default: 'submit')
+     * @returns {void}
+     */
     addSubmitButton(name = 'submit') {
         const element = new Submit(name);
         element.setValue('Login');
@@ -47,10 +76,18 @@ class LoginForm extends Form {
         this.add(element);
     }
 
+    /**
+     * Add CSRF protection field
+     * Creates a hidden CSRF token field to prevent cross-site request forgery attacks
+     * The token is validated on form submission to ensure request authenticity
+     * @param {string} name - Field name (default: 'csrf')
+     * @param {Object} options - CSRF options (token generation settings)
+     * @returns {string} The generated CSRF token
+     */
     addCsrfField(name = 'csrf', options = {}) {
         const element = new Csrf(name, options);
         this.add(element);
-        // Optionally, return the token for session storage
+        // Return the token for session storage or validation
         return element.getToken();
     }
 }

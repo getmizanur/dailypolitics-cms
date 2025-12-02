@@ -1,0 +1,9 @@
+.pagination a {
+	color: #1d70b8 !important
+}
+
+.page-item.active .page-link {
+	background-color: #1d70b8 !important;
+	border-color: #1d70b8 !important;
+	color: #ffffff !important;
+}

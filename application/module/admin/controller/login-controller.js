@@ -1,24 +1,48 @@
-const Controller = require(global.applicationPath('/library/mvc/controller/base-controller'));
-const LoginForm = require(global.applicationPath('/application/form/login-form'));
+const Controller = require(
+    global.applicationPath('/library/mvc/controller/base-controller'));
+const LoginForm = require(
+    global.applicationPath('/application/form/login-form'));
 const InputFilter = require(
     global.applicationPath('/library/input-filter/input-filter'));
-const DbAdapter = require(global.applicationPath('/library/authentication/adapter/db-adapter'));
+const DbAdapter = require(
+    global.applicationPath('/library/authentication/adapter/db-adapter'));
 
+/**
+ * LoginController - Handles user authentication for admin area
+ * Manages login, logout, and authentication checks for admin users
+ * Uses database adapter for credential verification and Redis session storage
+ * Extends the base Controller class to provide authentication functionality
+ */
 class LoginController extends Controller {
 
+    /**
+     * Constructor
+     * @param {Object} options - Controller options
+     */
     constructor(options = {}) {
         super(options);
     }
 
+    /**
+     * Pre-dispatch hook - Runs before every action
+     * Checks authentication for protected actions (all except login/index)
+     * Redirects unauthenticated users to login page
+     * Sets page title helper with 'Admin' suffix for all admin pages
+     * @returns {Response|undefined} Redirect response if not authenticated,
+     *                                undefined otherwise
+     */
     preDispatch() {
         // Check authentication for all actions except login and index
         const actionName = this.getRequest().getActionName();
 
-        if (actionName !== 'indexAction' && actionName !== 'loginAction') {
-            const authService = this.getServiceManager().get('AuthenticationService');
+        if (actionName !== 'indexAction' &&
+            actionName !== 'loginAction') {
+            const authService = this.getServiceManager()
+                .get('AuthenticationService');
 
             if (!authService.hasIdentity()) {
-                super.plugin('flashMessenger').addErrorMessage('You must be logged in to access this page');
+                super.plugin('flashMessenger').addErrorMessage(
+                    'You must be logged in to access this page');
                 return this.plugin('redirect').toRoute('adminLoginIndex');
             }
         }
@@ -27,22 +51,44 @@ class LoginController extends Controller {
         //const viewModel = this.getView();
         //const headTitle = viewModel.getHelper('headTitle');
         //headTitle.append('Admin');
-        this.getServiceManager().get('ViewHelperManager').get('headTitle').append('Admin');
+        this.getServiceManager().get('ViewHelperManager')
+            .get('headTitle').append('Admin');
     }
 
+    /**
+     * Index action - Default action for login route
+     * Delegates to loginAction to display login form
+     * @returns {Promise<Response>} Result from loginAction
+     */
     async indexAction() {
         return await this.loginAction();
     }
 
+    /**
+     * Login action - Handles user authentication
+     * Displays login form on GET request
+     * Processes login credentials on POST request
+     * Validates username (email) and password using InputFilter
+     * Authenticates against database using DbAdapter
+     * Writes user identity to Redis session on successful authentication
+     * Redirects to admin dashboard on success
+     * Shows error messages on validation or authentication failure
+     * @returns {Promise<Response|ViewModel>} Redirect response on success,
+     *                                         or ViewModel with login form
+     */
     async loginAction() {
         // Initialize authentication service
-        const authService = this.getServiceManager().get('AuthenticationService');
+        const authService = this.getServiceManager()
+            .get('AuthenticationService');
 
         // Get express session
         const expressSession = this.getSession();
 
-        console.log('Session ID:', expressSession ? expressSession.id : 'NO SESSION');
-        console.log('Session.AuthIdentity:', expressSession ? JSON.stringify(expressSession.AuthIdentity) : 'NO SESSION');
+        console.log('Session ID:',
+            expressSession ? expressSession.id : 'NO SESSION');
+        console.log('Session.AuthIdentity:',
+            expressSession ?
+                JSON.stringify(expressSession.AuthIdentity) : 'NO SESSION');
 
         // Check if user is already authenticated - redirect to dashboard
         if (authService.hasIdentity()) {
@@ -71,7 +117,8 @@ class LoginController extends Controller {
                         name: 'EmailAddress',
                         messages: {
                             INVALID: `Invalid type given. String expected`,
-                            INVALID_FORMAT: `The username is not a valid email address`
+                            INVALID_FORMAT:
+                                `The username is not a valid email address`
                         }
                     }
                 ]
@@ -107,7 +154,8 @@ class LoginController extends Controller {
                     const values = form.getData();
                     console.log('Starting authentication...');
                     const db = this.getServiceManager().get('Database');
-                    console.log('Database adapter retrieved:', db.constructor.name);
+                    console.log('Database adapter retrieved:',
+                        db.constructor.name);
 
                     // Connect to database if not already connected
                     if (!db.connection) {
@@ -116,56 +164,79 @@ class LoginController extends Controller {
                         console.log('Database connected successfully');
                     }
 
-                    const adapter = new DbAdapter(db, 'users', 'email', 'password_hash', 'password_salt');
+                    const adapter = new DbAdapter(
+                        db,
+                        'users',
+                        'email',
+                        'password_hash',
+                        'password_salt');
                     adapter.setUsername(values.username);
                     adapter.setPassword(values.password);
 
-                    console.log('Attempting authentication for user:', values.username);
+                    console.log('Attempting authentication for user:',
+                        values.username);
 
                     authService.setAdapter(adapter);
                     const result = await authService.authenticate();
 
-                    console.log('Authentication result:', result.getCode(), result.getMessages());
+                    console.log('Authentication result:',
+                        result.getCode(), result.getMessages());
 
                     if (result.isValid()) {
                         // Authentication successful
                         console.log('Authentication successful');
 
-                        // Write identity to session (without regeneration for now)
+                        // Write identity to session
+                        // (without regeneration for now)
                         const identity = result.getIdentity();
                         const authStorage = authService.getStorage();
                         authStorage.write(identity);
                         console.log('Identity written to session');
-                        console.log('Session.AuthIdentity after write:', JSON.stringify(expressSession.AuthIdentity));
+                        console.log('Session.AuthIdentity after write:',
+                            JSON.stringify(expressSession.AuthIdentity));
 
                         // Explicitly save session before redirect
-                        // IMPORTANT: Must await to ensure session is persisted before redirect
+                        // IMPORTANT: Must await to ensure session is
+                        // persisted before redirect
                         await new Promise((resolve, reject) => {
                             expressSession.save((err) => {
                                 if (err) {
-                                    console.error('[Login] Session save error:', err);
+                                    console.error(
+                                        '[Login] Session save error:', err);
                                     reject(err);
                                 } else {
-                                    console.log('[Login] Session saved successfully');
+                                    console.log(
+                                        '[Login] Session saved successfully');
                                     resolve();
                                 }
                             });
                         });
 
-                        super.plugin('flashMessenger').addSuccessMessage('Login successful');
-                        const redirectResponse = this.plugin('redirect').toRoute('adminDashboardIndex');
-                        console.log('Redirect response created:', redirectResponse ? 'YES' : 'NO');
-                        console.log('Redirect URL:', redirectResponse ? redirectResponse.getHeader('Location') : 'NONE');
-                        console.log('Is redirect?:', redirectResponse ? redirectResponse.isRedirect() : 'NONE');
+                        super.plugin('flashMessenger')
+                            .addSuccessMessage('Login successful');
+                        const redirectResponse = this.plugin('redirect')
+                            .toRoute('adminDashboardIndex');
+                        console.log('Redirect response created:',
+                            redirectResponse ? 'YES' : 'NO');
+                        console.log('Redirect URL:',
+                            redirectResponse ?
+                                redirectResponse.getHeader('Location') :
+                                'NONE');
+                        console.log('Is redirect?:',
+                            redirectResponse ?
+                                redirectResponse.isRedirect() : 'NONE');
                         return redirectResponse;
                     } else {
                         // Authentication failed - show generic error
                         console.log('Authentication failed');
-                        super.plugin('flashMessenger').addErrorMessage('Authentication unsuccessful');
+                        super.plugin('flashMessenger')
+                            .addErrorMessage('Authentication unsuccessful');
                     }
                 } catch (error) {
                     console.error('Authentication error:', error);
-                    super.plugin('flashMessenger').addErrorMessage('An error occurred during authentication: ' + error.message);
+                    super.plugin('flashMessenger').addErrorMessage(
+                        'An error occurred during authentication: ' +
+                        error.message);
                 }
             } else {
                 // After form.isValid() returns false
@@ -174,7 +245,8 @@ class LoginController extends Controller {
 
                 Object.keys(formMessages).forEach((fieldName) => {
                     if (form.has(fieldName)) {
-                        form.get(fieldName).setMessages(formMessages[fieldName]);
+                        form.get(fieldName)
+                            .setMessages(formMessages[fieldName]);
                     }
                 });
 
@@ -183,7 +255,8 @@ class LoginController extends Controller {
                 Object.keys(formMessages).forEach((fieldName) => {
                     const fieldMessages = formMessages[fieldName];
                     if (Array.isArray(fieldMessages)) {
-                        errorMessages = errorMessages.concat(fieldMessages);
+                        errorMessages =
+                            errorMessages.concat(fieldMessages);
                     } else {
                         errorMessages.push(fieldMessages);
                     }
@@ -192,18 +265,27 @@ class LoginController extends Controller {
                 // Add validation error messages to flash messenger
                 if (errorMessages.length > 0) {
                     errorMessages.forEach((message) => {
-                        super.plugin('flashMessenger').addErrorMessage(message);
+                        super.plugin('flashMessenger')
+                            .addErrorMessage(message);
                     });
                 }
             }
 
         }
 
-        // Pass form and token to the view (adjust as needed for your view system)
+        // Pass form and token to the view
+        // (adjust as needed for your view system)
         return this.getView()
             .setVariable('loginForm', form);
     }
 
+    /**
+     * Logout action - Terminates user session
+     * Destroys the Express session completely (removes from Redis store)
+     * Redirects user to login page after successful logout
+     * Logs session destruction details for debugging
+     * @returns {Promise<Response>} Redirect response to login page
+     */
     async logoutAction() {
         console.log('==========================================');
         console.log('[LogoutAction] START - User attempting to logout');
@@ -217,10 +299,13 @@ class LoginController extends Controller {
         await new Promise((resolve, reject) => {
             expressRequest.session.destroy((err) => {
                 if (err) {
-                    console.error('[LogoutAction] Session destroy error:', err);
+                    console.error('[LogoutAction] Session destroy error:',
+                        err);
                     reject(err);
                 } else {
-                    console.log('[LogoutAction] Session destroyed successfully, ID was:', oldSessionId);
+                    console.log(
+                        '[LogoutAction] Session destroyed successfully, ' +
+                        'ID was:', oldSessionId);
                     resolve();
                 }
             });

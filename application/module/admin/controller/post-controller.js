@@ -1,50 +1,95 @@
-const Controller = require(global.applicationPath('/library/mvc/controller/base-controller'));
-const ArticleForm = require(global.applicationPath('/application/form/article-form'));
-const SessionContainer = require(global.applicationPath('/library/session/session-container'));
-const InputFilter = require(global.applicationPath('/library/input-filter/input-filter'));
-const VarUtil = require(global.applicationPath('/library/util/var-util'));
-const JsonUtil = require(global.applicationPath('/library/util/json-util'));
+const Controller = require(
+    global.applicationPath('/library/mvc/controller/base-controller'));
+const ArticleForm = require(
+    global.applicationPath('/application/form/article-form'));
+const SessionContainer = require(
+    global.applicationPath('/library/session/session-container'));
+const InputFilter = require(
+    global.applicationPath('/library/input-filter/input-filter'));
+const VarUtil = require(
+    global.applicationPath('/library/util/var-util'));
+const JsonUtil = require(
+    global.applicationPath('/library/util/json-util'));
 const fs = require('fs');
 const PostEntity = require('../../../entity/post-entity');
 
-class DashboardController extends Controller {
+/**
+ * PostController - Manages blog post CRUD operations for admin area
+ * Handles creating new posts, editing published posts via revisions,
+ * listing posts with pagination, and post status management
+ * Uses PostService for database operations and PostEntity for validation
+ * Extends the base Controller class
+ */
+class PostController extends Controller {
 
+    /**
+     * Constructor
+     * @param {Object} options - Controller options
+     */
     constructor(options = {}) {
         super(options);
     }
 
+    /**
+     * Pre-dispatch hook - Runs before every action
+     * Checks authentication for all post management actions
+     * Redirects unauthenticated users to login page
+     * Sets page title helper with 'Admin' suffix
+     * @returns {Response|undefined} Redirect response if not authenticated
+     */
     preDispatch() {
         console.log('[DashboardController.preDispatch] Called');
         // Check authentication
-        const authService = this.getServiceManager().get('AuthenticationService');
+        const authService = this.getServiceManager()
+            .get('AuthenticationService');
         if (!authService.hasIdentity()) {
-            super.plugin('flashMessenger').addErrorMessage('You must be logged in to access this page');
+            super.plugin('flashMessenger').addErrorMessage(
+                'You must be logged in to access this page');
             return this.plugin('redirect').toRoute('adminLoginIndex');
         }
-        console.log('[DashboardController.preDispatch] About to append Admin to headTitle');
-        this.getServiceManager().get('ViewHelperManager').get('headTitle').append('Admin');
+        console.log(
+            '[DashboardController.preDispatch] About to append Admin ' +
+            'to headTitle');
+        this.getServiceManager().get('ViewHelperManager')
+            .get('headTitle').append('Admin');
         console.log('[DashboardController.preDispatch] Finished');
     }
 
+    /**
+     * Index action - Default action for post management
+     * Delegates to listAction to display post list
+     * @returns {Promise<Response|ViewModel>} Result from listAction
+     */
     async indexAction() {
         return this.listAction();
     }
 
+    /**
+     * List action - Displays paginated list of posts
+     * Shows posts with all statuses (draft, published, archived)
+     * Fetches posts and total count for pagination calculation
+     * Supports page parameter from route for pagination
+     * Displays 5 posts per page with numbered pagination
+     * @returns {Promise<ViewModel>} View with posts and pagination data
+     */
     async listAction() {
         try {
             const postService = this.getServiceManager().get('PostService');
-            const page = parseInt(this.plugin('params').fromRoute('page')) || 1;
+            const page = parseInt(
+                this.plugin('params').fromRoute('page')) || 1;
             const limit = 5;
             const offset = (page - 1) * limit;
 
             // Fetch posts with all statuses and total count for pagination
             const [posts, totalCount] = await Promise.all([
-                postService.getAllPostsWithStatus(['draft', 'published', 'archived'], limit, offset),
+                postService.getAllPostsWithStatus(
+                    ['draft', 'published', 'archived'], limit, offset),
                 postService.getPostCount({ includeDrafts: true })
             ]);
 
             // Get recent posts for sidebar
-            const recentPosts = await postService.getRecentPostsForSidebar();
+            const recentPosts = await postService
+                .getRecentPostsForSidebar();
 
             // Calculate pagination
             const totalPages = Math.ceil(totalCount / limit);
@@ -57,7 +102,8 @@ class DashboardController extends Controller {
                 });
             }
 
-            const baseUrl = this.helper('url').fromRoute('adminDashboardIndex');
+            const baseUrl = this.helper('url')
+                .fromRoute('adminDashboardIndex');
             // Set view variables
             this.getView()
                 .setVariable('posts', posts)
@@ -76,6 +122,20 @@ class DashboardController extends Controller {
         }
     }
 
+    /**
+     * New action - Creates a new blog post
+     * Displays article form on GET request
+     * Processes form submission on POST request
+     * Validates title (20-150 chars), excerpt (max 150 chars),
+     * content (required), category (required), and meta description
+     * Converts markdown to HTML for storage
+     * Generates unique slug for the post
+     * Supports "Save Draft" and "Publish" actions
+     * Pre-populates author fields with current user
+     * Redirects to confirmation page on success
+     * @returns {Promise<Response|ViewModel>} Redirect on success or
+     *                                         view with form
+     */
     async newAction() {
         // Fetch all categories from database
         const postService = this.getServiceManager().get('PostService');
@@ -86,15 +146,18 @@ class DashboardController extends Controller {
         try {
             const categories = await postService.getAllCategories();
 
-            // Add role-based button (Review for Authors, Publish for Editors/Admins)
-            const authService = this.getServiceManager().get('AuthenticationService');
+            // Add role-based button (Review for Authors,
+            // Publish for Editors/Admins)
+            const authService = this.getServiceManager()
+                .get('AuthenticationService');
             const identity = authService.getIdentity();
-            const userRole = identity?.role || 'author'; // Default to 'author' if role not found
+            const userRole = identity?.role || 'author';
             // Get current user identity for tracking
             const currentUserId = identity?.id || null;
             const authorName = identity?.name || null;
 
-            const actionUrl = this.helper('url').fromRoute('adminDashboardNew');
+            const actionUrl = this.helper('url')
+                .fromRoute('adminDashboardNew');
             // Set form attributes
             form.setAction(actionUrl);
             form.setMethod('POST');
@@ -132,7 +195,9 @@ class DashboardController extends Controller {
                 },
                 'title': {
                     required: true,
-                    requiredMessage: "<strong>Title</strong> is required. Please enter a title.",
+                    requiredMessage:
+                        "<strong>Title</strong> is required. " +
+                        "Please enter a title.",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -146,8 +211,11 @@ class DashboardController extends Controller {
                                 min: 20,
                                 max: 150,
                                 messageTemplate: {
-                                    INVALID_TOO_SHORT: 'Title must be at least 20 characters long',
-                                    INVALID_TOO_LONG: 'Title must not exceed 150 characters'
+                                    INVALID_TOO_SHORT:
+                                        'Title must be at least 20 ' +
+                                        'characters long',
+                                    INVALID_TOO_LONG:
+                                        'Title must not exceed 150 characters'
                                 }
                             }
                         }
@@ -167,7 +235,9 @@ class DashboardController extends Controller {
                                 name: "excerpt",
                                 max: 150,
                                 messageTemplate: {
-                                    INVALID_TOO_LONG: '<strong>Excerpt</strong> must not exceed 150 characters'
+                                    INVALID_TOO_LONG:
+                                        '<strong>Excerpt</strong> must not ' +
+                                        'exceed 150 characters'
                                 }
                             }
                         }
@@ -175,7 +245,9 @@ class DashboardController extends Controller {
                 },
                 'content_markdown': {
                     required: true,
-                    requiredMessage: "<strong>Content</strong> is required. Please enter content",
+                    requiredMessage:
+                        "<strong>Content</strong> is required. " +
+                        "Please enter content",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -184,7 +256,9 @@ class DashboardController extends Controller {
                 },
                 'category_id': {
                     required: true,
-                    requiredMessage: "<strong>Category</strong> is required. Please select a category",
+                    requiredMessage:
+                        "<strong>Category</strong> is required. " +
+                        "Please select a category",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -197,7 +271,8 @@ class DashboardController extends Controller {
                                 haystack: categoryIds
                             },
                             messages: {
-                                NOT_IN_ARRAY: 'Please select a valid category'
+                                NOT_IN_ARRAY:
+                                    'Please select a valid category'
                             }
                         }
                     ]
@@ -216,7 +291,9 @@ class DashboardController extends Controller {
                                 name: "meta_description",
                                 max: 150,
                                 messageTemplate: {
-                                    INVALID_TOO_LONG: '<strong>Meta description</strong> must not exceed 150 characters'
+                                    INVALID_TOO_LONG:
+                                        '<strong>Meta description</strong> ' +
+                                        'must not exceed 150 characters'
                                 }
                             }
                         }
@@ -234,18 +311,27 @@ class DashboardController extends Controller {
                             name: 'Callback',
                             options: {
                                 callback: (value) => {
-                                    // Accept '1', 1, true, 'true', 'on' for checked
-                                    // Accept '0', 0, false, 'false', '', null, undefined for unchecked
-                                    if (value === '1' || value === 1 || value === true || value === 'true' || value === 'on') {
+                                    // Accept '1', 1, true, 'true', 'on'
+                                    // for checked
+                                    // Accept '0', 0, false, 'false', '',
+                                    // null, undefined for unchecked
+                                    if (value === '1' || value === 1 ||
+                                        value === true || value === 'true' ||
+                                        value === 'on') {
                                         return true;
                                     }
-                                    if (value === '0' || value === 0 || value === false || value === 'false' || value === '' || value === null || value === undefined) {
+                                    if (value === '0' || value === 0 ||
+                                        value === false ||
+                                        value === 'false' || value === '' ||
+                                        value === null ||
+                                        value === undefined) {
                                         return true;
                                     }
                                     return false;
                                 },
                                 messageTemplate: {
-                                    INVALID: 'Invalid value for comment enabled'
+                                    INVALID: 'Invalid value for comment ' +
+                                        'enabled'
                                 }
                             }
                         }
@@ -263,8 +349,10 @@ class DashboardController extends Controller {
 
                 const isFormValid = form.isValid();
                 if (isFormValid) {
-                    const contentHtml = this.plugin('markdownToHtml').convert(postData.content_markdown);
-                    const excerptHtml = this.plugin('markdownToHtml').convert(postData.excerpt_markdown);
+                    const contentHtml = this.plugin('markdownToHtml')
+                        .convert(postData.content_markdown);
+                    const excerptHtml = this.plugin('markdownToHtml')
+                        .convert(postData.excerpt_markdown);
 
                     const slug = await postService.generateUniqueSlug();
 
@@ -280,18 +368,27 @@ class DashboardController extends Controller {
                         .setContentHtml(contentHtml)
                         .setAuthorId(postData.author_id)
                         .setCategoryId(postData.category_id)
-                        .setCommentsEnabled(postData.comments_enabled === '1' || postData.comments_enabled === true || postData.comments_enabled === 'on')
-                        .setRegenerateStatic(postData.regenerate_static || false)
-                        .setReviewRequested(postData.review_requested || false)
+                        .setCommentsEnabled(
+                            postData.comments_enabled === '1' ||
+                            postData.comments_enabled === true ||
+                            postData.comments_enabled === 'on')
+                        .setRegenerateStatic(
+                            postData.regenerate_static || false)
+                        .setReviewRequested(
+                            postData.review_requested || false)
                         .setCreatedAt(currentTimestamp)
                         .setUpdatedAt(currentTimestamp);
-                    // Note: published_at, deleted_at, approved_at, etc. are NOT set here for new posts
-                    // They remain null and will be set when the post is published/deleted/approved
+                    // Note: published_at, deleted_at, approved_at, etc.
+                    // are NOT set here for new posts
+                    // They remain null and will be set when the post is
+                    // published/deleted/approved
 
-                    if (VarUtil.isset(postData.save) && postData.save === 'Save Draft') {
+                    if (VarUtil.isset(postData.save) &&
+                        postData.save === 'Save Draft') {
                         postEntity.setDraft();
                         postEntity.setUpdatedBy(currentUserId);
-                    } else if (VarUtil.isset(postData.publish) && postData.publish === 'Publish') {
+                    } else if (VarUtil.isset(postData.publish) &&
+                               postData.publish === 'Publish') {
                         // Publish button clicked
                         postEntity.publish(currentUserId);
                         postEntity.approve(currentUserId);
@@ -302,10 +399,12 @@ class DashboardController extends Controller {
                     const isValid = postEntity.isValid();
 
                     if (!isValid) {
-                        const invalidInputs = postEntity.getInputFilter().getInvalidInputs();
+                        const invalidInputs = postEntity.getInputFilter()
+                            .getInvalidInputs();
                         console.log("\n=== VALIDATION ERRORS ===");
                         Object.keys(invalidInputs).forEach((fieldName) => {
-                            const messages = invalidInputs[fieldName].getMessages();
+                            const messages = invalidInputs[fieldName]
+                                .getMessages();
                             const value = postEntity.get(fieldName);
                             console.log(`Field: ${fieldName}`);
                             console.log(`  Value: "${value}"`);
@@ -315,17 +414,23 @@ class DashboardController extends Controller {
                     }
 
                     if (isValid) {
-                        console.log("dataForDb: " + JSON.stringify(dataForDb));
-                        const createPost = await postService.createPost(dataForDb);
-                        //log(`Post updated successfully: ${updatedPost.slug}`);
+                        console.log("dataForDb: " +
+                            JSON.stringify(dataForDb));
+                        const createPost = await postService
+                            .createPost(dataForDb);
+                        //log(`Post updated successfully:
+                        //    ${updatedPost.slug}`);
 
                         // Add success message
                         super.plugin('flashMessenger').addSuccessMessage(
-                            `Post saved successfully. Return back to Dashboard`);
+                            `Post saved successfully. Return back to ` +
+                            `Dashboard`);
 
                         // Redirect to list or stay on edit page
-                        return this.plugin('redirect').toRoute('adminDashboardConfirmation');
-                        //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
+                        return this.plugin('redirect')
+                            .toRoute('adminDashboardConfirmation');
+                        //return this.plugin('redirect').toRoute(
+                        //    'adminDashboardEdit', { slug: updatePost.slug });
                     }
                 } else {
                     // After form.isValid() returns false
@@ -334,9 +439,11 @@ class DashboardController extends Controller {
 
                     Object.keys(formMessages).forEach((fieldName) => {
                         if (form.has(fieldName)) {
-                            console.log("errorMessages: " + formMessages[fieldName]);
+                            console.log("errorMessages: " +
+                                formMessages[fieldName]);
                             console.log("errorFieldName: " + fieldName);
-                            form.get(fieldName).setMessages(formMessages[fieldName]);
+                            form.get(fieldName)
+                                .setMessages(formMessages[fieldName]);
                         }
                     });
 
@@ -345,7 +452,8 @@ class DashboardController extends Controller {
                     Object.keys(formMessages).forEach((fieldName) => {
                         const fieldMessages = formMessages[fieldName];
                         if (Array.isArray(fieldMessages)) {
-                            errorMessages = errorMessages.concat(fieldMessages);
+                            errorMessages =
+                                errorMessages.concat(fieldMessages);
                         } else {
                             errorMessages.push(fieldMessages);
                         }
@@ -354,7 +462,8 @@ class DashboardController extends Controller {
                     // Add validation error messages for flash messenger
                     if (errorMessages.length > 0) {
                         errorMessages.forEach((message) => {
-                            super.plugin('flashMessenger').addErrorMessage(message);
+                            super.plugin('flashMessenger')
+                                .addErrorMessage(message);
                         });
                     }
                 }
@@ -369,8 +478,22 @@ class DashboardController extends Controller {
             .setVariable('f', form);
     }
 
+    /**
+     * Edit action - Displays published post in read-only mode
+     * Shows article form with all fields disabled (readonly)
+     * Validates post ID as integer before database queries
+     * Checks for existing draft revision to conditionally show buttons
+     * Shows "Create Revision Draft" button only if no draft exists
+     * Shows "Continue Revision Draft" button if draft exists
+     * Handles form submission for creating revision or unpublishing
+     * Redirects to revision creation on "Create Revision Draft" action
+     * @returns {Promise<Response|ViewModel>} Redirect on form submission
+     *                                         or view with readonly form
+     */
     async editAction() {
-        let form; // Declare form outside try block so it's accessible in return statement
+        // Declare form outside try block so it's accessible
+        // in return statement
+        let form;
 
         try {
             const postService = this.getServiceManager().get('PostService');
@@ -382,78 +505,53 @@ class DashboardController extends Controller {
             form = new ArticleForm();
 
             // Get article slug
-            const articleSlug = this.plugin('params').fromRoute('slug');
+            const postId = this.plugin('params').fromRoute('id');
 
             const actionUrl = this.helper('url')
-                .fromRoute('adminDashboardEdit', { slug: articleSlug });
+                .fromRoute('adminDashboardEdit', { id : postId });
 
             // Set form attributes
             form.setAction(actionUrl);
             form.setMethod('POST');
 
-
             // Initialize form with categories
             form.addIdField();
             form.addAuthorIdField();
-            form.addSlugField();
-            form.addTitleField();
-            form.addExcerptField();
-            form.addContentField();
-            form.addAuthorNameField();
-            form.addCategoryField('category_id', categories);
-            form.addMetaDescriptionField();
-            form.addCommentEnabledField();
-            form.addDeleteButton();
+            form.addTitleField('title', { readonly: "readonly" });
+            form.addSlugField('slug', { readonly: "readonly" });
+            form.addExcerptField('excerpt_markdown',
+                { readonly: "readonly" });
+            form.addContentField('content_markdown',
+                { readonly: "readonly" });
+            form.addAuthorNameField('author_name',
+                { readonly: "readonly" });
+            form.addCategoryField('category_id', categories,
+                { readonly: "readonly", disabled : "true" });
+            form.addMetaDescriptionField('meta_description',
+                { readonly: "readonly" });
+            form.addCommentEnabledField('comments_enabled',
+                { readonly: "readonly" });
 
-            // Add role-based button (Review for Authors, Publish for Editors/Admins)
-            const authService = this.getServiceManager().get('AuthenticationService');
+            // Add role-based button (Review for Authors,
+            // Publish for Editors/Admins)
+            const authService = this.getServiceManager()
+                .get('AuthenticationService');
             const identity = authService.getIdentity();
-            const userRole = identity?.role || 'author'; // Default to 'author' if role not found
+            const userRole = identity?.role || 'author';
             // Get current user identity for tracking
             const currentUserId = identity?.id || null;
 
-            if (userRole === 'author') {
+            /*if (userRole === 'author') {
                 form.addReviewButton();
             } else if (userRole === 'editor' || userRole === 'admin') {
                 form.addPublishButton();
-            }
+            }*/
 
-            form.addSaveButton();
-
-            // If editing existing article, fetch and populate data
-            if (articleSlug) {
-                const article = await postService.getSinglePost(articleSlug, true, true);
-                if (article) {
-                    form.setData({
-                        id: article.id,
-                        slug: article.slug,
-                        title: article.title,
-                        excerpt_markdown: article.excerpt_markdown,
-                        content_markdown: article.content_markdown,
-                        author_id: article.author_id,
-                        author_name: article.author_name,
-                        category_id: article.category_id,
-                        meta_description: article.meta_description,
-                        comment_enabled: article.comment_enabled || 0
-                    });
-                }
-            }
-
-            // Build category names array for InArray validator
-            const categoryIds = categories.map(cat => String(cat.id));
-
+            // Validate post_id before using it
             const inputFilter = InputFilter.factory({
-                'author_id': {
+                'post_id': {
                     required: true,
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ]
-                },
-                'slug': {
-                    required: true,
-                    requiredMessage: "Required, non-empty field",
+                    requiredMessage: "Post ID is required",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -461,252 +559,98 @@ class DashboardController extends Controller {
                     ],
                     validators: [
                         {
-                            name: 'AlphaNumeric',
-                            options: {
-                                name: 'slug',
-                                allowDashAndUnderscore: true,
-                                messageTemplate: {
-                                    INVALID_FORMAT: 'Slug must contain only alphanumeric characters, hyphens, and underscores'
-                                }
-                            }
-                        }
-                    ]
-                },
-                'title': {
-                    required: true,
-                    requiredMessage: "<strong>Title</strong> is required. Please enter a title.",
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ],
-                    validators: [
-                        {
-                            name: 'StringLength',
-                            options: {
-                                name: "title",
-                                min: 20,
-                                max: 150,
-                                messageTemplate: {
-                                    INVALID_TOO_SHORT: 'Title must be at least 20 characters long',
-                                    INVALID_TOO_LONG: 'Title must not exceed 150 characters'
-                                }
-                            }
-                        }
-                    ]
-                },
-                'excerpt_markdown': {
-                    required: false,
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ],
-                    validators: [
-                        {
-                            name: 'StringLength',
-                            options: {
-                                name: "excerpt",
-                                max: 150,
-                                messageTemplate: {
-                                    INVALID_TOO_LONG: '<strong>Excerpt</strong> must not exceed 150 characters'
-                                }
-                            }
-                        }
-                    ]
-                },
-                'content_markdown': {
-                    required: true,
-                    requiredMessage: "<strong>Content</strong> is required. Please enter content",
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ]
-                },
-                'category_id': {
-                    required: true,
-                    requiredMessage: "<strong>Category</strong> is required. Please select a category",
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ],
-                    validators: [
-                        {
-                            name: 'InArray',
-                            options: {
-                                haystack: categoryIds
-                            },
+                            name: 'Integer',
+                            options: {},
                             messages: {
-                                NOT_IN_ARRAY: 'Please select a valid category'
-                            }
-                        }
-                    ]
-                },
-                'meta_description': {
-                    required: false,
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ],
-                    validators: [
-                        {
-                            name: 'StringLength',
-                            options: {
-                                name: "meta_description",
-                                max: 150,
-                                messageTemplate: {
-                                    INVALID_TOO_LONG: '<strong>Meta description</strong> must not exceed 150 characters'
-                                }
-                            }
-                        }
-                    ]
-                },
-                'comments_enabled': {
-                    required: false,
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ],
-                    validators: [
-                        {
-                            name: 'Callback',
-                            options: {
-                                callback: (value) => {
-                                    // Accept '1', 1, true, 'true', 'on' for checked
-                                    // Accept '0', 0, false, 'false', '', null, undefined for unchecked
-                                    if (value === '1' || value === 1 || value === true || value === 'true' || value === 'on') {
-                                        return true;
-                                    }
-                                    if (value === '0' || value === 0 || value === false || value === 'false' || value === '' || value === null || value === undefined) {
-                                        return true;
-                                    }
-                                    return false;
-                                },
-                                messageTemplate: {
-                                    INVALID: 'Invalid value for comment enabled'
-                                }
+                                INVALID: 'Please provide valid post ID'
                             }
                         }
                     ]
                 }
             });
-            form.setInputFilter(inputFilter);
 
+            inputFilter.setData({ post_id: postId });
+
+            // Only proceed if postId is valid
+            if(!inputFilter.isValid()) {
+                // Invalid post ID - redirect to dashboard
+                this.plugin('flashMessenger')
+                    .addMessage('Invalid post ID provided', 'error');
+                return this.plugin('redirect').toRoute('adminDashboard');
+            }
+
+            // Convert postId to integer after validation
+            const postIdInt = parseInt(postId, 10);
+
+            // Check for existing draft revision to conditionally
+            // render button
+            const postRevisionService = this.getServiceManager()
+                .get('PostRevisionService');
+            let draftRevision = null;
+
+            try {
+                draftRevision = await postRevisionService
+                    .getMostRecentDraftRevision(postIdInt);
+
+                if (draftRevision) {
+                    form.addContinueRevisionDraft();
+                } else {
+                    console.log(
+                        '[EditAction] No draft revision found for post:',
+                        postIdInt);
+                    // Only show "Create Revision Draft" button
+                    // if no draft exists
+                    form.addCreateRevisionDraftButton();
+                }
+            } catch (error) {
+                console.error(
+                    '[EditAction] Error checking for draft revision:',
+                    error);
+                // On error, still show the button (fail-safe)
+                form.addCreateRevisionDraftButton();
+            }
+
+            form.addUnpublishButton();
+
+            // Fetch and populate post data (postId already validated above)
+            const post = await postService.getSinglePost(
+                postIdInt, false, true);
+            if (post) {
+                form.setData({
+                    id: post.id,
+                    slug: post.slug,
+                    title: post.title,
+                    excerpt_markdown: post.excerpt_markdown,
+                    content_markdown: post.content_markdown,
+                    author_id: post.author_id,
+                    author_name: post.author_name,
+                    category_id: post.category_id,
+                    meta_description: post.meta_description,
+                    comment_enabled: post.comment_enabled || 0
+                });
+            }
+
+            // Handle form submission
             if (super.getRequest().isPost()) {
                 const postData = super.getRequest().getPost();
 
-                form.setData(postData);
-
-                const isFormValid = form.isValid();
-
-                if (isFormValid) {
-                    // Update post by slug
-                    try {
-                        const contentHtml = this.plugin('markdownToHtml').convert(postData.content_markdown);
-                        const excerptHtml = this.plugin('markdownToHtml').convert(postData.excerpt_markdown);
-
-                        const postEntity = new PostEntity(postData);
-                        postEntity
-                            .setSlug(postData.slug)
-                            .setTitle(postData.title)
-                            .setExcerptMarkdown(postData.excerpt_markdown)
-                            .setExcerptHtml(excerptHtml)
-                            .setContentMarkdown(postData.content_markdown)
-                            .setContentHtml(contentHtml)
-                            .setAuthorId(postData.author_id)
-                            .setCategoryId(postData.category_id)
-                            .setCommentsEnabled(postData.comments_enabled === '1' || postData.comments_enabled === true || postData.comments_enabled === 'on')
-                            .setStatus(postData.status || 'draft')
-                            .setRegenerateStatic(postData.regenerate_static || false)
-                            .setReviewRequested(postData.review_requested || false)
-                            .setPublishedAt(postData.published_at)
-                            .setUpdatedAt(postData.updated_at)
-                            .setDeletedAt(postData.deleted_at)
-                            .setApprovedAt(postData.approved_at)
-                            .setUpdatedBy(postData.updated_by)
-                            .setDeletedBy(postData.deleted_by)
-                            .setApprovedBy(postData.approved_by)
-                            .setPublishedBy(postData.published_by);
-
-                        // Check which submit button was clicked and handle accordingly
-                        if (VarUtil.isset(postData.save) && postData.save === 'Save Draft') {
-                            // Save Draft button clicked
-                            postEntity.setDraft();
-                            postEntity.setUpdatedBy(currentUserId);
-                        } else if (VarUtil.isset(postData.review_requested) && postData.review_requested === 'Submit for Review') {
-                            // Submit for Review button clicked
-                            postEntity.requestReview();
-                            postEntity.setUpdatedBy(currentUserId);
-                        } else if (VarUtil.isset(postData.publish) && postData.publish === 'Publish') {
-                            // Publish button clicked
-                            postEntity.publish(currentUserId);
-                            postEntity.approve(currentUserId);
-                            postEntity.setUpdatedBy(currentUserId);
-                        } else if (VarUtil.isset(postData.delete) && postData.delete === 'Delete') {
-                            // Delete button clicked
-                            postEntity.softDelete(currentUserId)
-                            postEntity.setUpdatedBy(currentUserId);
-                        }
-
-                        const dataForDb = postEntity.getObjectCopy();
-                        JsonUtil.unset(dataForDb, 'id');
-                        JsonUtil.unset(dataForDb, 'created_at');
-                        JsonUtil.unset(dataForDb, 'updated_at');
-
-                        if (postEntity.isValid()) {
-                            const updatedPost = await postService.updatePostBySlug(postData.slug, dataForDb);
-                            //log(`Post updated successfully: ${updatedPost.slug}`);
-
-                            // Add success message
-                            super.plugin('flashMessenger').addSuccessMessage(
-                                `Post saved successfully. Return back to Dashboard`);
-
-                            // Redirect to list or stay on edit page
-                            return this.plugin('redirect').toRoute('adminDashboardConfirmation');
-                            //return this.plugin('redirect').toRoute('adminDashboardEdit', { slug: updatePost.slug });
-                        }
-                    } catch (error) {
-                        super.plugin('flashMessenger').addErrorMessage(`Failed to update post: ${error.message}`);
-                    }
-                } else {
-                    // After form.isValid() returns false
-                    // Get validation messages from form
-                    const formMessages = form.getMessages();
-
-                    Object.keys(formMessages).forEach((fieldName) => {
-                        if (form.has(fieldName)) {
-                            form.get(fieldName).setMessages(formMessages[fieldName]);
-                        }
-                    });
-
-                    // Extract error messages for flash messenger
-                    let errorMessages = [];
-                    Object.keys(formMessages).forEach((fieldName) => {
-                        const fieldMessages = formMessages[fieldName];
-                        if (Array.isArray(fieldMessages)) {
-                            errorMessages = errorMessages.concat(fieldMessages);
-                        } else {
-                            errorMessages.push(fieldMessages);
-                        }
-                    });
-
-                    // Add validation error messages for flash messenger
-                    if (errorMessages.length > 0) {
-                        errorMessages.forEach((message) => {
-                            super.plugin('flashMessenger').addErrorMessage(message);
-                        });
-                    }
+                if (VarUtil.isset(postData.create_revision_draft) &&
+                    postData.create_revision_draft ===
+                    'Create Revision Draft') {
+                    return this.plugin('redirect')
+                        .toRoute('adminRevisionNew',
+                            { post_id: postIdInt });
+                } else if (VarUtil.isset(postData.unpublish) &&
+                           postData.unpublish === 'Unpublish') {
+                    // Handle unpublish action
                 }
-            } else {
-                form.populateValues(this.getRequest().getPost());
+                super.plugin('flashMessenger').addErrorMessage(
+                    `We're sorry — something went wrong. ` +
+                    `Please let us know and try again shortly`);
             }
-
         } catch (error) {
-            const errorMsg = `Error in editAction: ${error.message}\nStack: ${error.stack}`;
+            const errorMsg = `Error in editAction: ${error.message}\n` +
+                `Stack: ${error.stack}`;
             throw error;
         }
 
@@ -715,6 +659,14 @@ class DashboardController extends Controller {
         //.setVariable('flashMessages', flashMessages);
     }
 
+    /**
+     * Confirmation action - Displays confirmation page
+     * Shows flash messages (success, error, warning, info)
+     * Redirects to dashboard if no messages exist
+     * Used after successful post creation or updates
+     * @returns {Response|ViewModel} Redirect to dashboard if no messages,
+     *                                or view with flash messages
+     */
     confirmationAction() {
         // Check if there are any flash messages to display
         const flashMessenger = this.plugin('flashMessenger');
@@ -732,4 +684,4 @@ class DashboardController extends Controller {
     }
 }
 
-module.exports = DashboardController;
+module.exports = PostController;

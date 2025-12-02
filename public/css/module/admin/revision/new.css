@@ -322,7 +322,50 @@
     background-color: #005a30;
 }*/
 
-/* Save Article Button - Keep original blue */
+/* Submit for Delete Button - Red */
+.dp-button--delete,
+button[name="delete"],
+input[name="delete"] {
+    background-color: #d4351c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+}
+
+.dp-button--delete:hover,
+button[name="delete"]:hover,
+input[name="delete"]:hover {
+    background-color: #6f3331 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 0 #003078 !important;
+}
+
+.dp-button--delete:active,
+button[name="delete"]:active,
+input[name="delete"]:active {
+    background-color: #d4351c  !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    top: 2px;
+    position: relative;
+}
+
+.dp-button--delete:focus,
+button[name="delete"]:focus,
+input[name="delete"]:focus {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: 0 !important;
+    background-color: #d4351c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+}
+
+/* Save Article Button - Blue */
 .dp-button--save,
 button[name="submit"],
 input[name="submit"] {
@@ -360,104 +403,6 @@ input[name="submit"]:focus {
     outline: 3px solid #ffdd00 !important;
     outline-offset: 0 !important;
     background-color: #1d70b8 !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-/* Submit for Review Button - Orange */
-.dp-button--review,
-button[name="review_requested"],
-input[name="review_requested"] {
-    background-color: #f47738 !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-    width: auto !important;
-    min-width: auto !important;
-    max-width: none !important;
-}
-
-.dp-button--review:hover,
-button[name="review_requested"]:hover,
-input[name="review_requested"]:hover {
-    background-color: #492310 !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-.dp-button--review:active,
-button[name="review_requested"]:active,
-input[name="review_requested"]:active {
-    background-color: #f47738  !important;
-    color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    top: 2px;
-    position: relative;
-}
-
-.dp-button--review:focus,
-button[name="review_requested"]:focus,
-input[name="review_requested"]:focus {
-    outline: 3px solid #ffdd00 !important;
-    outline-offset: 0 !important;
-    background-color: #f47738 !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-/* Submit for Delete Button - Red */
-.dp-button--upublish,
-.dp-button--delete,
-button[name="delete"],
-button[name="unpublish"],
-input[name="delete"],
-input[name="unpublish"] {
-    background-color: #d4351c !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-    width: auto !important;
-    min-width: auto !important;
-    max-width: none !important;
-}
-
-.dp-button--upublish:hover,
-.dp-button--delete:hover,
-button[name="unpublish"]:hover,
-button[name="delete"]:hover,
-input[name="unpublish"]:hover,
-input[name="delete"]:hover {
-    background-color: #6f3331 !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-.dp-button--unpublish:active,
-.dp-button--delete:active,
-button[name="unpublish"]:active,
-button[name="delete"]:active,
-input[name="unpublish"]:active,
-input[name="delete"]:active {
-    background-color: #d4351c  !important;
-    color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    top: 2px;
-    position: relative;
-}
-
-.dp-button--unpublish:focus,
-.dp-button--delete:focus,
-button[name="unpublish"]:focus,
-button[name="delete"]:focus,
-input[name="unpublish"]:focus,
-input[name="delete"]:focus {
-    outline: 3px solid #ffdd00 !important;
-    outline-offset: 0 !important;
-    background-color: #d4351c !important;
     color: #ffffff !important;
     border: 2px solid transparent !important;
     box-shadow: 0 2px 0 #003078 !important;
@@ -504,50 +449,6 @@ input[name="publish"]:focus {
     border: 2px solid transparent !important;
     box-shadow: 0 2px 0 #002d18 !important;
 }
-
-/* Create Revision Draft Button - Yellow */
-.dp-button--revision_draft,
-button[name="revision_draft"],
-input[name="revision_draft"] {
-    background-color: #ffdd00 !important;
-    color: #0b0c0c !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-    width: auto !important;
-    min-width: auto !important;
-    max-width: none !important;
-}
-
-.dp-button--revision_draft:hover,
-button[name="revision_draft"]:hover,
-input[name="revision_draft"]:hover {
-    background-color: #d4c100 !important;
-    color: #0b0c0c !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
-.dp-button--revision_draft:active,
-button[name="revision_draft"]:active,
-input[name="revision_draft"]:active {
-    background-color: #ffdd00 !important;
-    color: #0b0c0c !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    top: 2px;
-    position: relative;
-}
-
-.dp-button--revision_draft:focus,
-button[name="revision_draft"]:focus,
-input[name="revision_draft"]:focus {
-    outline: 3px solid #0b0c0c !important;
-    outline-offset: 0 !important;
-    background-color: #ffdd00 !important;
-    color: #0b0c0c !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 2px 0 #003078 !important;
-}
-
 
 /* Secondary Button Style */
 .dp-button--secondary {
@@ -793,6 +694,48 @@ input[name="revision_draft"]:focus {
     border-radius: 50%;
 }
 
+/* GOV.UK Focus State for Buttons */
+.dp-button:hover {
+    background-color: #003078;
+    border-color: #003078;
+}
+
+.dp-button:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    box-shadow: 0 2px 0 #0b0c0c;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c;
+}
+
+/* Removed conflicting focus state - using definition above at line 390 */
+
+button[name="review_requested"]:focus,
+input[name="review_requested"]:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00 !important;
+    box-shadow: 0 2px 0 #0b0c0c;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c;
+}
+
+.dp-button--secondary:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+}
+
+.dp-button--warning:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    box-shadow: 0 2px 0 #0b0c0c;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c;
+}
+
 .dp-button--cancel {
     font-size: 19px;
     font-weight: 400;
@@ -854,6 +797,11 @@ input[name="revision_draft"]:focus {
     background-color: #f3fef7;
 }
 
+.dp-inset-text--yellow {
+    border-left-color: #ffdd00;;
+    background-color:  #FFF4B3;
+}
+
 .dp-inset-text--warning {
     border-left-color: #f47738;
     background-color: #fef7f6;
@@ -875,3 +823,141 @@ input[name="revision_draft"]:focus {
   padding: 2px 4px;
   border-radius: 2px;
 }
+
+.key-term__2 {
+  font-weight: 600;
+  background-color: #E5E5E5;
+  color: #0b0c0c;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+
+/* Save Article Button - Keep original blue */
+.dp-button--save_revision_draft,
+button[name="submit"],
+input[name="submit"] {
+    background-color: #1d70b8 !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+}
+
+.dp-button--save_revision_draft:hover,
+button[name="submit"]:hover,
+input[name="submit"]:hover {
+    background-color: #003078 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 0 #003078 !important;
+}
+
+.dp-button--save_revision_draft:active,
+button[name="submit"]:active,
+input[name="submit"]:active {
+    background-color: #1d70b8 !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    top: 2px;
+    position: relative;
+}
+
+.dp-button--save_revision_draft:focus,
+button[name="submit"]:focus,
+input[name="submit"]:focus {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: 0 !important;
+    background-color: #1d70b8 !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+}
+
+/* Submit for Publish Button - Green */
+.dp-button--publish_revision,
+button[name="publish_revision"],
+input[name="publish_revision"] {
+    background-color: #00703c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #002d18 !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+}
+
+.dp-button--publish_revision:hover,
+button[name="publish_revision"]:hover,
+input[name="publish_revision"]:hover {
+    background-color: #005a30 !important;
+    box-shadow: 0 2px 0 #002d18 !important;
+}
+
+.dp-button--publish_revision:active,
+button[name="publish_revision"]:active,
+input[name="publish_revision"]:active {
+    background-color: #00703c !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    top: 2px;
+    position: relative;
+}
+
+.dp-button--publish_revision:focus,
+button[name="publish_revision"]:focus,
+input[name="publish_revision"]:focus {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: 0 !important;
+    background-color: #00703c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #002d18 !important;
+}
+
+/* Submit for Delete Button - Red */
+.dp-button--delete_draft,
+button[name="delete_draft"],
+input[name="delete_draft"] {
+    background-color: #d4351c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+}
+
+.dp-button--delete_draft:hover,
+button[name="delete_draft"]:hover,
+input[name="delete_draft"]:hover {
+    background-color: #6f3331 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 0 #003078 !important;
+}
+
+.dp-button--delete_draft:active
+button[name="delete_draft"]:active,
+input[name="delete_draft"]:active {
+    background-color: #d4351c  !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    top: 2px;
+    position: relative;
+}
+
+.dp-button--delete_draft:focus,
+button[name="delete_draft"]:focus,
+input[name="delete_draft"]:focus {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: 0 !important;
+    background-color: #d4351c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+}
+

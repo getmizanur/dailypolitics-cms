@@ -28,6 +28,8 @@ class BaseController {
         this.returnResponse = null;
         this.dispatched = false;
         this.view = null;
+
+        this.noRender = false;
     }
 
     setServiceManager(serviceManager) {
@@ -101,6 +103,15 @@ class BaseController {
         let value = this.getRequest().getQuery(name, defaultValue);
 
         return value;
+    }
+
+    setNoRender(flag = true) {
+        this.noRender = !!flag;
+        return this;
+    }
+
+    isNoRender() {
+        return this.noRender;
     }
 
     returnResponse() {

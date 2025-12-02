@@ -1,0 +1,18 @@
+{% extends 'layout/master.njk' %}
+
+{% block content %}
+<div class="container admin-dashboard-margin-y-8">
+  <div class="admin-article-form-container dp-pt-0">
+    <div class="row align-items-center admin-dashboard-fix-row">
+      <div class="col-sm-12 col-md-12">
+        <div class="card admin-dashboard-card dp-pt-0" itemscope itemtype="https://schema.org/Table">
+
+            {# Flash Messages using flashBanner helper #}
+            {{ flashBanner('success', success_flash_messages) | safe }}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

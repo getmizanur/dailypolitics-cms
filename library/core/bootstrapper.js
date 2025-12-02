@@ -305,8 +305,6 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
             }
         }
 
-
-
         if (front.getResponse().isRedirect()) {
             let location = front.getResponse().getHeader('Location');
             res.redirect(location);
