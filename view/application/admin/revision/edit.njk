@@ -7,30 +7,34 @@
       <div class="col-sm-12 col-md-12">
         <div class="card admin-dashboard-card dp-pt-0" itemscope itemtype="https://schema.org/Table">
             {# Inset text #}
-            <div class="dp-inset-text dp-inset-text--success">
+            <div class="dp-inset-text dp-inset-text--yellow">
                 <p>
-                    You’re viewing a <strong class="key-term">published post</strong>.
-                    Any changes must be made in a
-                    <strong class="key-term">revision draft</strong>.
-                    Create a <strong class="key-term">revision draft</strong> to update the
-                    <strong class="key-term">live version</strong>.
+                    You’re working on a
+                    <strong class="key-term__2">revision draft</strong>.
+                    Changes here will not affect the
+                    <strong class="key-term__2">live post</strong>
+                    until you
+                    <strong class="key-term__2">publish the revision</strong>.
                 </p>
             </div>
 
+            {# Information Message #}
+            {% if info_flash_messages.length > 0 %}
+                {% set msg = info_flash_messages [0] %}
+                {{ flashPanel('information', msg.title, msg.message) | safe }}
+            {% endif %}
+
+            {# Success Message #}
+            {% if success_flash_messages.length > 0 %}
+                {% set msg = success_flash_messages[0] %}
+                {{ flashPanel('completion', msg.title, msg.message) | safe }}
+            {% endif %}
+
             {# Error messages #}
             {% if error_flash_messages.length > 0 %}
-            <div class="dp-error-summary">
-                <h2 class="dp-error-summary__title">There is a problem</h2>
-                <div class="dp-error-summary__body">
-                    <ul class="dp-error-summary__list">
-                        {% for message in error_flash_messages %}
-                        <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
+                {{ flashBanner('error', error_flash_messages) | safe }}
             {% endif %}
-            
+
             {{ form().openTag(f) }}
 
                 {{ formHidden(f.get('id')) | safe }}
@@ -84,16 +88,25 @@
                     {{ formError(f.get('comments_enabled')) | safe }}
                 </div>
 
-                <div class="form-group">
+                 <div class="form-group{% if errorDecorator(f.get('change_reason')) %} dp-form-group--error{% endif %}">
+                    {{ formLabel(f.get('change_reason')) | safe }}
+                    {{ formError(f.get('change_reason')) | safe }}
+                    {{ formTextarea(f.get('change_reason')) | safe }}
+                </div>
+
+               <div class="form-group">
                     <div class="dp-button-group">
                         <div class="dp-button-group__left">
-                            {{ formSubmit(f.get('create_revision_draft')) | safe }}
-                            {% if f.get('unpublish') %}
-                                {{ formSubmit(f.get('unpublish')) | safe }}
-                            {% endif %}
-                        </div>
-                        <div class="dp-button-group__right">
-                            <a href="{{ url('adminDashboardIndex') }}" class="dp-button--cancel">Cancel</a>
+                            <div class="dp-button-group__primary-actions">
+                                {{ formSubmit(f.get('save_revision_draft')) | safe }}
+                                {{ formSubmit(f.get('publish_revision')) | safe }}
+                            </div>
+                            <div class="dp-button-group__destructive-actions">
+                                {{ formSubmit(f.get('delete_draft')) | safe }}
+                            </div>
+                            <div class="dp-button-group__secondary-actions">
+                                {{ formSubmit(f.get('exit_this_page')) | safe }}
+                            </div>
                         </div>
                     </div>
                 </div>

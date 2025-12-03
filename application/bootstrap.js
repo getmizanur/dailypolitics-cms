@@ -1,11 +1,11 @@
 const path = require('path');
 
-const Bootstrapper
-    = require(global.applicationPath('/library/core/bootstrapper'));
-const ClassUtil
-    = require(global.applicationPath('/library/util/class-util'));
-const Registry
-    = require(global.applicationPath('/library/core/registry'));
+const Bootstrapper = require(
+    global.applicationPath('/library/core/bootstrapper'));
+const ClassUtil = require(
+    global.applicationPath('/library/util/class-util'));
+const Registry = require(
+    global.applicationPath('/library/core/registry'));
 const cookieSession = require('cookie-session');
 const express = require('express');
 const nunjucks = require('nunjucks');
@@ -18,24 +18,65 @@ const compression = require('compression');
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-// IMPORTANT!
-// It matters the order of init functions. 
-// Please put them in order of how they should be called. 
+/**
+ * Bootstrap - Application initialization and configuration
+ * Extends the core Bootstrapper class to set up the Express application
+ * Handles initialization of: configuration, session management, view
+ * engine, helpers, and routing
+ * Initialization order is critical - methods must be called in the
+ * correct sequence
+ * Supports multiple session stores: file, Redis, MongoDB, MySQL, and
+ * memory
+ * Integrates Nunjucks templating engine with view helpers
+ * Sets up 404 error handling and static file serving
+ *
+ * IMPORTANT: The order of init functions matters!
+ * Please put them in order of how they should be called.
+ *
+ * @extends Bootstrapper
+ */
 class Bootstrap extends Bootstrapper {
 
+    /**
+     * Constructor
+     * Initializes the Bootstrap instance with Express app and service
+     * manager
+     * @param {express.Application} app - Express application instance
+     * @param {ServiceManager|null} serviceManager - Service manager for
+     *                                               dependency injection
+     */
     constructor(app, serviceManager = null) {
         super();
         this.app = app;
         this.serviceManager = serviceManager;
     }
 
+    /**
+     * Initialize application configuration
+     * Sets up Express middleware for compression and body parsing
+     * Uses Express built-in JSON and URL-encoded parsers (Express 4.16+)
+     * Enables gzip compression for all responses
+     * @returns {void}
+     */
     initAppConfig() {
-        // Use Express's built-in body parsing middleware (available since Express 4.16)
+        // Use Express's built-in body parsing middleware
+        // (available since Express 4.16)
         this.app.use(compression());
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
     }
 
+    /**
+     * Initialize session middleware
+     * Loads session configuration from application config
+     * Supports multiple session stores: file, Redis, MongoDB, MySQL,
+     * memory
+     * Configures session cookie settings (maxAge, httpOnly, secure,
+     * sameSite)
+     * Can be disabled via configuration (enabled: false)
+     * Sets up proxy trust for secure cookie handling
+     * @returns {void}
+     */
     initSession() {
         const session = require('express-session');
 
@@ -52,7 +93,8 @@ class Bootstrap extends Bootstrapper {
 
         // Skip session initialization if disabled
         if (sessionConfig.enabled === false) {
-            console.log('Session middleware disabled via configuration');
+            console.log(
+                'Session middleware disabled via configuration');
             return;
         }
 
@@ -60,7 +102,8 @@ class Bootstrap extends Bootstrapper {
 
         // Build express-session configuration from our config
         const expressSessionConfig = {
-            secret: sessionConfig.secret || 'your-secret-key-change-in-production',
+            secret: sessionConfig.secret ||
+                'your-secret-key-change-in-production',
             name: sessionConfig.name || 'JSSESSIONID',
             resave: sessionConfig.resave || false,
             saveUninitialized: sessionConfig.saveUninitialized || false,
@@ -83,9 +126,25 @@ class Bootstrap extends Bootstrapper {
         // Apply session middleware
         this.app.use(session(expressSessionConfig));
 
-        console.log(`Express session middleware initialized with ${sessionConfig.store || 'memory'} store`);
+        console.log(
+            `Express session middleware initialized with ` +
+            `${sessionConfig.store || 'memory'} store`);
     }
 
+    /**
+     * Create session store based on configuration
+     * Factory method that creates appropriate session store instance
+     * Supports: file, Redis, MongoDB, MySQL, and memory stores
+     * Falls back to memory store if configured store is unavailable
+     * Handles connection errors and logs warnings
+     * @param {Object} sessionConfig - Session configuration object
+     * @param {string} sessionConfig.store - Store type (file, redis,
+     *                                       mongodb, mysql, memory)
+     * @param {Object} sessionConfig.store_options - Store-specific
+     *                                               options
+     * @returns {Object|null} Session store instance or null for memory
+     *                        store
+     */
     createSessionStore(sessionConfig) {
         const storeType = sessionConfig.store || 'file';
         const storeOptions = sessionConfig.store_options || {};
@@ -94,18 +153,25 @@ class Bootstrap extends Bootstrapper {
             case 'file':
                 try {
                     const session = require('express-session');
-                    const FileStore = require('session-file-store')(session);
+                    const FileStore = require('session-file-store')(
+                        session);
 
-                    // Clean up store options - remove logFn if it's not a function
+                    // Clean up store options - remove logFn if it's
+                    // not a function
                     const cleanOptions = { ...storeOptions };
-                    if (!cleanOptions.logFn || typeof cleanOptions.logFn !== 'function') {
+                    if (!cleanOptions.logFn ||
+                        typeof cleanOptions.logFn !== 'function') {
                         delete cleanOptions.logFn;
                     }
 
-                    console.log('Using file-based session store with options:', cleanOptions);
+                    console.log(
+                        'Using file-based session store with options:',
+                        cleanOptions);
                     return new FileStore(cleanOptions);
                 } catch (error) {
-                    console.warn('File store not available, falling back to memory store:', error.message);
+                    console.warn(
+                        'File store not available, falling back to ' +
+                        'memory store:', error.message);
                     return null;
                 }
 
@@ -116,15 +182,21 @@ class Bootstrap extends Bootstrapper {
 
                     // Create Redis client
                     const redisClient = createClient({
-                        url: storeOptions.url || `redis://${storeOptions.host || 'localhost'}:${storeOptions.port || 6379}`,
+                        url: storeOptions.url ||
+                            `redis://${storeOptions.host || 'localhost'}` +
+                            `:${storeOptions.port || 6379}`,
                         password: storeOptions.password || undefined,
                         database: storeOptions.db || 0,
                         socket: {
-                            connectTimeout: storeOptions.connectTimeout || 10000,
+                            connectTimeout:
+                                storeOptions.connectTimeout || 10000,
                             reconnectStrategy: (retries) => {
                                 if (retries > 10) {
-                                    console.error('Redis connection failed after 10 retries');
-                                    return new Error('Redis connection failed');
+                                    console.error(
+                                        'Redis connection failed after ' +
+                                        '10 retries');
+                                    return new Error(
+                                        'Redis connection failed');
                                 }
                                 return Math.min(retries * 100, 3000);
                             }
@@ -137,7 +209,8 @@ class Bootstrap extends Bootstrapper {
                     });
 
                     redisClient.on('connect', () => {
-                        console.log('Redis client connected successfully');
+                        console.log(
+                            'Redis client connected successfully');
                     });
 
                     redisClient.on('error', (err) => {
@@ -148,18 +221,24 @@ class Bootstrap extends Bootstrapper {
                     const store = new RedisStore({
                         client: redisClient,
                         prefix: storeOptions.prefix || 'sess:',
-                        ttl: storeOptions.ttl || 3600, // 1 hour in seconds
+                        ttl: storeOptions.ttl || 3600,
                     });
 
-                    console.log('Using Redis session store with options:', {
-                        url: storeOptions.url || `redis://${storeOptions.host || 'localhost'}:${storeOptions.port || 6379}`,
-                        prefix: storeOptions.prefix || 'sess:',
-                        ttl: storeOptions.ttl || 3600
-                    });
+                    console.log(
+                        'Using Redis session store with options:', {
+                            url: storeOptions.url ||
+                                `redis://${storeOptions.host ||
+                                    'localhost'}:${storeOptions.port ||
+                                    6379}`,
+                            prefix: storeOptions.prefix || 'sess:',
+                            ttl: storeOptions.ttl || 3600
+                        });
 
                     return store;
                 } catch (error) {
-                    console.warn('Redis store not available, falling back to memory store:', error.message);
+                    console.warn(
+                        'Redis store not available, falling back to ' +
+                        'memory store:', error.message);
                     console.warn('Error stack:', error.stack);
                     return null;
                 }
@@ -167,32 +246,51 @@ class Bootstrap extends Bootstrapper {
             case 'mongodb':
                 try {
                     const MongoStore = require('connect-mongo');
-                    console.log('Using MongoDB session store with options:', storeOptions);
+                    console.log(
+                        'Using MongoDB session store with options:',
+                        storeOptions);
                     return MongoStore.create(storeOptions);
                 } catch (error) {
-                    console.warn('MongoDB store not available, falling back to memory store:', error.message);
+                    console.warn(
+                        'MongoDB store not available, falling back to ' +
+                        'memory store:', error.message);
                     return null;
                 }
 
             case 'mysql':
                 try {
                     const session = require('express-session');
-                    const MySQLStore = require('express-mysql-session')(session);
-                    console.log('Using MySQL session store with options:', storeOptions);
+                    const MySQLStore = require('express-mysql-session')(
+                        session);
+                    console.log(
+                        'Using MySQL session store with options:',
+                        storeOptions);
                     return new MySQLStore(storeOptions);
                 } catch (error) {
-                    console.warn('MySQL store not available, falling back to memory store:', error.message);
+                    console.warn(
+                        'MySQL store not available, falling back to ' +
+                        'memory store:', error.message);
                     return null;
                 }
 
             case 'memory':
             default:
-                console.log('Using memory session store (not recommended for production)');
+                console.log(
+                    'Using memory session store ' +
+                    '(not recommended for production)');
                 // Use default MemoryStore (built into express-session)
                 return null;
         }
     }
 
+    /**
+     * Initialize application configuration registry
+     * Loads application.config.js and stores in registry
+     * Extracts and registers routing configuration
+     * Makes configuration accessible to the entire application
+     * Sets up the container for dependency injection
+     * @returns {void}
+     */
     initConfig() {
         let registry = new Registry();
         const appConfig = require('./config/application.config');
@@ -202,6 +300,17 @@ class Bootstrap extends Bootstrapper {
         super.setContainer(registry);
     }
 
+    /**
+     * Initialize view engine and template system
+     * Configures Nunjucks templating engine with Express
+     * Sets up view helpers through ViewHelperManager
+     * Registers date filter and custom view helpers
+     * Enables template auto-reloading in development
+     * Makes view helpers globally available in templates
+     * Ensures request-scoped helper instances for proper routing
+     * context
+     * @returns {void}
+     */
     initView() {
         const nunjucks = require('nunjucks');
         this.app.set('view engine', nunjucks);
@@ -222,9 +331,12 @@ class Bootstrap extends Bootstrapper {
             next();
         });
 
-        // register view helpers from configuration using ViewHelperManager
-        // Get ViewHelperManager from ServiceManager (uses factory pattern)
-        const viewHelperManager = this.serviceManager.get('ViewHelperManager');
+        // Register view helpers from configuration using
+        // ViewHelperManager
+        // Get ViewHelperManager from ServiceManager
+        // (uses factory pattern)
+        const viewHelperManager = this.serviceManager.get(
+            'ViewHelperManager');
 
         // Store the nunjucks env in global for controller access
         global.nunjucksEnv = env;
@@ -236,61 +348,93 @@ class Bootstrap extends Bootstrapper {
         // Store reference to serviceManager for use in helper closure
         const serviceManager = this.serviceManager;
 
-        // Register each helper directly on env.globals for template access
+        // Register each helper directly on env.globals for template
+        // access
         // Templates can use {{ headTitle() }} directly
         helperNames.forEach(helperName => {
             env.addGlobal(helperName, function (...args) {
-                // Get FRESH ViewHelperManager from ServiceManager each time
-                // This ensures we get the request-scoped instance with current RouteMatch
-                const currentViewHelperManager = serviceManager.get('ViewHelperManager');
+                // Get FRESH ViewHelperManager from ServiceManager
+                // each time
+                // This ensures we get the request-scoped instance
+                // with current RouteMatch
+                const currentViewHelperManager = serviceManager.get(
+                    'ViewHelperManager');
 
                 // Get the helper instance from ViewHelperManager
-                const helperInstance = currentViewHelperManager.get(helperName);
+                const helperInstance = currentViewHelperManager.get(
+                    helperName);
 
                 // Set the nunjucks context on the helper
                 helperInstance.setContext(this);
 
                 // IMPORTANT: pass Nunjucks ctx as FINAL argument
                 return helperInstance.render(...args, this);
-                //                                     ^^^ this = Nunjucks ctx
+                //                                     ^^^ this =
+                //                                     Nunjucks ctx
             });
         });
     }
 
+    /**
+     * Initialize static asset serving
+     * Configures Express to serve static files from public directory
+     * Enables direct access to CSS, JavaScript, images, and other
+     * static assets
+     * @returns {void}
+     */
     initHelper() {
         this.app.use(express.static('public'));
     }
 
+    /**
+     * Initialize application routing
+     * Mounts all routes from configuration
+     * Sets up dispatcher middleware for MVC routing
+     * Adds 404 error handler as catch-all route
+     * Resolves and renders custom 404 error template
+     * Falls back to basic HTML error page if template resolution
+     * fails
+     * @returns {void}
+     */
     initRouter() {
-        // Mount routers 
+        // Mount routers
         const registry = super.getContainer();
         const router = registry.get('routes');
         for (let key in router) {
             if (router[key].hasOwnProperty('route')) {
                 this.app.all(router[key].route,
-                    async (req, res, next) => this.dispatcher(req, res, next));
+                    async (req, res, next) =>
+                        this.dispatcher(req, res, next));
             }
         }
 
         // Add 404 handler middleware (must be after all other routes)
         this.app.use((req, res, next) => {
             try {
-                // Resolve 404 template path using framework-level error handling
-                const errorTemplateInfo = this.resolveErrorTemplate('404');
+                // Resolve 404 template path using framework-level
+                // error handling
+                const errorTemplateInfo = this.resolveErrorTemplate(
+                    '404');
                 const templatePath = errorTemplateInfo.templatePath;
 
                 const templateData = {
                     pageTitle: 'Page Not Found',
                     errorCode: 404,
-                    errorMessage: 'The page you are looking for could not be found.'
+                    errorMessage:
+                        'The page you are looking for could not be ' +
+                        'found.'
                 };
 
-                // Set 404 status and render template directly (no MVC overhead)
+                // Set 404 status and render template directly
+                // (no MVC overhead)
                 res.status(404);
                 res.render(templatePath, templateData);
             } catch (error) {
-                // If error template resolution fails, send basic error response
-                console.error('Error template resolution failed:', error.message);
+                // If error template resolution fails, send basic
+                // error response
+                console.error(
+                    'Error template resolution failed:',
+                    error.message);
                 res.status(404).send(`
                     <h1>404 - Page Not Found</h1>
                     <p>The page you are looking for could not be found.</p>

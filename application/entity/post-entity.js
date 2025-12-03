@@ -1,69 +1,91 @@
-const AbstractEntity = require(global.applicationPath('/library/core/common/abstract-entity'));
-const VarUtil = require(global.applicationPath('/library/util/var-util'));
-const InputFilter = require(global.applicationPath('/library/input-filter/input-filter'));
+const AbstractEntity = require(
+    global.applicationPath('/library/core/common/abstract-entity'));
+const VarUtil = require(
+    global.applicationPath('/library/util/var-util'));
+const InputFilter = require(
+    global.applicationPath('/library/input-filter/input-filter'));
 
 /**
- * PostEntity
- * Represents a blog post/article entity with all associated metadata
+ * PostEntity - Represents a blog post/article entity with all
+ * associated metadata
  * Maps to the 'posts' table in PostgreSQL database
- *
+ * Provides complete post lifecycle management including status
+ * transitions, validation, and data transformation
+ * Supports draft, published, archived workflow with review and approval
+ * process
+ * Includes SEO metadata, category relationships, hero image management,
+ * and comment settings
+ * Extends AbstractEntity for common entity functionality (get/set
+ * methods)
  * @extends AbstractEntity
  */
 class PostEntity extends AbstractEntity {
 
+    /**
+     * Constructor
+     * Initializes post entity with comprehensive database schema
+     * All fields map directly to PostgreSQL 'posts' table columns
+     * Sets up default values matching database constraints
+     * @param {Object} data - Optional initial data to populate entity
+     */
     constructor(data = null) {
         super();
 
-        // Initialize storage with default post structure matching database schema
+        // Initialize storage with default post structure matching
+        // database schema
         this.storage = {
             // Primary key
             id: null,
 
             // Basic post information
-            slug: null,
-            title: null,
-            excerpt_html: null,
-            excerpt_markdown: null,
-            content_html: null,
-            content_markdown: null,
+            slug: null,                  // URL-friendly identifier
+            title: null,                 // Post title
+            excerpt_html: null,          // Short summary (HTML)
+            excerpt_markdown: null,      // Short summary (Markdown)
+            content_html: null,          // Full content (HTML)
+            content_markdown: null,      // Full content (Markdown)
 
             // Relationships
-            author_id: null,
-            category_id: null,
-            presentation_style_id: null,
+            author_id: null,             // Foreign key to users table
+            category_id: null,           // Foreign key to categories
+                                         // table
+            presentation_style_id: null, // Foreign key to
+                                         // presentation_styles table
 
             // Display & styling
-            header_color_override: null,
-            is_featured: false,
+            header_color_override: null, // Custom header color
+            is_featured: false,          // Featured post flag
 
             // Hero image
-            hero_image_url: null,
-            hero_image_alt: null,
-            hero_image_caption: null,
-            hero_image_credit: null,
+            hero_image_url: null,        // Main hero image URL
+            hero_image_alt: null,        // Image alt text for
+                                         // accessibility
+            hero_image_caption: null,    // Image caption
+            hero_image_credit: null,     // Image credit/attribution
 
             // SEO metadata
-            meta_title: null,
-            meta_description: null,
+            meta_title: null,            // SEO title override
+            meta_description: null,      // SEO meta description
 
             // Post settings
-            comments_enabled: true,
-            status: 'draft', // 'draft', 'published', 'archived'
-            regenerate_static: false,
-            review_requested: false,
+            comments_enabled: true,      // Boolean: allow comments
+            status: 'draft',             // draft/published/archived
+            regenerate_static: false,    // Boolean: regenerate static
+                                         // HTML
+            review_requested: false,     // Boolean: review requested
 
             // Timestamps
-            published_at: null,
-            created_at: null,
-            updated_at: null,
-            deleted_at: null,
-            approved_at: null,
+            published_at: null,          // When post was published
+            created_at: null,            // When record was created
+            updated_at: null,            // When record was last updated
+            deleted_at: null,            // Soft delete timestamp
+            approved_at: null,           // When post was approved
 
             // User tracking
-            updated_by: null,
-            deleted_by: null,
-            approved_by: null,
-            published_by: null
+            updated_by: null,            // User ID who last updated
+            deleted_by: null,            // User ID who deleted
+            approved_by: null,           // User ID who approved
+            published_by: null           // User ID who published
         };
 
         // Populate from data if provided
@@ -74,18 +96,20 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Exchange data from object into this entity
-     * Implements the required abstract method
-     *
+     * Populates entity fields from provided data object
+     * Only sets fields that are explicitly defined (not undefined)
+     * Preserves default values when data fields are undefined
+     * Implements the required AbstractEntity method
      * @param {Object} data - Data to populate entity with
-     * @returns {PostEntity} - Returns this for method chaining
+     * @returns {PostEntity} This entity for method chaining
      */
     exchangeObject(data) {
         if (!VarUtil.isObject(data)) {
             return this;
         }
 
-        // Map all properties from data to storage
-        // Using conditional assignment to preserve defaults when values are undefined
+        // Map all properties from data to storage using conditional
+        // assignment to preserve defaults when values are undefined
 
         // Primary key
         if (data.id !== undefined) this.storage.id = data.id;
@@ -93,55 +117,88 @@ class PostEntity extends AbstractEntity {
         // Basic post information
         if (data.slug !== undefined) this.storage.slug = data.slug;
         if (data.title !== undefined) this.storage.title = data.title;
-        if (data.excerpt_html !== undefined) this.storage.excerpt_html = data.excerpt_html;
-        if (data.excerpt_markdown !== undefined) this.storage.excerpt_markdown = data.excerpt_markdown;
-        if (data.content_html !== undefined) this.storage.content_html = data.content_html;
-        if (data.content_markdown !== undefined) this.storage.content_markdown = data.content_markdown;
+        if (data.excerpt_html !== undefined)
+            this.storage.excerpt_html = data.excerpt_html;
+        if (data.excerpt_markdown !== undefined)
+            this.storage.excerpt_markdown = data.excerpt_markdown;
+        if (data.content_html !== undefined)
+            this.storage.content_html = data.content_html;
+        if (data.content_markdown !== undefined)
+            this.storage.content_markdown = data.content_markdown;
 
         // Relationships
-        if (data.author_id !== undefined) this.storage.author_id = data.author_id;
-        if (data.category_id !== undefined) this.storage.category_id = data.category_id;
-        if (data.presentation_style_id !== undefined) this.storage.presentation_style_id = data.presentation_style_id;
+        if (data.author_id !== undefined)
+            this.storage.author_id = data.author_id;
+        if (data.category_id !== undefined)
+            this.storage.category_id = data.category_id;
+        if (data.presentation_style_id !== undefined)
+            this.storage.presentation_style_id =
+                data.presentation_style_id;
 
         // Display & styling
-        if (data.header_color_override !== undefined) this.storage.header_color_override = data.header_color_override;
-        if (data.is_featured !== undefined) this.storage.is_featured = data.is_featured;
+        if (data.header_color_override !== undefined)
+            this.storage.header_color_override =
+                data.header_color_override;
+        if (data.is_featured !== undefined)
+            this.storage.is_featured = data.is_featured;
 
         // Hero image
-        if (data.hero_image_url !== undefined) this.storage.hero_image_url = data.hero_image_url;
-        if (data.hero_image_alt !== undefined) this.storage.hero_image_alt = data.hero_image_alt;
-        if (data.hero_image_caption !== undefined) this.storage.hero_image_caption = data.hero_image_caption;
-        if (data.hero_image_credit !== undefined) this.storage.hero_image_credit = data.hero_image_credit;
+        if (data.hero_image_url !== undefined)
+            this.storage.hero_image_url = data.hero_image_url;
+        if (data.hero_image_alt !== undefined)
+            this.storage.hero_image_alt = data.hero_image_alt;
+        if (data.hero_image_caption !== undefined)
+            this.storage.hero_image_caption = data.hero_image_caption;
+        if (data.hero_image_credit !== undefined)
+            this.storage.hero_image_credit = data.hero_image_credit;
 
         // SEO metadata
-        if (data.meta_title !== undefined) this.storage.meta_title = data.meta_title;
-        if (data.meta_description !== undefined) this.storage.meta_description = data.meta_description;
+        if (data.meta_title !== undefined)
+            this.storage.meta_title = data.meta_title;
+        if (data.meta_description !== undefined)
+            this.storage.meta_description = data.meta_description;
 
         // Post settings
-        if (data.comments_enabled !== undefined) this.storage.comments_enabled = data.comments_enabled;
-        if (data.status !== undefined) this.storage.status = data.status;
-        if (data.regenerate_static !== undefined) this.storage.regenerate_static = data.regenerate_static;
-        if (data.review_requested !== undefined) this.storage.review_requested = data.review_requested;
+        if (data.comments_enabled !== undefined)
+            this.storage.comments_enabled = data.comments_enabled;
+        if (data.status !== undefined)
+            this.storage.status = data.status;
+        if (data.regenerate_static !== undefined)
+            this.storage.regenerate_static = data.regenerate_static;
+        if (data.review_requested !== undefined)
+            this.storage.review_requested = data.review_requested;
 
         // Timestamps
-        if (data.published_at !== undefined) this.storage.published_at = data.published_at;
-        if (data.created_at !== undefined) this.storage.created_at = data.created_at;
-        if (data.updated_at !== undefined) this.storage.updated_at = data.updated_at;
-        if (data.deleted_at !== undefined) this.storage.deleted_at = data.deleted_at;
-        if (data.approved_at !== undefined) this.storage.approved_at = data.approved_at;
+        if (data.published_at !== undefined)
+            this.storage.published_at = data.published_at;
+        if (data.created_at !== undefined)
+            this.storage.created_at = data.created_at;
+        if (data.updated_at !== undefined)
+            this.storage.updated_at = data.updated_at;
+        if (data.deleted_at !== undefined)
+            this.storage.deleted_at = data.deleted_at;
+        if (data.approved_at !== undefined)
+            this.storage.approved_at = data.approved_at;
 
         // User tracking
-        if (data.updated_by !== undefined) this.storage.updated_by = data.updated_by;
-        if (data.deleted_by !== undefined) this.storage.deleted_by = data.deleted_by;
-        if (data.approved_by !== undefined) this.storage.approved_by = data.approved_by;
-        if (data.published_by !== undefined) this.storage.published_by = data.published_by;
+        if (data.updated_by !== undefined)
+            this.storage.updated_by = data.updated_by;
+        if (data.deleted_by !== undefined)
+            this.storage.deleted_by = data.deleted_by;
+        if (data.approved_by !== undefined)
+            this.storage.approved_by = data.approved_by;
+        if (data.published_by !== undefined)
+            this.storage.published_by = data.published_by;
 
         return this;
     }
 
     /**
+     * Get object copy of entity data
+     * Returns shallow copy of all entity fields
      * Alias for getArrayCopy to match AbstractEntity interface
-     * @returns {Object}
+     * Used for serialization, database operations, and API responses
+     * @returns {Object} Copy of entity storage object
      */
     getObjectCopy() {
         return {
@@ -179,11 +236,14 @@ class PostEntity extends AbstractEntity {
         };
     }
 
-    // ==================== Convenience Getters ====================
+    // ================================================================
+    // CONVENIENCE GETTERS - Read access to entity fields
+    // All getters use AbstractEntity's get() method for consistency
+    // ================================================================
 
     /**
      * Get post ID
-     * @returns {number|null}
+     * @returns {number|null} Primary key ID
      */
     getId() {
         return this.get('id');
@@ -191,7 +251,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get post slug
-     * @returns {string|null}
+     * @returns {string|null} URL-friendly post identifier
      */
     getSlug() {
         return this.get('slug');
@@ -199,7 +259,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get post title
-     * @returns {string|null}
+     * @returns {string|null} Post title text
      */
     getTitle() {
         return this.get('title');
@@ -207,7 +267,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get excerpt HTML
-     * @returns {string|null}
+     * @returns {string|null} Post excerpt in HTML format
      */
     getExcerptHtml() {
         return this.get('excerpt_html');
@@ -215,7 +275,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get excerpt markdown
-     * @returns {string|null}
+     * @returns {string|null} Post excerpt in Markdown format
      */
     getExcerptMarkdown() {
         return this.get('excerpt_markdown');
@@ -223,7 +283,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get content HTML
-     * @returns {string|null}
+     * @returns {string|null} Full post content in HTML format
      */
     getContentHtml() {
         return this.get('content_html');
@@ -231,7 +291,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get content markdown
-     * @returns {string|null}
+     * @returns {string|null} Full post content in Markdown format
      */
     getContentMarkdown() {
         return this.get('content_markdown');
@@ -239,7 +299,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get author ID
-     * @returns {number|null}
+     * @returns {number|null} Foreign key to users table
      */
     getAuthorId() {
         return this.get('author_id');
@@ -247,7 +307,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get category ID
-     * @returns {number|null}
+     * @returns {number|null} Foreign key to categories table
      */
     getCategoryId() {
         return this.get('category_id');
@@ -255,7 +315,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get presentation style ID
-     * @returns {number|null}
+     * @returns {number|null} Foreign key to presentation_styles table
      */
     getPresentationStyleId() {
         return this.get('presentation_style_id');
@@ -263,7 +323,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get post status
-     * @returns {string} - 'draft', 'published', or 'archived'
+     * Returns 'draft' as default if status not explicitly set
+     * @returns {string} Current status (draft/published/archived)
      */
     getStatus() {
         return this.get('status', 'draft');
@@ -271,7 +332,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Check if post is published
-     * @returns {boolean}
+     * @returns {boolean} True if status is 'published', false otherwise
      */
     isPublished() {
         return this.get('status') === 'published';
@@ -279,7 +340,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Check if post is draft
-     * @returns {boolean}
+     * @returns {boolean} True if status is 'draft', false otherwise
      */
     isDraft() {
         return this.get('status') === 'draft';
@@ -287,7 +348,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Check if post is archived
-     * @returns {boolean}
+     * @returns {boolean} True if status is 'archived', false otherwise
      */
     isArchived() {
         return this.get('status') === 'archived';
@@ -295,7 +356,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Check if post is featured
-     * @returns {boolean}
+     * Returns false as default if is_featured not explicitly set
+     * @returns {boolean} True if post is featured, false otherwise
      */
     isFeatured() {
         return this.get('is_featured', false);
@@ -303,7 +365,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Check if comments are enabled
-     * @returns {boolean}
+     * Returns true as default if comments_enabled not explicitly set
+     * @returns {boolean} True if comments allowed, false otherwise
      */
     areCommentsEnabled() {
         return this.get('comments_enabled', true);
@@ -311,7 +374,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Check if review is requested
-     * @returns {boolean}
+     * Returns false as default if review_requested not explicitly set
+     * @returns {boolean} True if review requested, false otherwise
      */
     isReviewRequested() {
         return this.get('review_requested', false);
@@ -319,7 +383,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Check if post has been deleted (soft delete)
-     * @returns {boolean}
+     * @returns {boolean} True if deleted_at is set, false otherwise
      */
     isDeleted() {
         return this.get('deleted_at') !== null;
@@ -327,7 +391,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get published date
-     * @returns {Date|string|null}
+     * @returns {Date|string|null} Published timestamp
      */
     getPublishedAt() {
         return this.get('published_at');
@@ -335,7 +399,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get creation date
-     * @returns {Date|string|null}
+     * @returns {Date|string|null} Created timestamp
      */
     getCreatedAt() {
         return this.get('created_at');
@@ -343,7 +407,7 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get last update date
-     * @returns {Date|string|null}
+     * @returns {Date|string|null} Updated timestamp
      */
     getUpdatedAt() {
         return this.get('updated_at');
@@ -351,18 +415,22 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get published by user ID
-     * @returns {number|null}
+     * @returns {number|null} User ID who published post
      */
     getPublishedBy() {
         return this.get('published_by');
     }
 
-    // ==================== Convenience Setters ====================
+    // ================================================================
+    // CONVENIENCE SETTERS - Write access to entity fields
+    // All setters use AbstractEntity's set() method for consistency
+    // Return this entity for method chaining
+    // ================================================================
 
     /**
      * Set post ID
-     * @param {number} id
-     * @returns {PostEntity}
+     * @param {number} id - Primary key ID
+     * @returns {PostEntity} This entity for method chaining
      */
     setId(id) {
         return this.set('id', id);
@@ -370,8 +438,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set post slug
-     * @param {string} slug
-     * @returns {PostEntity}
+     * @param {string} slug - URL-friendly post identifier
+     * @returns {PostEntity} This entity for method chaining
      */
     setSlug(slug) {
         return this.set('slug', slug);
@@ -379,8 +447,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set post title
-     * @param {string} title
-     * @returns {PostEntity}
+     * @param {string} title - Post title text
+     * @returns {PostEntity} This entity for method chaining
      */
     setTitle(title) {
         return this.set('title', title);
@@ -388,8 +456,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set excerpt HTML
-     * @param {string} excerptHtml
-     * @returns {PostEntity}
+     * @param {string} excerptHtml - Post excerpt in HTML format
+     * @returns {PostEntity} This entity for method chaining
      */
     setExcerptHtml(excerptHtml) {
         return this.set('excerpt_html', excerptHtml);
@@ -397,8 +465,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set excerpt markdown
-     * @param {string} excerptMarkdown
-     * @returns {PostEntity}
+     * @param {string} excerptMarkdown - Post excerpt in Markdown format
+     * @returns {PostEntity} This entity for method chaining
      */
     setExcerptMarkdown(excerptMarkdown) {
         return this.set('excerpt_markdown', excerptMarkdown);
@@ -406,8 +474,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set content HTML
-     * @param {string} contentHtml
-     * @returns {PostEntity}
+     * @param {string} contentHtml - Full post content in HTML format
+     * @returns {PostEntity} This entity for method chaining
      */
     setContentHtml(contentHtml) {
         return this.set('content_html', contentHtml);
@@ -415,8 +483,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set content markdown
-     * @param {string} contentMarkdown
-     * @returns {PostEntity}
+     * @param {string} contentMarkdown - Full post content in Markdown
+     *                                   format
+     * @returns {PostEntity} This entity for method chaining
      */
     setContentMarkdown(contentMarkdown) {
         return this.set('content_markdown', contentMarkdown);
@@ -424,8 +493,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set author ID
-     * @param {number} authorId
-     * @returns {PostEntity}
+     * @param {number} authorId - Foreign key to users table
+     * @returns {PostEntity} This entity for method chaining
      */
     setAuthorId(authorId) {
         return this.set('author_id', authorId);
@@ -433,8 +502,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set category ID
-     * @param {number} categoryId
-     * @returns {PostEntity}
+     * @param {number} categoryId - Foreign key to categories table
+     * @returns {PostEntity} This entity for method chaining
      */
     setCategoryId(categoryId) {
         return this.set('category_id', categoryId);
@@ -442,21 +511,29 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set post status
-     * @param {string} status - 'draft', 'published', or 'archived'
-     * @returns {PostEntity}
+     * Validates that status is one of the allowed values
+     * @param {string} status - Status value (draft/published/archived)
+     * @returns {PostEntity} This entity for method chaining
+     * @throws {Error} If status is not valid
      */
     setStatus(status) {
         const validStatuses = ['draft', 'published', 'archived'];
         if (!validStatuses.includes(status)) {
-            throw new Error(`Invalid status: ${status}. Must be one of: ${validStatuses.join(', ')}`);
+            throw new Error(
+                `Invalid status: ${status}. Must be one of: ` +
+                `${validStatuses.join(', ')}`);
         }
         return this.set('status', status);
     }
 
     /**
      * Publish the post
-     * @param {number} publishedBy - User ID who published the post (optional)
-     * @returns {PostEntity}
+     * Changes status to 'published' and sets published_at timestamp
+     * Sets published_by user ID if provided
+     * Marks post for static regeneration
+     * @param {number} publishedBy - User ID who published the post
+     *                               (optional)
+     * @returns {PostEntity} This entity for method chaining
      */
     publish(publishedBy = null) {
         this.set('status', 'published');
@@ -474,7 +551,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set post as draft
-     * @returns {PostEntity}
+     * Changes status to 'draft' (unpublished state)
+     * @returns {PostEntity} This entity for method chaining
      */
     setDraft() {
         return this.set('status', 'draft');
@@ -482,7 +560,8 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Archive the post
-     * @returns {PostEntity}
+     * Changes status to 'archived', removing from active content
+     * @returns {PostEntity} This entity for method chaining
      */
     archive() {
         return this.set('status', 'archived');
@@ -490,8 +569,10 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set featured status
-     * @param {boolean} featured
-     * @returns {PostEntity}
+     * Marks post as featured (highlighted/promoted content)
+     * @param {boolean} featured - Whether post is featured (default:
+     *                             true)
+     * @returns {PostEntity} This entity for method chaining
      */
     setFeatured(featured = true) {
         return this.set('is_featured', featured);
@@ -499,8 +580,10 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Enable/disable comments
-     * @param {boolean} enabled
-     * @returns {PostEntity}
+     * Controls whether readers can comment on this post
+     * @param {boolean} enabled - Whether comments are allowed (default:
+     *                            false)
+     * @returns {PostEntity} This entity for method chaining
      */
     setCommentsEnabled(enabled = false) {
         return this.set('comments_enabled', enabled);
@@ -508,7 +591,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Request review for this post
-     * @returns {PostEntity}
+     * Sets review_requested flag to true
+     * Used to signal editorial review needed
+     * @returns {PostEntity} This entity for method chaining
      */
     requestReview() {
         return this.set('review_requested', true);
@@ -516,7 +601,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Clear review request
-     * @returns {PostEntity}
+     * Sets review_requested flag to false
+     * Used after review is completed or canceled
+     * @returns {PostEntity} This entity for method chaining
      */
     clearReviewRequest() {
         return this.set('review_requested', false);
@@ -524,8 +611,10 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Soft delete the post
+     * Sets deleted_at timestamp without removing from database
+     * Records user ID who performed deletion
      * @param {number} deletedBy - User ID who deleted the post
-     * @returns {PostEntity}
+     * @returns {PostEntity} This entity for method chaining
      */
     softDelete(deletedBy = null) {
         this.set('deleted_at', new Date().toISOString());
@@ -537,7 +626,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Restore soft-deleted post
-     * @returns {PostEntity}
+     * Clears deleted_at timestamp and deleted_by user ID
+     * Returns post to active state
+     * @returns {PostEntity} This entity for method chaining
      */
     restore() {
         this.set('deleted_at', null);
@@ -547,8 +638,10 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set presentation style ID
-     * @param {number} presentationStyleId
-     * @returns {PostEntity}
+     * Links post to a presentation style configuration
+     * @param {number} presentationStyleId - Foreign key to
+     *                                       presentation_styles table
+     * @returns {PostEntity} This entity for method chaining
      */
     setPresentationStyleId(presentationStyleId) {
         return this.set('presentation_style_id', presentationStyleId);
@@ -556,8 +649,10 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set header color override
-     * @param {string} headerColorOverride
-     * @returns {PostEntity}
+     * Allows custom header color for this specific post
+     * @param {string} headerColorOverride - CSS color value (hex, rgb,
+     *                                       etc.)
+     * @returns {PostEntity} This entity for method chaining
      */
     setHeaderColorOverride(headerColorOverride) {
         return this.set('header_color_override', headerColorOverride);
@@ -565,8 +660,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set hero image URL
-     * @param {string} heroImageUrl
-     * @returns {PostEntity}
+     * Main hero/featured image for the post
+     * @param {string} heroImageUrl - URL to hero image
+     * @returns {PostEntity} This entity for method chaining
      */
     setHeroImageUrl(heroImageUrl) {
         return this.set('hero_image_url', heroImageUrl);
@@ -574,8 +670,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set hero image alt text
-     * @param {string} heroImageAlt
-     * @returns {PostEntity}
+     * Alternative text for accessibility (screen readers)
+     * @param {string} heroImageAlt - Alt text description
+     * @returns {PostEntity} This entity for method chaining
      */
     setHeroImageAlt(heroImageAlt) {
         return this.set('hero_image_alt', heroImageAlt);
@@ -583,8 +680,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set hero image caption
-     * @param {string} heroImageCaption
-     * @returns {PostEntity}
+     * Caption text displayed with hero image
+     * @param {string} heroImageCaption - Caption text
+     * @returns {PostEntity} This entity for method chaining
      */
     setHeroImageCaption(heroImageCaption) {
         return this.set('hero_image_caption', heroImageCaption);
@@ -592,8 +690,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set hero image credit
-     * @param {string} heroImageCredit
-     * @returns {PostEntity}
+     * Photo credit or attribution for hero image
+     * @param {string} heroImageCredit - Credit/attribution text
+     * @returns {PostEntity} This entity for method chaining
      */
     setHeroImageCredit(heroImageCredit) {
         return this.set('hero_image_credit', heroImageCredit);
@@ -601,8 +700,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set meta title
-     * @param {string} metaTitle
-     * @returns {PostEntity}
+     * SEO meta title override (used in <title> tag)
+     * @param {string} metaTitle - SEO title text
+     * @returns {PostEntity} This entity for method chaining
      */
     setMetaTitle(metaTitle) {
         return this.set('meta_title', metaTitle);
@@ -610,8 +710,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set meta description
-     * @param {string} metaDescription
-     * @returns {PostEntity}
+     * SEO meta description (used in <meta name="description"> tag)
+     * @param {string} metaDescription - SEO description text
+     * @returns {PostEntity} This entity for method chaining
      */
     setMetaDescription(metaDescription) {
         return this.set('meta_description', metaDescription);
@@ -619,8 +720,10 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set regenerate static flag
-     * @param {boolean} regenerateStatic
-     * @returns {PostEntity}
+     * Marks post for static HTML regeneration on next build
+     * @param {boolean} regenerateStatic - Whether to regenerate static
+     *                                     HTML (default: true)
+     * @returns {PostEntity} This entity for method chaining
      */
     setRegenerateStatic(regenerateStatic = true) {
         return this.set('regenerate_static', regenerateStatic);
@@ -628,8 +731,10 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set review requested flag
-     * @param {boolean} reviewRequested
-     * @returns {PostEntity}
+     * Marks post as needing editorial review
+     * @param {boolean} reviewRequested - Whether review is requested
+     *                                    (default: true)
+     * @returns {PostEntity} This entity for method chaining
      */
     setReviewRequested(reviewRequested = true) {
         return this.set('review_requested', reviewRequested);
@@ -637,8 +742,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set published at timestamp
-     * @param {Date|string} publishedAt
-     * @returns {PostEntity}
+     * Records when post was published
+     * @param {Date|string} publishedAt - Published timestamp
+     * @returns {PostEntity} This entity for method chaining
      */
     setPublishedAt(publishedAt) {
         return this.set('published_at', publishedAt);
@@ -646,8 +752,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set created at timestamp
-     * @param {Date|string} createdAt
-     * @returns {PostEntity}
+     * Records when post was created
+     * @param {Date|string} createdAt - Created timestamp
+     * @returns {PostEntity} This entity for method chaining
      */
     setCreatedAt(createdAt) {
         return this.set('created_at', createdAt);
@@ -655,8 +762,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set updated at timestamp
-     * @param {Date|string} updatedAt
-     * @returns {PostEntity}
+     * Records when post was last updated
+     * @param {Date|string} updatedAt - Updated timestamp
+     * @returns {PostEntity} This entity for method chaining
      */
     setUpdatedAt(updatedAt) {
         return this.set('updated_at', updatedAt);
@@ -664,8 +772,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set deleted at timestamp
-     * @param {Date|string} deletedAt
-     * @returns {PostEntity}
+     * Records when post was soft-deleted
+     * @param {Date|string} deletedAt - Deleted timestamp
+     * @returns {PostEntity} This entity for method chaining
      */
     setDeletedAt(deletedAt) {
         return this.set('deleted_at', deletedAt);
@@ -673,8 +782,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set approved at timestamp
-     * @param {Date|string} approvedAt
-     * @returns {PostEntity}
+     * Records when post was approved by editor
+     * @param {Date|string} approvedAt - Approved timestamp
+     * @returns {PostEntity} This entity for method chaining
      */
     setApprovedAt(approvedAt) {
         return this.set('approved_at', approvedAt);
@@ -682,8 +792,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set updated by user ID
-     * @param {number} updatedBy
-     * @returns {PostEntity}
+     * Records which user last updated the post
+     * @param {number} updatedBy - User ID who updated
+     * @returns {PostEntity} This entity for method chaining
      */
     setUpdatedBy(updatedBy) {
         return this.set('updated_by', updatedBy);
@@ -691,8 +802,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set deleted by user ID
-     * @param {number} deletedBy
-     * @returns {PostEntity}
+     * Records which user deleted the post
+     * @param {number} deletedBy - User ID who deleted
+     * @returns {PostEntity} This entity for method chaining
      */
     setDeletedBy(deletedBy) {
         return this.set('deleted_by', deletedBy);
@@ -700,8 +812,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set approved by user ID
-     * @param {number} approvedBy
-     * @returns {PostEntity}
+     * Records which user approved the post
+     * @param {number} approvedBy - User ID who approved
+     * @returns {PostEntity} This entity for method chaining
      */
     setApprovedBy(approvedBy) {
         return this.set('approved_by', approvedBy);
@@ -709,8 +822,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Set published by user ID
-     * @param {number} publishedBy
-     * @returns {PostEntity}
+     * Records which user published the post
+     * @param {number} publishedBy - User ID who published
+     * @returns {PostEntity} This entity for method chaining
      */
     setPublishedBy(publishedBy) {
         return this.set('published_by', publishedBy);
@@ -718,8 +832,11 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Approve the post
+     * Sets approved_by user ID, approved_at timestamp, and clears
+     * review_requested flag
+     * Used in editorial workflow to mark post as reviewed and approved
      * @param {number} approvedBy - User ID who approved the post
-     * @returns {PostEntity}
+     * @returns {PostEntity} This entity for method chaining
      */
     approve(approvedBy) {
         this.set('approved_by', approvedBy);
@@ -728,12 +845,19 @@ class PostEntity extends AbstractEntity {
         return this;
     }
 
-    // ==================== Validation Methods ====================
+    // ================================================================
+    // VALIDATION METHODS - InputFilter configuration and validation
+    // ================================================================
 
     /**
      * Get the InputFilter for validation
      * Creates a new InputFilter if not already set
-     * @returns {InputFilter}
+     * Configures comprehensive validation rules for all editable fields
+     * Includes required field checks, string length limits, and data
+     * type validation
+     * Uses filters to clean/normalize input (trim, strip tags, HTML
+     * entities)
+     * @returns {InputFilter} Configured input filter instance
      */
     getInputFilter() {
         if (!this.inputFilter) {
@@ -762,7 +886,10 @@ class PostEntity extends AbstractEntity {
                                 name: 'slug',
                                 allowDashAndUnderscore: true,
                                 messageTemplate: {
-                                    INVALID_FORMAT: 'Slug must contain only alphanumeric characters, hyphens, and underscores'
+                                    INVALID_FORMAT:
+                                        'Slug must contain only ' +
+                                        'alphanumeric characters, ' +
+                                        'hyphens, and underscores'
                                 }
                             }
                         }
@@ -770,7 +897,9 @@ class PostEntity extends AbstractEntity {
                 },
                 'title': {
                     required: true,
-                    requiredMessage: "<strong>Title</strong> is required. Please enter a title.",
+                    requiredMessage:
+                        "<strong>Title</strong> is required. Please " +
+                        "enter a title.",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -784,8 +913,12 @@ class PostEntity extends AbstractEntity {
                                 min: 20,
                                 max: 150,
                                 messageTemplate: {
-                                    INVALID_TOO_SHORT: 'Title must be at least 20 characters long',
-                                    INVALID_TOO_LONG: 'Title must not exceed 150 characters'
+                                    INVALID_TOO_SHORT:
+                                        'Title must be at least 20 ' +
+                                        'characters long',
+                                    INVALID_TOO_LONG:
+                                        'Title must not exceed 150 ' +
+                                        'characters'
                                 }
                             }
                         }
@@ -806,7 +939,9 @@ class PostEntity extends AbstractEntity {
                                 name: "excerpt",
                                 max: 150,
                                 messageTemplate: {
-                                    INVALID_TOO_LONG: '<strong>Excerpt</strong> must not exceed 150 characters'
+                                    INVALID_TOO_LONG:
+                                        '<strong>Excerpt</strong> must ' +
+                                        'not exceed 150 characters'
                                 }
                             }
                         }
@@ -814,7 +949,9 @@ class PostEntity extends AbstractEntity {
                 },
                 'content_markdown': {
                     required: true,
-                    requiredMessage: "<strong>Content</strong> is required. Please enter content",
+                    requiredMessage:
+                        "<strong>Content</strong> is required. Please " +
+                        "enter content",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -836,7 +973,9 @@ class PostEntity extends AbstractEntity {
                                 name: "excerpt",
                                 max: 150,
                                 messageTemplate: {
-                                    INVALID_TOO_LONG: 'Excerpt must not exceed 150 characters'
+                                    INVALID_TOO_LONG:
+                                        'Excerpt must not exceed 150 ' +
+                                        'characters'
                                 }
                             }
                         }
@@ -844,11 +983,13 @@ class PostEntity extends AbstractEntity {
                 },
                 'content_html': {
                     required: true,
-                    requiredMessage: "Content is required. Please enter content"
+                    requiredMessage:
+                        "Content is required. Please enter content"
                 },
                 'category_id': {
                     required: true,
-                    requiredMessage: "Category is required. Please select a category",
+                    requiredMessage:
+                        "Category is required. Please select a category",
                     filters: [
                         { name: 'HtmlEntities' },
                         { name: 'StringTrim' },
@@ -859,7 +1000,8 @@ class PostEntity extends AbstractEntity {
                             name: 'Integer',
                             options: {},
                             messages: {
-                                INVALID: 'Please select a valid category'
+                                INVALID:
+                                    'Please select a valid category'
                             }
                         }
                     ]
@@ -883,15 +1025,16 @@ class PostEntity extends AbstractEntity {
                     ]
                 }
             });
-            // You can configure validation rules here if needed
+            // InputFilter configured with comprehensive validation rules
         }
         return this.inputFilter;
     }
 
     /**
      * Set the InputFilter for validation
+     * Allows custom InputFilter to be injected
      * @param {InputFilter} inputFilter - The InputFilter instance to use
-     * @returns {PostEntity}
+     * @returns {PostEntity} This entity for method chaining
      */
     setInputFilter(inputFilter) {
         this.inputFilter = inputFilter;
@@ -900,8 +1043,10 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Validate the post entity
-     * Uses the InputFilter to validate entity data
-     * @returns {boolean} - True if valid, false otherwise
+     * Uses the InputFilter to validate entity data against defined rules
+     * Runs all validators and filters on current entity data
+     * @returns {boolean} True if validation passes, false if any
+     *                    validation errors
      */
     isValid() {
         const inputFilter = this.getInputFilter();
@@ -909,32 +1054,51 @@ class PostEntity extends AbstractEntity {
         return inputFilter.isValid();
     }
 
-    // ==================== Utility Methods ====================
+    // ================================================================
+    // UTILITY METHODS - Data transformation and helper functions
+    // ================================================================
 
     /**
-     * Get data prepared for database insertion
-     * Removes null id and returns underscore_case keys
-     *
-     * @param {boolean} forUpdate - If true, includes id for UPDATE queries
-     * @returns {Object} - Data object ready for database
+     * Get data prepared for database insertion or update
+     * Removes null id for INSERT operations
+     * For UPDATE: removes null/undefined fields to avoid overwriting
+     * existing data
+     * For INSERT: converts undefined values to null for PostgreSQL
+     * compatibility
+     * @param {boolean} forUpdate - If true, includes id for UPDATE
+     *                              queries; if false, excludes id for
+     *                              INSERT
+     * @returns {Object} Data object ready for database operation
      */
     getDataForDatabase(forUpdate = false) {
         const data = this.getObjectCopy();
 
-        // Remove id for INSERT operations
+        // Remove id for INSERT operations (database auto-generates)
         if (!forUpdate) {
             delete data.id;
         }
 
-        // Convert undefined values to null for PostgreSQL compatibility
-        Object.keys(data).forEach(key => {
-            if (data[key] === undefined) {
-                data[key] = null;
-            }
-        });
+        // For UPDATE operations, remove null values to avoid overwriting
+        // existing data with nulls (only update fields that were
+        // explicitly set)
+        if (forUpdate) {
+            Object.keys(data).forEach(key => {
+                if (data[key] === null || data[key] === undefined) {
+                    delete data[key];
+                }
+            });
+        } else {
+            // For INSERT operations, convert undefined values to null
+            // for PostgreSQL compatibility
+            Object.keys(data).forEach(key => {
+                if (data[key] === undefined) {
+                    data[key] = null;
+                }
+            });
+        }
 
-        // Remove computed/read-only fields that shouldn't be manually set
-        // (created_at and updated_at are handled by database triggers)
+        // Note: created_at and updated_at are handled by database
+        // triggers
 
         return data;
     }
@@ -942,8 +1106,8 @@ class PostEntity extends AbstractEntity {
     /**
      * Prepare data for form display
      * Returns only fields that should be shown in forms
-     *
-     * @returns {Object}
+     * Excludes internal/system fields like timestamps and user tracking
+     * @returns {Object} Data object suitable for form population
      */
     getDataForForm() {
         return {
@@ -970,7 +1134,9 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Check if post has required fields for publishing
-     * @returns {boolean}
+     * Validates that all essential fields are populated before publish
+     * @returns {boolean} True if post can be published, false if
+     *                    missing required fields
      */
     canBePublished() {
         return !!(
@@ -983,7 +1149,11 @@ class PostEntity extends AbstractEntity {
 
     /**
      * Get validation errors for publishing
-     * @returns {string[]} - Array of error messages
+     * Returns array of human-readable error messages for missing
+     * required fields
+     * Used to provide feedback when publish validation fails
+     * @returns {string[]} Array of error messages (empty if all
+     *                     required fields present)
      */
     getPublishValidationErrors() {
         const errors = [];

@@ -598,6 +598,83 @@ class PostService extends AbstractService {
     }
 
     /**
+     * Update a post by ID
+     * @param {number} id - Post ID to search by
+     * @param {Object} updateData - Data to update
+     * @returns {Promise<Object>} Updated post object
+     */
+    async updatePostById(id, updateData) {
+        try {
+            const adapter = await this.initializeDatabase();
+            const Update = require('../../library/db/sql/update');
+            const update = new Update(adapter);
+
+            // Build update query
+            update.table('posts')
+                  .set(updateData)
+                  .where('id = ?', id)
+                  .where('deleted_at IS NULL');
+
+            await update.execute();
+
+            // Return the updated post
+            return await this.getSinglePost(id, false, true);
+        } catch (error) {
+            console.error('Error updating post by ID:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Delete a post by ID (hard delete)
+     * Permanently removes the post from the database
+     * Use with caution - this cannot be undone
+     * @param {number} id - Post ID to delete
+     * @returns {Promise<void>}
+     */
+    async deletePost(id) {
+        try {
+            const adapter = await this.initializeDatabase();
+            const Delete = require('../../library/db/sql/delete');
+            const deleteQuery = new Delete(adapter);
+
+            // Build delete query
+            deleteQuery.from('posts')
+                       .where('id = ?', id);
+
+            await deleteQuery.execute();
+        } catch (error) {
+            console.error('Error deleting post by ID:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Soft delete a post by ID
+     * Sets deleted_at timestamp instead of removing from database
+     * @param {number} id - Post ID to soft delete
+     * @param {number} deletedBy - User ID who is deleting the post
+     * @returns {Promise<Object>} Updated post object
+     */
+    async softDeletePost(id, deletedBy = null) {
+        try {
+            const updateData = {
+                deleted_at: new Date().toISOString(),
+                regenerate_static: true
+            };
+
+            if (deletedBy) {
+                updateData.deleted_by = deletedBy;
+            }
+
+            return await this.updatePostById(id, updateData);
+        } catch (error) {
+            console.error('Error soft deleting post by ID:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Generate a unique slug for a post
      * Uses the opaqueId plugin to generate random slugs and checks for uniqueness
      * @returns {Promise<string>} Unique slug

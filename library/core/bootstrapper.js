@@ -305,28 +305,41 @@ The ${errorType}.njk template should extend your layout and provide user-friendl
             }
         }
 
+        // If Express has already sent the response (e.g. controller used 
+        // res.json/res.redirect), then do NOT attempt to render or redirect again.
+        if (res.headersSent) {
+            return;
+        }
+
         if (front.getResponse().isRedirect()) {
             let location = front.getResponse().getHeader('Location');
-            res.redirect(location);
-        } else {
-            if (view) {
-                // Check for custom status code from view model or request flags
-                let statusCode = null;
-                if (view && typeof view.getVariable === 'function') {
-                    statusCode = view.getVariable('_status');
-                } else {
-                    console.error('Bootstrapper: view is not a proper ViewModel instance:', typeof view, view);
-                }
-                statusCode = statusCode || (req._is404 ? 404 : null) || (req._is500 ? 500 : null);
-                if (statusCode) {
-                    res.status(statusCode);
-                }
+            return res.redirect(location);
+        }
 
-                // BEFORE you render the view, prepare flash messages:
-                front.prepareFlashMessenger();
+        // If controller explicitly disabled rendering, assume it has already written to 
+        // res and just exit.
+        /*if (typeof front.isNoRender === 'function' && front.isNoRender()) {
+            return;
+        }*/
 
-                return res.render(view.getTemplate(), view.getVariables());
+        // Normal view rendering path
+        if (view) {
+            // Check for custom status code from view model or request flags
+            let statusCode = null;
+            if (view && typeof view.getVariable === 'function') {
+                statusCode = view.getVariable('_status');
+            } else {
+                console.error('Bootstrapper: view is not a proper ViewModel instance:', typeof view, view);
             }
+            statusCode = statusCode || (req._is404 ? 404 : null) || (req._is500 ? 500 : null);
+            if (statusCode) {
+                res.status(statusCode);
+            }
+
+            // BEFORE you render the view, prepare flash messages:
+            front.prepareFlashMessenger();
+
+            return res.render(view.getTemplate(), view.getVariables());
         }
     }
 

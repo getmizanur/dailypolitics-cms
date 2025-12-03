@@ -207,7 +207,7 @@ class ArticleForm extends Form {
     addMetaDescriptionField(name = 'meta_description',
                             additionalAttributes = {}) {
         const element = new Textarea(name);
-        element.setLabel('Meta Description');
+        element.setLabel('Meta description');
         element.setAttributes({
             'class': 'dp-input',
             'id': 'article-meta-description',
@@ -231,7 +231,7 @@ class ArticleForm extends Form {
     addCommentEnabledField(name = 'comments_enabled',
                            additionalAttributes = {}) {
         const element = new Checkbox(name);
-        element.setLabel('Enable Comments');
+        element.setLabel('Enable comments');
         element.setAttributes({
             'class': 'dp-checkbox',
             'id': 'article-comment-enabled',
@@ -248,6 +248,30 @@ class ArticleForm extends Form {
     }
 
     /**
+     * Add excerpt field (textarea)
+     * @param {string} name
+     * @param {Object} additionalAttributes - Optional additional HTML
+     *                                         attributes
+     * @returns {ArticleForm}
+     */
+    addChangeReasonField(name = 'change_reason',
+                    additionalAttributes = {}) {
+        const element = new Textarea(name);
+        element.setLabel('Reason for change');
+        element.setAttributes({
+            'class': 'dp-input',
+            'id': 'change_reason',
+            'rows': '4',
+            'placeholder': 'Please give a brief reason for this change',
+            //'maxlength': '500'
+            ...additionalAttributes
+        });
+        element.setLabelAttribute('class', 'dp-label');
+        this.add(element);
+        return this;
+    }
+
+    /**
      * Add change reason field (textarea)
      * Used in revision drafts to document the reason for changes
      * Helps track editorial history and provides context for updates
@@ -259,7 +283,7 @@ class ArticleForm extends Form {
     addChangeReasonField(name = 'change_reason',
                     additionalAttributes = {}) {
         const element = new Textarea(name);
-        element.setLabel('Reason for change');
+        element.setLabel('Reason For Change');
         element.setAttributes({
             'class': 'dp-input',
             'id': 'change-reason',
@@ -309,8 +333,23 @@ class ArticleForm extends Form {
      *                         (default: 'Save Revision Draft')
      * @returns {ArticleForm}
      */
+    addExitThisPageButton(name = 'exit_this_page',
+                               label = 'Exit this page') {
+        return this.addSubmitButton(name, label,
+            'dp-button--exit_this_page');
+    }
+
+    /**
+     * Add save revision draft button
+     * Saves changes to an existing revision draft without publishing
+     * @param {string} name - Button name
+     *                        (default: 'save_revision_draft')
+     * @param {string} label - Button label text
+     *                         (default: 'Save Revision Draft')
+     * @returns {ArticleForm}
+     */
     addSaveRevisionDraftButton(name = 'save_revision_draft',
-                               label = 'Save Revision Draft') {
+                               label = 'Save revision draft') {
         return this.addSubmitButton(name, label,
             'dp-button--save_revision_draft');
     }
@@ -324,7 +363,7 @@ class ArticleForm extends Form {
      * @returns {ArticleForm}
      */
     addPublishRevisionButton(name = 'publish_revision',
-                             label = 'Publish Revision') {
+                             label = 'Publish revision') {
         return this.addSubmitButton(name, label,
             'dp-button--publish_revision');
     }
@@ -337,7 +376,7 @@ class ArticleForm extends Form {
      * @returns {ArticleForm}
      */
     addDeleteDraftButton(name = 'delete_draft',
-                         label = 'Delete Draft') {
+                         label = 'Delete draft') {
         return this.addSubmitButton(name, label,
             'dp-button--delete_draft');
     }
@@ -353,7 +392,7 @@ class ArticleForm extends Form {
      * @returns {ArticleForm}
      */
     addContinueRevisionDraftButton(name = 'continue_revision_draft',
-                                   label = 'Continue Revision Draft') {
+                                   label = 'Continue revision draft') {
         return this.addSubmitButton(name, label,
             'dp-button--continue_revision_draft');
     }
@@ -381,7 +420,7 @@ class ArticleForm extends Form {
      * @returns {ArticleForm}
      */
     addCreateRevisionDraftButton(name = "create_revision_draft",
-                                 label = "Create Revision Draft") {
+                                 label = "Create revision draft") {
         return this.addSubmitButton(name, label,
             "dp-button--revision_draft");
     }
@@ -432,7 +471,7 @@ class ArticleForm extends Form {
      * @param {string} label
      * @returns {ArticleForm}
      */
-    addSaveButton(name = 'save', label = 'Save Draft') {
+    addSaveButton(name = 'save', label = 'Save draft') {
         return this.addSubmitButton(name, label, 'dp-button--save');
     }
 

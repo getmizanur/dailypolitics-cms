@@ -87,7 +87,7 @@ class FlashBannerHelper extends AbstractHelper {
      * @private
      */
     _escapeHtml(str) {
-        if (str === null || str === undefined) {
+        /*if (str === null || str === undefined) {
             return '';
         }
         str = String(str);
@@ -99,7 +99,8 @@ class FlashBannerHelper extends AbstractHelper {
             "'": '&#x27;',
             '/': '&#x2F;'
         };
-        return str.replace(/[&<>"'\/]/g, (match) => htmlEscapeMap[match]);
+        return str.replace(/[&<>"'\/]/g, (match) => htmlEscapeMap[match]);*/
+        return str;
     }
 }
 

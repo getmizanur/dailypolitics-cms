@@ -347,6 +347,36 @@ class PostRevisionService extends AbstractService {
     }
 
     /**
+     * Mark all other revisions (both draft and approved) as superseded
+     * Used when publishing a revision - makes all previous revisions obsolete
+     * @param {number} postId - Post ID
+     * @param {number} excludeRevisionId - Revision ID to exclude (the one being published)
+     * @returns {Promise<boolean>} True if updated successfully
+     */
+    async markOtherRevisionsAsSuperseded(postId, excludeRevisionId) {
+        try {
+            const adapter = await this.initializeDatabase();
+            const Update = require('../../library/db/sql/update');
+            const update = new Update(adapter);
+
+            // Build update query - mark all revisions except the current one as superseded
+            update.table('post_revisions')
+                  .set({ status: 'superseded' })
+                  .where('post_id = ?', postId)
+                  .where('id != ?', excludeRevisionId)
+                  .where("status IN ('draft', 'approved')");
+
+            await update.execute();
+            console.log('Successfully marked other revisions as superseded for post:', postId);
+
+            return true;
+        } catch (error) {
+            console.error('Error marking other revisions as superseded:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Count revisions by post ID and status
      * @param {number} postId - Post ID
      * @param {string} status - Optional status to filter by

@@ -73,53 +73,47 @@ class PostController extends Controller {
      * @returns {Promise<ViewModel>} View with posts and pagination data
      */
     async listAction() {
-        try {
-            const postService = this.getServiceManager().get('PostService');
-            const page = parseInt(
-                this.plugin('params').fromRoute('page')) || 1;
-            const limit = 5;
-            const offset = (page - 1) * limit;
+        const postService = this.getServiceManager().get('PostService');
+        const page = parseInt(
+            this.plugin('params').fromRoute('page')) || 1;
+        const limit = 5;
+        const offset = (page - 1) * limit;
 
-            // Fetch posts with all statuses and total count for pagination
-            const [posts, totalCount] = await Promise.all([
-                postService.getAllPostsWithStatus(
-                    ['draft', 'published', 'archived'], limit, offset),
-                postService.getPostCount({ includeDrafts: true })
-            ]);
+        // Fetch posts with all statuses and total count for pagination
+        const [posts, totalCount] = await Promise.all([
+            postService.getAllPostsWithStatus(
+                ['draft', 'published', 'archived'], limit, offset),
+            postService.getPostCount({ includeDrafts: true })
+        ]);
 
-            // Get recent posts for sidebar
-            const recentPosts = await postService
-                .getRecentPostsForSidebar();
+        // Get recent posts for sidebar
+        const recentPosts = await postService
+            .getRecentPostsForSidebar();
 
-            // Calculate pagination
-            const totalPages = Math.ceil(totalCount / limit);
-            // Build numbered pagination array
-            const pages = [];
-            for (let i = 1; i <= totalPages; i++) {
-                pages.push({
-                    number: i,
-                    isCurrent: i === page
-                });
-            }
-
-            const baseUrl = this.helper('url')
-                .fromRoute('adminDashboardIndex');
-            // Set view variables
-            this.getView()
-                .setVariable('posts', posts)
-                .setVariable('pagination', {
-                    mode: 'admin',
-                    currentPage: page,
-                    totalItems: totalCount,
-                    baseUrl: baseUrl
-                });
-
-            return this.getView();
-
-        } catch (error) {
-            console.error('Error in indexAction:', error);
-            throw error;
+        // Calculate pagination
+        const totalPages = Math.ceil(totalCount / limit);
+        // Build numbered pagination array
+        const pages = [];
+        for (let i = 1; i <= totalPages; i++) {
+            pages.push({
+                number: i,
+                isCurrent: i === page
+            });
         }
+
+        const baseUrl = this.helper('url')
+            .fromRoute('adminDashboardIndex');
+        // Set view variables
+        this.getView()
+            .setVariable('posts', posts)
+            .setVariable('pagination', {
+                mode: 'admin',
+                currentPage: page,
+                totalItems: totalCount,
+                baseUrl: baseUrl
+            });
+
+        return this.getView();
     }
 
     /**
@@ -143,49 +137,48 @@ class PostController extends Controller {
         // Create form
         const form = new ArticleForm();
 
-        try {
-            const categories = await postService.getAllCategories();
+        const categories = await postService.getAllCategories();
 
-            // Add role-based button (Review for Authors,
-            // Publish for Editors/Admins)
-            const authService = this.getServiceManager()
-                .get('AuthenticationService');
-            const identity = authService.getIdentity();
-            const userRole = identity?.role || 'author';
-            // Get current user identity for tracking
-            const currentUserId = identity?.id || null;
-            const authorName = identity?.name || null;
+        // Add role-based button (Review for Authors,
+        // Publish for Editors/Admins)
+        const authService = this.getServiceManager()
+            .get('AuthenticationService');
+        const identity = authService.getIdentity();
+        const userRole = identity?.role || 'author';
+        // Get current user identity for tracking
+        const currentUserId = identity?.id || null;
+        const authorName = identity?.name || null;
 
-            const actionUrl = this.helper('url')
-                .fromRoute('adminDashboardNew');
-            // Set form attributes
-            form.setAction(actionUrl);
-            form.setMethod('POST');
+        const actionUrl = this.helper('url')
+            .fromRoute('adminDashboardNew');
+        // Set form attributes
+        form.setAction(actionUrl);
+        form.setMethod('POST');
 
-            // Initialize form with categories
-            form.addIdField();
-            form.addTitleField();
-            form.addExcerptField();
-            form.addContentField();
-            form.addAuthorIdField();
-            form.addAuthorNameField();
-            form.addCategoryField('category_id', categories);
-            form.addMetaDescriptionField();
-            form.addCommentEnabledField();
-            form.addPublishButton();
-            form.addSaveButton();
+        // Initialize form with categories
+        form.addIdField();
+        form.addTitleField();
+        form.addExcerptField();
+        form.addContentField();
+        form.addAuthorIdField();
+        form.addAuthorNameField();
+        form.addCategoryField('category_id', categories);
+        form.addMetaDescriptionField();
+        form.addCommentEnabledField();
+        form.addPublishButton();
+        form.addSaveButton();
 
-            // Pre-populate author fields with current user information
-            form.setData({
-                author_id: currentUserId,
-                author_name: authorName
-            });
+        // Pre-populate author fields with current user information
+        form.setData({
+            author_id: currentUserId,
+            author_name: authorName
+        });
 
-            // Build category names array for InArray validator
-            const categoryIds = categories.map(cat => String(cat.id));
+        // Build category names array for InArray validator
+        const categoryIds = categories.map(cat => String(cat.id));
 
-            const inputFilter = InputFilter.factory({
-                'author_id': {
+        const inputFilter = InputFilter.factory({
+            'author_id': {
                     required: true,
                     filters: [
                         { name: 'HtmlEntities' },
@@ -337,141 +330,136 @@ class PostController extends Controller {
                         }
                     ]
                 }
-            });
-            form.setInputFilter(inputFilter);
+        });
+        form.setInputFilter(inputFilter);
 
-            if (super.getRequest().isPost()) {
-                const postData = super.getRequest().getPost();
+        if (super.getRequest().isPost()) {
+            const postData = super.getRequest().getPost();
 
-                console.log("postData: " + JSON.stringify(postData));
+            console.log("postData: " + JSON.stringify(postData));
 
-                form.setData(postData);
+            form.setData(postData);
 
-                const isFormValid = form.isValid();
-                if (isFormValid) {
-                    const contentHtml = this.plugin('markdownToHtml')
-                        .convert(postData.content_markdown);
-                    const excerptHtml = this.plugin('markdownToHtml')
-                        .convert(postData.excerpt_markdown);
+            const isFormValid = form.isValid();
+            if (isFormValid) {
+                const contentHtml = this.plugin('markdownToHtml')
+                    .convert(postData.content_markdown);
+                const excerptHtml = this.plugin('markdownToHtml')
+                    .convert(postData.excerpt_markdown);
 
-                    const slug = await postService.generateUniqueSlug();
+                const slug = await postService.generateUniqueSlug();
 
-                    const postEntity = new PostEntity(postData);
-                    const currentTimestamp = new Date().toISOString();
+                const postEntity = new PostEntity(postData);
+                const currentTimestamp = new Date().toISOString();
 
-                    postEntity
-                        .setSlug(slug)
-                        .setTitle(postData.title)
-                        .setExcerptMarkdown(postData.excerpt_markdown)
-                        .setExcerptHtml(excerptHtml)
-                        .setContentMarkdown(postData.content_markdown)
-                        .setContentHtml(contentHtml)
-                        .setAuthorId(postData.author_id)
-                        .setCategoryId(postData.category_id)
-                        .setCommentsEnabled(
-                            postData.comments_enabled === '1' ||
-                            postData.comments_enabled === true ||
-                            postData.comments_enabled === 'on')
-                        .setRegenerateStatic(
-                            postData.regenerate_static || false)
-                        .setReviewRequested(
-                            postData.review_requested || false)
-                        .setCreatedAt(currentTimestamp)
-                        .setUpdatedAt(currentTimestamp);
-                    // Note: published_at, deleted_at, approved_at, etc.
-                    // are NOT set here for new posts
-                    // They remain null and will be set when the post is
-                    // published/deleted/approved
+                postEntity
+                    .setSlug(slug)
+                    .setTitle(postData.title)
+                    .setExcerptMarkdown(postData.excerpt_markdown)
+                    .setExcerptHtml(excerptHtml)
+                    .setContentMarkdown(postData.content_markdown)
+                    .setContentHtml(contentHtml)
+                    .setAuthorId(postData.author_id)
+                    .setCategoryId(postData.category_id)
+                    .setCommentsEnabled(
+                        postData.comments_enabled === '1' ||
+                        postData.comments_enabled === true ||
+                        postData.comments_enabled === 'on')
+                    .setRegenerateStatic(
+                        postData.regenerate_static || false)
+                    .setReviewRequested(
+                        postData.review_requested || false)
+                    .setCreatedAt(currentTimestamp)
+                    .setUpdatedAt(currentTimestamp);
+                // Note: published_at, deleted_at, approved_at, etc.
+                // are NOT set here for new posts
+                // They remain null and will be set when the post is
+                // published/deleted/approved
 
-                    if (VarUtil.isset(postData.save) &&
-                        postData.save === 'Save Draft') {
-                        postEntity.setDraft();
-                        postEntity.setUpdatedBy(currentUserId);
-                    } else if (VarUtil.isset(postData.publish) &&
-                               postData.publish === 'Publish') {
-                        // Publish button clicked
-                        postEntity.publish(currentUserId);
-                        postEntity.approve(currentUserId);
-                        postEntity.setUpdatedBy(currentUserId);
-                    }
+                if (VarUtil.isset(postData.save) &&
+                    postData.save === 'Save draft') {
+                    postEntity.setDraft();
+                    postEntity.setUpdatedBy(currentUserId);
+                } else if (VarUtil.isset(postData.publish) &&
+                           postData.publish === 'Publish') {
+                    // Publish button clicked
+                    postEntity.publish(currentUserId);
+                    postEntity.approve(currentUserId);
+                    postEntity.setUpdatedBy(currentUserId);
+                }
 
-                    const dataForDb = postEntity.getDataForDatabase();
-                    const isValid = postEntity.isValid();
+                const dataForDb = postEntity.getDataForDatabase();
+                const isValid = postEntity.isValid();
 
-                    if (!isValid) {
-                        const invalidInputs = postEntity.getInputFilter()
-                            .getInvalidInputs();
-                        console.log("\n=== VALIDATION ERRORS ===");
-                        Object.keys(invalidInputs).forEach((fieldName) => {
-                            const messages = invalidInputs[fieldName]
-                                .getMessages();
-                            const value = postEntity.get(fieldName);
-                            console.log(`Field: ${fieldName}`);
-                            console.log(`  Value: "${value}"`);
-                            console.log(`  Errors: ${messages.join(', ')}`);
-                        });
-                        console.log("========================\n");
-                    }
-
-                    if (isValid) {
-                        console.log("dataForDb: " +
-                            JSON.stringify(dataForDb));
-                        const createPost = await postService
-                            .createPost(dataForDb);
-                        //log(`Post updated successfully:
-                        //    ${updatedPost.slug}`);
-
-                        // Add success message
-                        super.plugin('flashMessenger').addSuccessMessage(
-                            `Post saved successfully. Return back to ` +
-                            `Dashboard`);
-
-                        // Redirect to list or stay on edit page
-                        return this.plugin('redirect')
-                            .toRoute('adminDashboardConfirmation');
-                        //return this.plugin('redirect').toRoute(
-                        //    'adminDashboardEdit', { slug: updatePost.slug });
-                    }
-                } else {
-                    // After form.isValid() returns false
-                    // Get validation messages from form
-                    const formMessages = form.getMessages();
-
-                    Object.keys(formMessages).forEach((fieldName) => {
-                        if (form.has(fieldName)) {
-                            console.log("errorMessages: " +
-                                formMessages[fieldName]);
-                            console.log("errorFieldName: " + fieldName);
-                            form.get(fieldName)
-                                .setMessages(formMessages[fieldName]);
-                        }
+                if (!isValid) {
+                    const invalidInputs = postEntity.getInputFilter()
+                        .getInvalidInputs();
+                    console.log("\n=== VALIDATION ERRORS ===");
+                    Object.keys(invalidInputs).forEach((fieldName) => {
+                        const messages = invalidInputs[fieldName]
+                            .getMessages();
+                        const value = postEntity.get(fieldName);
+                        console.log(`Field: ${fieldName}`);
+                        console.log(`  Value: "${value}"`);
+                        console.log(`  Errors: ${messages.join(', ')}`);
                     });
+                    console.log("========================\n");
+                }
 
-                    // Extract error messages for flash messenger
-                    let errorMessages = [];
-                    Object.keys(formMessages).forEach((fieldName) => {
-                        const fieldMessages = formMessages[fieldName];
-                        if (Array.isArray(fieldMessages)) {
-                            errorMessages =
-                                errorMessages.concat(fieldMessages);
-                        } else {
-                            errorMessages.push(fieldMessages);
-                        }
-                    });
+                if (isValid) {
+                    console.log("dataForDb: " +
+                        JSON.stringify(dataForDb));
+                    const createPost = await postService
+                        .createPost(dataForDb);
+                    //log(`Post updated successfully:
+                    //    ${updatedPost.slug}`);
 
-                    // Add validation error messages for flash messenger
-                    if (errorMessages.length > 0) {
-                        errorMessages.forEach((message) => {
-                            super.plugin('flashMessenger')
-                                .addErrorMessage(message);
-                        });
+                    // Add success message
+                    super.plugin('flashMessenger').addSuccessMessage(
+                        `Post saved successfully. Return back to ` +
+                        `Dashboard`);
+
+                    // Redirect to list or stay on edit page
+                    return this.plugin('redirect')
+                        .toRoute('adminDashboardConfirmation');
+                    //return this.plugin('redirect').toRoute(
+                    //    'adminDashboardEdit', { slug: updatePost.slug });
+                }
+            } else {
+                // After form.isValid() returns false
+                // Get validation messages from form
+                const formMessages = form.getMessages();
+
+                Object.keys(formMessages).forEach((fieldName) => {
+                    if (form.has(fieldName)) {
+                        console.log("errorMessages: " +
+                            formMessages[fieldName]);
+                        console.log("errorFieldName: " + fieldName);
+                        form.get(fieldName)
+                            .setMessages(formMessages[fieldName]);
                     }
+                });
+
+                // Extract error messages for flash messenger
+                let errorMessages = [];
+                Object.keys(formMessages).forEach((fieldName) => {
+                    const fieldMessages = formMessages[fieldName];
+                    if (Array.isArray(fieldMessages)) {
+                        errorMessages =
+                            errorMessages.concat(fieldMessages);
+                    } else {
+                        errorMessages.push(fieldMessages);
+                    }
+                });
+
+                // Add validation error messages for flash messenger
+                if (errorMessages.length > 0) {
+                    errorMessages.forEach((message) => {
+                        super.plugin('flashMessenger')
+                            .addErrorMessage(message);
+                    });
                 }
             }
-
-        } catch (error) {
-            console.error('Error in indexAction:', error);
-            throw error;
         }
 
         return this.getView()
@@ -491,32 +479,97 @@ class PostController extends Controller {
      *                                         or view with readonly form
      */
     async editAction() {
-        // Declare form outside try block so it's accessible
-        // in return statement
-        let form;
+        const postService = this.getServiceManager().get('PostService');
+        // Fetch all categories from database
+        const categories = await postService.getAllCategories();
 
-        try {
-            const postService = this.getServiceManager().get('PostService');
+        // Create form
+        const form = new ArticleForm();
+        let isDraft = false;
 
-            // Fetch all categories from database
-            const categories = await postService.getAllCategories();
+        // Get article slug
+        const postId = this.plugin('params').fromRoute('id');
 
-            // Create form
-            form = new ArticleForm();
+        const actionUrl = this.helper('url')
+            .fromRoute('adminDashboardEdit', { id : postId });
 
-            // Get article slug
-            const postId = this.plugin('params').fromRoute('id');
+        // Set form attributes
+        form.setAction(actionUrl);
+        form.setMethod('POST');
 
-            const actionUrl = this.helper('url')
-                .fromRoute('adminDashboardEdit', { id : postId });
+        // Add role-based button (Review for Authors,
+        // Publish for Editors/Admins)
+        const authService = this.getServiceManager()
+            .get('AuthenticationService');
+        const identity = authService.getIdentity();
+        const userRole = identity?.role || 'author';
+        // Get current user identity for tracking
+        const currentUserId = identity?.id || null;
 
-            // Set form attributes
-            form.setAction(actionUrl);
-            form.setMethod('POST');
+        /*if (userRole === 'author') {
+            form.addReviewButton();
+        } else if (userRole === 'editor' || userRole === 'admin') {
+            form.addPublishButton();
+        }*/
 
-            // Initialize form with categories
-            form.addIdField();
-            form.addAuthorIdField();
+        // Validate post_id before using it
+        const inputFilter = InputFilter.factory({
+            'post_id': {
+                required: true,
+                requiredMessage: "Post ID is required",
+                filters: [
+                    { name: 'HtmlEntities' },
+                    { name: 'StringTrim' },
+                    { name: 'StripTags' }
+                ],
+                validators: [
+                    {
+                        name: 'Integer',
+                        options: {},
+                        messages: {
+                            INVALID: 'Please provide valid post ID'
+                        }
+                    }
+                ]
+            }
+        });
+
+        inputFilter.setData({ post_id: postId });
+
+        // Only proceed if postId is valid
+        if(!inputFilter.isValid()) {
+            // Invalid post ID - redirect to dashboard
+            this.plugin('flashMessenger')
+                .addMessage('Invalid post ID provided', 'error');
+            return this.plugin('redirect').toRoute('adminDashboardIndex');
+        }
+
+        // Convert postId to integer after validation
+        const postIdInt = parseInt(postId, 10);
+
+        // Fetch and populate post data (postId already validated above)
+        const post = await postService.getSinglePost(
+            postIdInt, false, true);
+
+        // Check if post is draft (assign to outer scope variable)
+        isDraft = post && post.status === 'draft';
+
+        // Initialize form fields (conditionally readonly based on status)
+        form.addIdField();
+        form.addAuthorIdField();
+
+        if (isDraft) {
+            // Draft posts: all fields are editable
+            form.addTitleField('title');
+            form.addSlugField('slug');
+            form.addExcerptField('excerpt_markdown');
+            form.addContentField('content_markdown');
+            form.addAuthorNameField('author_name');
+            form.addCategoryField('category_id', categories);
+            form.addMetaDescriptionField('meta_description');
+            form.addCommentEnabledField('comments_enabled');
+        } else {
+            // Published posts: all fields are readonly
             form.addTitleField('title', { readonly: "readonly" });
             form.addSlugField('slug', { readonly: "readonly" });
             form.addExcerptField('excerpt_markdown',
@@ -531,59 +584,17 @@ class PostController extends Controller {
                 { readonly: "readonly" });
             form.addCommentEnabledField('comments_enabled',
                 { readonly: "readonly" });
+        }
 
-            // Add role-based button (Review for Authors,
-            // Publish for Editors/Admins)
-            const authService = this.getServiceManager()
-                .get('AuthenticationService');
-            const identity = authService.getIdentity();
-            const userRole = identity?.role || 'author';
-            // Get current user identity for tracking
-            const currentUserId = identity?.id || null;
-
-            /*if (userRole === 'author') {
-                form.addReviewButton();
-            } else if (userRole === 'editor' || userRole === 'admin') {
-                form.addPublishButton();
-            }*/
-
-            // Validate post_id before using it
-            const inputFilter = InputFilter.factory({
-                'post_id': {
-                    required: true,
-                    requiredMessage: "Post ID is required",
-                    filters: [
-                        { name: 'HtmlEntities' },
-                        { name: 'StringTrim' },
-                        { name: 'StripTags' }
-                    ],
-                    validators: [
-                        {
-                            name: 'Integer',
-                            options: {},
-                            messages: {
-                                INVALID: 'Please provide valid post ID'
-                            }
-                        }
-                    ]
-                }
-            });
-
-            inputFilter.setData({ post_id: postId });
-
-            // Only proceed if postId is valid
-            if(!inputFilter.isValid()) {
-                // Invalid post ID - redirect to dashboard
-                this.plugin('flashMessenger')
-                    .addMessage('Invalid post ID provided', 'error');
-                return this.plugin('redirect').toRoute('adminDashboard');
-            }
-
-            // Convert postId to integer after validation
-            const postIdInt = parseInt(postId, 10);
-
-            // Check for existing draft revision to conditionally
-            // render button
+        // Add buttons based on post status
+        if (isDraft) {
+            // Draft posts: Show Save, Publish, Delete, Exit buttons
+            form.addSaveButton();
+            form.addPublishButton();
+            form.addDeleteButton();
+            form.addExitThisPageButton();
+        } else {
+            // Published posts: Show revision and unpublish buttons
             const postRevisionService = this.getServiceManager()
                 .get('PostRevisionService');
             let draftRevision = null;
@@ -593,7 +604,7 @@ class PostController extends Controller {
                     .getMostRecentDraftRevision(postIdInt);
 
                 if (draftRevision) {
-                    form.addContinueRevisionDraft();
+                    form.addContinueRevisionDraftButton();
                 } else {
                     console.log(
                         '[EditAction] No draft revision found for post:',
@@ -611,51 +622,155 @@ class PostController extends Controller {
             }
 
             form.addUnpublishButton();
+            form.addExitThisPageButton();
+        }
 
-            // Fetch and populate post data (postId already validated above)
-            const post = await postService.getSinglePost(
-                postIdInt, false, true);
-            if (post) {
-                form.setData({
-                    id: post.id,
-                    slug: post.slug,
-                    title: post.title,
-                    excerpt_markdown: post.excerpt_markdown,
-                    content_markdown: post.content_markdown,
-                    author_id: post.author_id,
-                    author_name: post.author_name,
-                    category_id: post.category_id,
-                    meta_description: post.meta_description,
-                    comment_enabled: post.comment_enabled || 0
-                });
+        // Populate form data
+        if (post) {
+            form.setData({
+                id: post.id,
+                slug: post.slug,
+                title: post.title,
+                excerpt_markdown: post.excerpt_markdown,
+                content_markdown: post.content_markdown,
+                author_id: post.author_id,
+                author_name: post.author_name,
+                category_id: post.category_id,
+                meta_description: post.meta_description,
+                comment_enabled: post.comment_enabled || 0
+            });
+        }
+
+        // Handle form submission
+        if (super.getRequest().isPost()) {
+            const postData = super.getRequest().getPost();
+
+            // Handle exit this page action first (doesn't need validation)
+            const isExitThisPage = VarUtil.isset(postData.exit_this_page) &&
+                postData.exit_this_page === 'Exit this page';
+
+            if (isExitThisPage) {
+                // Simply redirect to dashboard without any changes
+                return this.plugin('redirect').toRoute('adminDashboardIndex');
             }
 
-            // Handle form submission
-            if (super.getRequest().isPost()) {
-                const postData = super.getRequest().getPost();
+            // Handle draft post actions (save, publish, delete)
+            const isSave = VarUtil.isset(postData.save) && postData.save === 'Save draft';
+            const isPublish = VarUtil.isset(postData.publish) && postData.publish === 'Publish';
+            const isDelete = VarUtil.isset(postData.delete) && postData.delete === 'Delete';
 
-                if (VarUtil.isset(postData.create_revision_draft) &&
-                    postData.create_revision_draft ===
-                    'Create Revision Draft') {
+            if (isSave || isPublish || isDelete) {
+                // Validate the form for save and publish actions
+                if (isSave || isPublish) {
+                    form.setData(postData);
+
+                    if (!form.isValid()) {
+                        // Validation failed - re-render form with errors
+                        return this.getView().setVariable('f', form);
+                    }
+
+                    // Create post entity with validated data
+                    const validatedData = form.getData();
+                    const postEntity = new PostEntity();
+                    postEntity
+                        .setId(postIdInt)
+                        .setTitle(validatedData.title)
+                        .setSlug(validatedData.slug)
+                        .setExcerptMarkdown(validatedData.excerpt_markdown)
+                        .setContentMarkdown(validatedData.content_markdown)
+                        .setAuthorId(validatedData.author_id)
+                        .setCategoryId(validatedData.category_id)
+                        .setMetaDescription(validatedData.meta_description)
+                        .setCommentsEnabled(validatedData.comments_enabled || false)
+                        .setUpdatedBy(currentUserId);
+
+                    if (isPublish) {
+                        postEntity
+                            .setStatus('published')
+                            .setPublishedAt(new Date().toISOString())
+                            .setPublishedBy(currentUserId)
+                            .setRegenerateStatic(true);
+                    } else {
+                        postEntity.setStatus('draft');
+                    }
+
+                    // Update post in database
+                    const postDataForDb = postEntity.getDataForDatabase(true);
+                    await postService.updatePostById(postIdInt, postDataForDb);
+
+                    // Add success message
+                    if (isPublish) {
+                        super.plugin('flashMessenger').addSuccessMessage({
+                            title: 'Post published',
+                            message: 'Your post has been published successfully and will appear on the live site after the next build.'
+                        });
+                    } else {
+                        super.plugin('flashMessenger').addSuccessMessage({
+                            title: 'Draft saved',
+                            message: 'Your draft has been saved successfully.'
+                        });
+                    }
+
+                    // Redirect back to edit page
                     return this.plugin('redirect')
-                        .toRoute('adminRevisionNew',
-                            { post_id: postIdInt });
-                } else if (VarUtil.isset(postData.unpublish) &&
-                           postData.unpublish === 'Unpublish') {
-                    // Handle unpublish action
+                        .toRoute('adminDashboardEdit', { id: postIdInt });
                 }
-                super.plugin('flashMessenger').addErrorMessage(
-                    `We're sorry — something went wrong. ` +
-                    `Please let us know and try again shortly`);
+
+                if (isDelete) {
+                    // Delete the draft post
+                    await postService.deletePost(postIdInt);
+
+                    // Add info message
+                    super.plugin('flashMessenger').addInfoMessage({
+                        title: 'Draft deleted',
+                        message: 'Draft post has been deleted successfully.'
+                    });
+
+                    // Redirect to dashboard
+                    return this.plugin('redirect').toRoute('adminDashboardIndex');
+                }
             }
-        } catch (error) {
-            const errorMsg = `Error in editAction: ${error.message}\n` +
-                `Stack: ${error.stack}`;
-            throw error;
+
+            // Handle revision draft actions (both create and continue)
+            if ((VarUtil.isset(postData.create_revision_draft) &&
+                 postData.create_revision_draft ===
+                 'Create revision draft') ||
+                (VarUtil.isset(postData.continue_revision_draft) &&
+                 postData.continue_revision_draft ===
+                 'Continue revision draft')) {
+                return this.plugin('redirect')
+                    .toRoute('adminRevisionNew',
+                        { post_id: postIdInt });
+            } else if (VarUtil.isset(postData.unpublish) &&
+                       postData.unpublish === 'Unpublish') {
+                // Handle unpublish action - change status from published to draft
+                const postService = this.getServiceManager().get('PostService');
+
+                // Update post status to draft
+                await postService.updatePostById(postIdInt, {
+                    status: 'draft',
+                    regenerate_static: true,
+                    updated_by: currentUserId
+                });
+
+                // Add warning message
+                super.plugin('flashMessenger').addWarningMessage({
+                    title: "Post unpublished",
+                    message: "Post unpublished successfully. The live version will be removed in the next site build"
+                });
+
+                // Redirect back to the edit page
+                return this.plugin('redirect')
+                    .toRoute('adminDashboardEdit', { id: postIdInt });
+            }
+            super.plugin('flashMessenger').addErrorMessage(
+                `We're sorry — something went wrong. ` +
+                `Please let us know and try again shortly`);
         }
 
         return this.getView()
-            .setVariable('f', form);
+            .setVariable('f', form)
+            .setVariable('isDraft', isDraft);
         //.setVariable('flashMessages', flashMessages);
     }
 

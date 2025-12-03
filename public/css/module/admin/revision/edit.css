@@ -285,6 +285,31 @@
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+    align-items: center;
+}
+
+.dp-button-group__primary-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dp-button-group__destructive-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-left: 24px;
+    padding-left: 24px;
+    border-left: 2px solid #b1b4b6;
+}
+
+.dp-button-group__secondary-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-left: 24px;
+    padding-left: 24px;
+    border-left: 2px solid #b1b4b6;
 }
 
 .dp-button-group__right {
@@ -324,6 +349,9 @@
 
 /* Save Article Button - Keep original blue */
 .dp-button--save,
+.dp-button--save_revision_draft,
+button[name="save_revision_draft"],
+input[name="save_revision_draft"],
 button[name="submit"],
 input[name="submit"] {
     background-color: #1d70b8 !important;
@@ -336,6 +364,9 @@ input[name="submit"] {
 }
 
 .dp-button--save:hover,
+.dp-button--save_revision_draft:hover,
+button[name="save_revision_draft"]:hover,
+input[name="save_revision_draft"]:hover,
 button[name="submit"]:hover,
 input[name="submit"]:hover {
     background-color: #003078 !important;
@@ -344,6 +375,9 @@ input[name="submit"]:hover {
 }
 
 .dp-button--save:active,
+.dp-button--save_revision_draft:active,
+button[name="save_revision_draft"]:active,
+input[name="save_revision_draft"]:active ,
 button[name="submit"]:active,
 input[name="submit"]:active {
     background-color: #1d70b8 !important;
@@ -355,6 +389,9 @@ input[name="submit"]:active {
 }
 
 .dp-button--save:focus,
+.dp-button--save_revision_draft:focus,
+button[name="save_revision_draft"]:focus,
+input[name="save_revision_draft"]:focus,
 button[name="submit"]:focus,
 input[name="submit"]:focus {
     outline: 3px solid #ffdd00 !important;
@@ -411,9 +448,15 @@ input[name="review_requested"]:focus {
 /* Submit for Delete Button - Red */
 .dp-button--upublish,
 .dp-button--delete,
+.dp-button--delete_draft,
+.dp-button--exist_this_page,
 button[name="delete"],
-button[name="unpublish"],
 input[name="delete"],
+button[name="exit_this_page"],
+input[name="exit_this_page"],
+button[name="delete_draft"],
+input[name="delete_draft"],
+button[name="unpublish"],
 input[name="unpublish"] {
     background-color: #d4351c !important;
     color: #ffffff !important;
@@ -426,9 +469,15 @@ input[name="unpublish"] {
 
 .dp-button--upublish:hover,
 .dp-button--delete:hover,
+.dp-button--delete_draft:hover,
+.dp-button--exit_this_page:hover,
 button[name="unpublish"]:hover,
-button[name="delete"]:hover,
 input[name="unpublish"]:hover,
+button[name="exit_this_page"]:hover,
+input[name="exit_this_page"]:hover,
+button[name="delete_draft"]:hover,
+input[name="delete_draft"]:hover,
+button[name="delete"]:hover,
 input[name="delete"]:hover {
     background-color: #6f3331 !important;
     color: #ffffff !important;
@@ -437,9 +486,14 @@ input[name="delete"]:hover {
 
 .dp-button--unpublish:active,
 .dp-button--delete:active,
+.dp-button--exist_this_page:active,
 button[name="unpublish"]:active,
-button[name="delete"]:active,
 input[name="unpublish"]:active,
+button[name="exit_this_page"]:active,
+input[name="exit_this_page"]:active,
+button[name="delete_draft"]:active,
+input[name="delete_draft"]:active,
+button[name="delete"]:active,
 input[name="delete"]:active {
     background-color: #d4351c  !important;
     color: #ffffff !important;
@@ -451,9 +505,15 @@ input[name="delete"]:active {
 
 .dp-button--unpublish:focus,
 .dp-button--delete:focus,
+.dp-button--delete_draft:focus,
+.dp-button--exit_this_page:focus,
 button[name="unpublish"]:focus,
-button[name="delete"]:focus,
 input[name="unpublish"]:focus,
+button[name="exit_this_page"]:focus,
+input[name="exit_this_page"]:focus,
+button[name="delete_draft"]:focus,
+input[name="delete_draft"]:focus,
+button[name="delete"]:focus,
 input[name="delete"]:focus {
     outline: 3px solid #ffdd00 !important;
     outline-offset: 0 !important;
@@ -465,6 +525,9 @@ input[name="delete"]:focus {
 
 /* Submit for Publish Button - Green */
 .dp-button--publish,
+.dp-button--publish_revision,
+button[name="publish_revision"],
+input[name="publish_revision"],
 button[name="publish"],
 input[name="publish"] {
     background-color: #00703c !important;
@@ -477,6 +540,9 @@ input[name="publish"] {
 }
 
 .dp-button--publish:hover,
+.dp-button--publish_revision:hover,
+button[name="publish_revision"]:hover,
+input[name="publish_revision"]:hover,
 button[name="publish"]:hover,
 input[name="publish"]:hover {
     background-color: #005a30 !important;
@@ -484,6 +550,9 @@ input[name="publish"]:hover {
 }
 
 .dp-button--publish:active,
+.dp-button--publish_revision:active,
+button[name="publish_revision"]:active,
+input[name="publish_revision"]:active,
 button[name="publish"]:active,
 input[name="publish"]:active {
     background-color: #00703c !important;
@@ -495,6 +564,9 @@ input[name="publish"]:active {
 }
 
 .dp-button--publish:focus,
+.dp-button--publish_revision:focus,
+button[name="publish_revision"]:focus,
+input[name="publish_revision"]:focus, 
 button[name="publish"]:focus,
 input[name="publish"]:focus {
     outline: 3px solid #ffdd00 !important;
@@ -507,6 +579,9 @@ input[name="publish"]:focus {
 
 /* Create Revision Draft Button - Yellow */
 .dp-button--revision_draft,
+.dp-button--continue_revision_draft,
+button[name="continue_revision_draft"],
+input[name="continue_revision_draft"],
 button[name="revision_draft"],
 input[name="revision_draft"] {
     background-color: #ffdd00 !important;
@@ -519,6 +594,9 @@ input[name="revision_draft"] {
 }
 
 .dp-button--revision_draft:hover,
+.dp-button--continue_revision_draft:hover,
+button[name="continue_revision_draft"]:hover,
+input[name="continue_revision_draft"]:hover,
 button[name="revision_draft"]:hover,
 input[name="revision_draft"]:hover {
     background-color: #d4c100 !important;
@@ -527,6 +605,9 @@ input[name="revision_draft"]:hover {
 }
 
 .dp-button--revision_draft:active,
+.dp-button--continue_revision_draft:active,
+button[name="continue_revision_draft"]:active,
+input[name="continue_revision_draft"]:active,
 button[name="revision_draft"]:active,
 input[name="revision_draft"]:active {
     background-color: #ffdd00 !important;
@@ -538,6 +619,9 @@ input[name="revision_draft"]:active {
 }
 
 .dp-button--revision_draft:focus,
+.dp-button--continue_revision_draft:focus,
+button[name="continue_revision_draft"]:focus,
+input[name="continue_revision_draft"]:focus,
 button[name="revision_draft"]:focus,
 input[name="revision_draft"]:focus {
     outline: 3px solid #0b0c0c !important;
@@ -591,6 +675,27 @@ input[name="revision_draft"]:focus {
     .dp-button-group__left,
     .dp-button-group__right {
         width: 100%;
+    }
+
+    .dp-button-group__left {
+        flex-direction: column;
+    }
+
+    .dp-button-group__primary-actions,
+    .dp-button-group__destructive-actions,
+    .dp-button-group__secondary-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .dp-button-group__destructive-actions,
+    .dp-button-group__secondary-actions {
+        margin-left: 0;
+        padding-left: 0;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-left: none;
+        border-top: 2px solid #b1b4b6;
     }
 
     .dp-button-group__right {
@@ -667,6 +772,11 @@ input[name="revision_draft"]:focus {
     margin-bottom: 30px;
     border: 5px solid #1d70b8;
     background-color: #1d70b8;
+}
+
+.dp-notification-banner--success {
+    border-color: #00703c;
+    background-color: #00703c;
 }
 
 .dp-notification-banner--success {
@@ -811,3 +921,115 @@ input[name="revision_draft"]:focus {
     text-decoration: none;
 }
 
+/* Inset Text Box - Highlighted Information */
+.dp-inset-text {
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    clear: both;
+    border-left: 10px solid #1d70b8;
+    background-color: #f3f2f1;
+}
+
+.dp-inset-text:first-child {
+    margin-top: 0;
+}
+
+.dp-inset-text:last-child {
+    margin-bottom: 0;
+}
+
+.dp-inset-text > :first-child {
+    margin-top: 0;
+}
+
+.dp-inset-text > :last-child {
+    margin-bottom: 0;
+}
+
+.dp-inset-text p {
+    margin: 0 0 15px 0;
+    font-size: 19px;
+    line-height: 1.5;
+    color: #0b0c0c;
+}
+
+.dp-inset-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* Inset Text Box Variants */
+.dp-inset-text--success {
+    border-left-color: #00703c;
+    background-color: #f3fef7;
+}
+
+.dp-inset-text--yellow {
+    border-left-color: #ffdd00;;
+    background-color:  #FFF4B3;
+}
+
+.dp-inset-text--warning {
+    border-left-color: #f47738;
+    background-color: #fef7f6;
+}
+
+.dp-inset-text--error {
+    border-left-color: #d4351c;
+    background-color: #fef7f7;
+}
+
+.dp-inset-text--info {
+    border-left-color: #1d70b8;
+    background-color: #f3f9fc;
+}
+
+.key-term {
+  font-weight: 600;
+  background-color: #fff3cd; /* soft yellow highlight */
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.key-term__2 {
+  font-weight: 600;
+  background-color: #E5E5E5;
+  color: #0b0c0c;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+
+/* Panel implementation */
+.dp-panel {
+  box-sizing: border-box;
+  border: 5px solid transparent;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Confirmation-style panel */
+.dp-panel--confirmation {
+  background-color: #00703c; /* strong green */
+  color: #ffffff;
+}
+
+/* Confirmation-style panel */
+.dp-panel--information {
+  background-color: #1d70b8; /* strong green */
+  color: #ffffff;
+}
+
+/* Title inside the panel */
+.dp-panel__title {
+  margin: 0 0 10px;
+  font-size: 2rem;      /* adjust to match your scale */
+  font-weight: 700;
+}
+
+/* Body text inside the panel */
+.dp-panel__body {
+  margin: 0;
+  font-size: 1.125rem;  /* slightly larger than normal body text */
+}

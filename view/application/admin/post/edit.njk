@@ -6,16 +6,44 @@
     <div class="row align-items-center admin-dashboard-fix-row">
       <div class="col-sm-12 col-md-12">
         <div class="card admin-dashboard-card dp-pt-0" itemscope itemtype="https://schema.org/Table">
-            {# Inset text #}
-            <div class="dp-inset-text dp-inset-text--success">
-                <p>
-                    You’re viewing a <strong class="key-term">published post</strong>.
-                    Any changes must be made in a
-                    <strong class="key-term">revision draft</strong>.
-                    Create a <strong class="key-term">revision draft</strong> to update the
-                    <strong class="key-term">live version</strong>.
-                </p>
-            </div>
+            {# Inset text - conditional based on post status #}
+            {% if isDraft %}
+                <div class="dp-inset-text dp-inset-text--yellow">
+                    <p>
+                        You're editing a <strong class="key-term__2">draft post</strong>.
+                        This post is not yet published and will not appear on the live site
+                        until you click <strong class="key-term__2">Publish</strong>.
+                    </p>
+                </div>
+            {% else %}
+                <div class="dp-inset-text dp-inset-text--success">
+                    <p>
+                        You're viewing a <strong class="key-term">published post</strong>.
+                        Any changes must be made in a
+                        <strong class="key-term">revision draft</strong>.
+                        Create a <strong class="key-term">revision draft</strong> to update the
+                        <strong class="key-term">live version</strong>.
+                    </p>
+                </div>
+            {% endif %}
+
+            {# Success Message #}
+            {% if success_flash_messages.length > 0 %}
+                {% set msg = success_flash_messages[0] %}
+                {{ flashPanel('completion', msg.title, msg.message) | safe }}
+            {% endif %}
+
+            {# Information Message #}
+            {% if info_flash_messages.length > 0 %}
+                {% set msg = info_flash_messages [0] %}
+                {{ flashPanel('information', msg.title, msg.message) | safe }}
+            {% endif %}
+
+            {# Warning Message #}
+            {% if warning_flash_messages.length > 0 %}
+                {% set msg = warning_flash_messages[0] %}
+                {{ flashPanel('warning', msg.title, msg.message) | safe }}
+            {% endif %}
 
             {# Error messages #}
             {% if error_flash_messages.length > 0 %}
@@ -30,7 +58,7 @@
                 </div>
             </div>
             {% endif %}
-            test
+          
             {{ form().openTag(f) }}
 
                 {{ formHidden(f.get('id')) | safe }}
@@ -87,18 +115,43 @@
                 <div class="form-group">
                     <div class="dp-button-group">
                         <div class="dp-button-group__left">
-                            {% if f.get('create_revision_draft') %}
-                                {{ formSubmit(f.get('create_revision_draft')) | safe }}
+                            {% if isDraft %}
+                                {# Draft post: Show Save, Publish, Delete, Exit buttons #}
+                                <div class="dp-button-group__primary-actions">
+                                    {% if f.get('save') %}
+                                        {{ formSubmit(f.get('save')) | safe }}
+                                    {% endif %}
+                                    {% if f.get('publish') %}
+                                        {{ formSubmit(f.get('publish')) | safe }}
+                                    {% endif %}
+                                </div>
+                                {% if f.get('delete') %}
+                                    <div class="dp-button-group__destructive-actions">
+                                        {{ formSubmit(f.get('delete')) | safe }}
+                                    </div>
+                                {% endif %}
+                                <div class="dp-button-group__secondary-actions">
+                                    {{ formSubmit(f.get('exit_this_page')) | safe }}
+                                </div>
+                            {% else %}
+                                {# Published post: Show revision and unpublish buttons #}
+                                <div class="dp-button-group__primary-actions">
+                                    {% if f.get('create_revision_draft') %}
+                                        {{ formSubmit(f.get('create_revision_draft')) | safe }}
+                                    {% endif %}
+                                    {% if f.get('continue_revision_draft') %}
+                                        {{ formSubmit(f.get('continue_revision_draft')) | safe }}
+                                    {% endif %}
+                                </div>
+                                {% if f.get('unpublish') %}
+                                    <div class="dp-button-group__destructive-actions">
+                                        {{ formSubmit(f.get('unpublish')) | safe }}
+                                    </div>
+                                {% endif %}
+                                <div class="dp-button-group__secondary-actions">
+                                    {{ formSubmit(f.get('exit_this_page')) | safe }}
+                                </div>
                             {% endif %}
-                            {% if f.get('continue_revision_draft') %}
-                                {{ formSubmit(f.get('continue_revision_draft')) | safe }}
-                            {% endif %}
-                            {% if f.get('unpublish') %}
-                                {{ formSubmit(f.get('unpublish')) | safe }}
-                            {% endif %}
-                        </div>
-                        <div class="dp-button-group__right">
-                            <a href="{{ url('adminDashboardIndex') }}" class="dp-button--cancel">Cancel</a>
                         </div>
                     </div>
                 </div>
