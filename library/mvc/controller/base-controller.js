@@ -42,7 +42,7 @@ class BaseController {
         this.dispatched = false;
         this.view = null;
 
-        //this.noRender = false;
+        this.noRender = false;
     }
 
     /**
@@ -197,14 +197,14 @@ class BaseController {
         return value;
     }
 
-    /*setNoRender(flag = true) {
+    setNoRender(flag = true) {
         this.noRender = !!flag;
         return this;
     }
 
     isNoRender() {
         return this.noRender;
-    }*/
+    }
 
     /**
      * Return response object

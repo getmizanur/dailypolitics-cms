@@ -3,7 +3,7 @@ const os = require('os');
 module.exports = {
     // Router configuration - consolidated routing setup
     "router": require('./routes.config'),
-    
+
     // Cache configuration with environment-specific settings and file-based backend for development
     "cache": {
         "enabled": process.env.CACHE_ENABLED !== 'false', // Allow disabling via env var
@@ -21,7 +21,7 @@ module.exports = {
             "file_name_prefix": process.env.CACHE_FILE_PREFIX || "cache_",
             "cache_file_perm": parseInt(process.env.CACHE_FILE_PERM) || 0o644,
             "metatadatas_array_max_size": parseInt(process.env.CACHE_METADATA_MAX_SIZE) || 100
-            
+
             /*
              * ALTERNATIVE BACKEND CONFIGURATIONS (for production reference):
              * 
@@ -60,7 +60,7 @@ module.exports = {
              */
         }
     },
-    
+
     // Session configuration with environment-specific settings
     "session": {
         "enabled": process.env.SESSION_ENABLED !== 'false', // Allow disabling via env var
@@ -78,7 +78,7 @@ module.exports = {
             "path": process.env.SESSION_COOKIE_PATH || '/'
         },
         // Store options - dynamically selected based on SESSION_STORE env variable
-        "store_options": (function() {
+        "store_options": (function () {
             const storeType = process.env.SESSION_STORE || "file";
 
             switch (storeType.toLowerCase()) {
@@ -160,7 +160,7 @@ module.exports = {
          * "store_options": {}
          */
     },
-    
+
     // Database configuration with PostgreSQL
     "database": {
         "enabled": process.env.DATABASE_ENABLED !== 'false',
@@ -218,7 +218,7 @@ module.exports = {
          * }
          */
     },
-    
+
     // Service Manager configuration - for custom application services only
     // Framework services (ViewManager, ViewHelperManager, PluginManager) are managed by ServiceManager
     "service_manager": {
@@ -231,7 +231,7 @@ module.exports = {
             "PostRevisionService": "/application/service/factory/post-revision-service-factory"
         }
     },
-    
+
     // Controller Plugins configuration - only custom application plugins
     // Framework plugins (flashMessenger, layout, params, etc.) are managed by PluginManager
     "controller_plugins": {
@@ -246,7 +246,7 @@ module.exports = {
             }
         }
     },
-    
+
     // View Helpers configuration - only custom application helpers
     // Framework helpers (form, formButton, etc.) are managed by ViewHelperManager
     "view_helpers": {
@@ -282,6 +282,14 @@ module.exports = {
             "newsArticleJsonLd": {
                 "class": "/application/helper/news-article-json-ld-helper",
                 "params": ["data", "options = {}"]
+            },
+            "explode": {
+                "class": "/application/helper/explode-helper",
+                "params": ["separator", "string", "limit"]
+            },
+            "detail": {
+                "class": "/application/helper/detail-helper",
+                "params": ["element", "message"]
             }
         },
         "factories": {
@@ -297,7 +305,7 @@ module.exports = {
         // }
     },
 
-    "view_manager" : {
+    "view_manager": {
         "display_not_found_reason": process.env.VIEW_DISPLAY_NOT_FOUND_REASON === 'true' || false,
         "display_exceptions": process.env.VIEW_DISPLAY_EXCEPTIONS === 'true' || false,
         "doctype": process.env.VIEW_DOCTYPE || "HTML5",

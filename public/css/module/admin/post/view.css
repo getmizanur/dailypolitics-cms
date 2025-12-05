@@ -1,0 +1,467 @@
+/* =========================================
+   ADMIN POST PREVIEW STYLES
+   Includes blog styles for realistic preview
+   ========================================= */
+
+/* TYPOGRAPHY & TEXT STYLES */
+.dailypolitics-heading-xl, .app-prose-scope h1 {
+    color: #0b0c0c;
+    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+    font-family: Anton, "Anton Fallback", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 700;
+    line-height: 1.09375;
+    display: block;
+    margin: 0;
+    padding: 16px;
+    font-weight: normal;
+    letter-spacing: 0;
+    line-height: 1.2em;
+    text-transform: uppercase;
+    word-break: break-word;
+    font-size: 32px !important;
+}
+
+.dailypolitics-heading-xl a {
+    color: #ffffff;
+    text-decoration:none;
+    font-size: inherit;
+}
+
+.dailypolitics-body {
+    color: #0b0c0c;
+    font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    font-size: 19px !important;
+    font-size: 1rem;
+    line-height: 1.618 !important;
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding: 0px;
+}
+
+.dailypolitics-body p {
+    color: #0b0c0c;
+    font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    font-size: 19px !important;
+    font-size: 1rem;
+    line-height: 1.618 !important;
+    margin: 0;
+    padding: 16px;
+}
+
+.dailypolitics-body img {
+    width: 100%;
+}
+
+.dailypolitics-footer {
+    font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important;
+    padding: .75rem 1.25rem;
+    background-color: #f3f2f1;
+    border-top: 1px solid rgba(0,0,0,.125);
+}
+
+/* CARD STYLES */
+.card {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    font-size: 19px;
+}
+
+.card-header {
+    padding: .75rem 1.25rem;
+    font-family: Anton, "Anton Fallback", sans-serif;
+    color: #000;
+    margin-bottom: 0;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    letter-spacing: 0;
+    line-height: 1.2em;
+    text-transform: uppercase;
+    word-break: break-word;
+    font-size: 32px !important;
+}
+
+.card-header:first-child {
+    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+}
+
+.card-body {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1.25rem;
+}
+
+.card li a {
+    color: #003078;
+    font-size: 19px;
+}
+
+/* POST HEADER STYLES */
+.post-header {
+    font-family: Anton, "Anton Fallback", sans-serif;
+}
+
+.header {
+    color: #fff;
+}
+
+/* Color classes for headers */
+.breaking {
+    background-color: #c0392b;
+    color:#fff;
+}
+
+.red {
+    background-color: #d4351c;
+    color:#fff !important;
+}
+
+.red a {
+    color:#fff !important;
+}
+
+.yellow {
+    background-color: #ffdd00;
+    color:#000 !important;
+}
+
+.yellow a {
+    color:#000 !important;
+}
+
+.green {
+    background-color: #00703c;
+    color:#fff !important;
+}
+
+.green a {
+    color:#fff !important;
+}
+
+.blue {
+    background-color: #1d70b8;
+    color:#fff !important;
+}
+
+.blue a {
+    color:#fff !important;
+}
+
+.dark-blue {
+    background-color: #003078;
+    color:#fff !important;
+}
+
+.dark-blue a {
+    color:#fff !important;
+}
+
+.light-blue {
+    background-color: #5694ca;
+    color:#000 !important;
+}
+
+.light-blue a {
+    color:#000 !important;
+}
+
+.purple {
+    background-color:#4c2c92;
+    color:#fff !important;
+}
+
+.purple a {
+    color:#fff !important;
+}
+
+.black {
+    background-color: #0b0c0c;
+    color:#fff !important;
+}
+
+.black a {
+    color:#fff !important;
+}
+
+/* LIST GROUP (SIDEBAR) */
+.list-group {
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: .75rem 1.25rem;
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,.125);
+    font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    font-size:16px;
+}
+
+.clearfix::after {
+    display: block;
+    clear: both;
+    content: "";
+}
+
+.odd {
+    border-top: 1px solid rgba(0,0,0,.125);
+}
+
+@media screen and (max-width: 600px) {
+    .hidden-phone {
+        display: none;
+        clear: both;
+        float: left;
+        margin: 10px auto 5px 20px;
+        display: none;
+    }
+}
+
+/* TAGS */
+.dp-tag {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+  background-color: #f3f2f1;
+  color: #222222;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.dp-tag + .dp-tag {
+  margin-left: 0.25rem;
+}
+
+.dp-tag--grey {
+    background-color: #b1b4b6;
+    color: #0b0c0c;
+}
+
+.dp-tag--breaking {
+    background-color: #c0392b;
+    color:#fff;
+}
+
+.dp-tag--red {
+    background-color: #d4351c;
+    color:#fff !important;
+}
+
+.dp-tag--red a {
+    color:#fff !important;
+}
+
+.dp-tag--blue {
+    background-color: #1d70b8;
+    color:#fff !important;
+}
+
+.dp-tag--green {
+    background-color: #00703c;
+    color:#fff !important;
+}
+
+.dp-tag--yellow {
+    background-color: #ffdd00;
+    color:#0b0c0c !important;
+}
+
+.dp-tag--purple {
+    background-color: #4c2c92;
+    color:#fff !important;
+}
+
+.dp-tag--breaking {
+    background-color: #c0392b;
+    color:#fff;
+}
+
+.dp-tag--red {
+    background-color: #d4351c;
+    color:#fff !important;
+}
+
+.dp-tag--red a {
+    color:#fff !important;
+}
+
+.dp-tag--yellow {
+    background-color: #ffdd00;
+    color:#000 !important;
+}
+
+.dp-tag--yellow a {
+    color:#000 !important;
+}
+
+.dp-tag--green {
+    background-color: #00703c;
+    color:#fff !important;
+}
+
+.dp-tag--green a {
+    color:#fff !important;
+}
+
+.dp-tag--blue {
+    background-color: #1d70b8;
+    color:#fff !important;
+}
+
+.dp-tag--blue a {
+    color:#fff !important;
+}
+
+.dp-tag--dark-blue {
+    background-color: #003078;
+    color:#fff !important;
+}
+
+.dp-tag--dark-blue a {
+    color:#fff !important;
+}
+
+.dp-tag--light-blue {
+    background-color: #5694ca;
+    color:#000 !important;
+}
+
+.dp-tag--light-blue a {
+    color:#000 !important;
+}
+
+.dp-tag--purple {
+    background-color:#4c2c92;
+    color:#fff !important;
+}
+
+.dp-tag--purple a {
+    color:#fff !important;
+}
+
+.dp-tag--black {
+    background-color: #0b0c0c;
+    color:#fff !important;
+}
+
+.dp-tag--black a {
+    color:#fff !important;
+}
+
+/* MEDIA ELEMENTS */
+.media-landscape {
+    max-width: 100%;
+}
+
+.media-caption {
+    padding: 8px 16px;
+    background-color: #f3f2f1;
+    font-size: 14px;
+    color: #505a5f;
+}
+
+.media-caption__text {
+    display: block;
+}
+
+.image-and-copyright-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* UTILITY CLASSES */
+.dailypolitics-!-margin-top-8 {
+    margin-top: 40px !important;
+}
+
+.dailypolitics-!-margin-top-4 {
+    margin-top: 20px !important;
+}
+
+.dailypolitics-!-margin-bottom-8 {
+    margin-bottom: 40px !important;
+}
+
+.dailypolitics-margin-left-5 {
+    margin-left: 5px;
+}
+
+.dailypolitics-margin-right-5 {
+    margin-right: 5px;
+}
+
+.article-meta {
+    padding: 16px;
+}
+
+.article-excerpt {
+    padding-top: 0;
+}
+
+/* PREVIEW-SPECIFIC BUTTON STYLES */
+.dp-button {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 19px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: Roboto, 'Roboto Fallback', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    margin-top: 30px;
+}
+
+.dp-button--secondary {
+    background-color: #1d70b8;
+    color: #ffffff;
+    border-color: #1d70b8;
+    box-shadow: 0 2px 0 #003078;
+}
+
+.dp-button--secondary:hover {
+    background-color: #003078;
+    border-color: #003078;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* RESPONSIVE DESIGN */
+@media screen and (max-width: 768px) {
+    .dp-notification-banner__heading {
+        font-size: 20px;
+    }
+
+    .dp-notification-banner__content {
+        font-size: 14px;
+    }
+}

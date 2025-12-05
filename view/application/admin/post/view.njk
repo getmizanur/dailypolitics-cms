@@ -1,0 +1,176 @@
+{% extends 'layout/master.njk' %}
+
+{% block content %}
+{# Preview Banner #}
+{% if isPreview %}
+<div class="dp-notification-banner dp-notification-banner--warning" role="region" aria-labelledby="preview-banner">
+    <div class="container">
+        <h2 class="dp-notification-banner__heading" id="preview-banner">
+            Preview Mode
+        </h2>
+        <p class="dp-notification-banner__content">
+            You are viewing a preview of this post. This is how it will appear on the live site.
+            {% if post._isDraftRevision %}
+            <strong>Showing draft revision content.</strong>
+            {% elif post.status === 'draft' %}
+            <strong>This post is not published yet.</strong>
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<style>
+.dp-notification-banner {
+    background-color: #ffe5cc;
+    border-bottom: 4px solid #f47738;
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+
+.dp-notification-banner--warning {
+    background-color: #fff3cd;
+    border-bottom-color: #ffbf47;
+}
+
+.dp-notification-banner__heading {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #0b0c0c;
+}
+
+.dp-notification-banner__content {
+    font-size: 16px;
+    margin: 0;
+    color: #0b0c0c;
+}
+</style>
+{% endif %}
+
+<div class="container">
+    <div class="row">
+        {{ sidebar(recentPosts) | safe }}
+
+        <div class="col-sm-8 col-md-8">
+            {% if post %}
+                <article class="card dailypolitics-!-margin-top-8" itemscope itemtype="https://schema.org/NewsArticle">
+                    {# Apply presentation style CSS classes to the article header #}
+                    <header>
+                        <h1 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'post-header header red' }}" itemprop="headline">{{ post.title }}</h1>
+                    </header>
+
+                    {# Hero image with proper schema markup #}
+                    {% if post.hero_image_url %}
+                    <figure class="media-landscape has-caption full-width lead" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+                        <span class="image-and-copyright-container">
+                            <img class="js-image-replace"
+                                 src="{{ post.hero_image_url }}"
+                                 alt="{{ post.hero_image_alt if post.hero_image_alt else post.title }}"
+                                 itemprop="image" fetchpriority="high">
+                        </span>
+                        {% if post.hero_image_caption %}
+                        <figcaption class="media-caption">
+                            <span class="media-caption__text" itemprop="caption">
+                                {{ post.hero_image_caption }}
+                            </span>
+                        </figcaption>
+                        {% endif %}
+                        <meta itemprop="width" content="1200">
+                        <meta itemprop="height" content="630">
+                    </figure>
+                    {% endif %}
+
+                    <section>
+                        {# Article metadata #}
+                        <div class="article-meta" style="padding: 16px;">
+                            {% if post.author_name %}
+                            <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+                                <span itemprop="name"><strong class="dp-tag" style="font-weight: 700 !important;">By {{ post.author_name }}</strong></span>
+                            </span>
+                            <strong class="dp-tag dp-tag--{{ post.presentation_style_slug }}" style="font-weight: 700 !important;">{{ post.category_name }}</strong>
+                            <!--<strong class="dp-tag dp-tag--{{ post.presentation_style_slug }}" style="font-weight: 700 !important;">{{ post.presentation_style_name }}</strong>-->
+                            {% endif %}
+                        </div>
+
+                        {# Article body #}
+                        <div class="dailypolitics-body" style="padding: 16px;">
+                            {# Excerpt/description #}
+                            {% if post.excerpt %}
+                            <p class="article-excerpt" itemprop="description" style="padding-top: 0;">{{ post.excerpt_html }}</p>
+                            {% endif %}
+
+                            {# Main article content #}
+                            <div itemprop="articleBody">
+                                {{ post.content_html | safe }}
+                            </div>
+
+                            {# Hidden metadata for schema.org #}
+                            <meta itemprop="dateModified" content="{{ post.updated_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">
+                            {% if post.category_name %}
+                            <meta itemprop="articleSection" content="{{ post.category_name }}">
+                            {% endif %}
+                            <meta itemprop="inLanguage" content="en-GB">
+
+                            {# Publisher information (required by Google) #}
+                            <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization" hidden>
+                                <meta itemprop="name" content="Daily Politics">
+                                <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+                                    <meta itemprop="url" content="/images/logo.png">
+                                    <meta itemprop="width" content="600">
+                                    <meta itemprop="height" content="60">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dailypolitics-footer d-flex justify-content-between">
+                            <div>
+                                <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_clock_226587.png" class="dailypolitics-margin-right-5" width="19" alt="publication date"> 
+                                {% if post.published_at %}
+                                    <time itemprop="datePublished" datetime="{{ post.published_at | date('YYYY-MM-DDTHH:mm:ssZ') }}">{{ post.published_at | date('MMMM Do, YYYY') }}</time>
+                                {% else %}
+                                    <span class="dp-tag dp-tag--grey">Not yet published</span>
+                                {% endif %}
+                            </div>
+                            <div>
+
+
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.dailypolitics.com/2021/07/29/northern-ireland-could-become-a-permanent-casualty-of-brexit-if-the-protocol-dispute-remains-unresolved.html" target="_blank" rel="noopener noreferrer"><img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_facebook_circle_294710.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23" alt="facebook"></a>
+
+        <!--<img src="/assets/img/iconfinder_335_Telegram_logo_4375108.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23px">
+
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://www.dailypolitics.com/2021/07/29/northern-ireland-could-become-a-permanent-casualty-of-brexit-if-the-protocol-dispute-remains-unresolved.html&title=Northern Ireland could become a "permanent casualty" of Brexit if the Protocol dispute remains unresolved" target="_blank"><img src="/assets/img/iconfinder_linkedin_circle_294706.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23px"></a>-->
+
+
+        <a href="whatsapp://send?text=https://www.dailypolitics.com/2021/07/29/northern-ireland-could-become-a-permanent-casualty-of-brexit-if-the-protocol-dispute-remains-unresolved.html" target="_blank" rel="noopener noreferrer"><img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_375_Whatsapp_logo_4375153.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23" alt="whatsapp"></a>
+
+        <a href="mailto:?subject=Northern%20Ireland%20could%20become%20a%20%22permanent%20casualty%22%20of%20Brexit%20if%20the%20Protocol%20dispute%20remains%20unresolved&amp;body=https://www.dailypolitics.com/2021/07/29/northern-ireland-could-become-a-permanent-casualty-of-brexit-if-the-protocol-dispute-remains-unresolved.html" target="_blank"><img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_008_Mail_183573.png" class="dailypolitics-margin-left-5 dailypolitics-margin-right-5" width="23" alt="email"></a>
+
+
+
+                            </div>
+                        </div>
+                    </section>
+                </article>
+
+                {# Back to edit button for preview mode #}
+                {% if isPreview %}
+                <div class="text-center dailypolitics-!-margin-top-4 dailypolitics-!-margin-bottom-8">
+                    <a href="/admin/posts/{{ post.id }}/edit" class="dp-button dp-button--secondary">
+                        Back to Edit
+                    </a>
+                </div>
+                {% else %}
+                {# Article Navigation - Previous/Next (only on live site) #}
+                {{ pager({mode: 'article', prevArticle: prevArticle, nextArticle: nextArticle}) | safe }}
+                {% endif %}
+            {% else %}
+                <div class="dailypolitics-correction card dailypolitics-!-margin-top-8">
+                    <div class="card-body text-center">
+                        <h3>Article Not Found</h3>
+                        <p>The article you're looking for could not be found.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -12,6 +12,8 @@
             this.preview = null;
             this.tabs = null;
             this.currentTab = 'edit';
+            // Check if this is basic or advanced mode
+            this.mode = textarea.dataset.editorMode || 'advanced';
 
             this.init();
         }
@@ -48,7 +50,21 @@
         createToolbar() {
             const toolbar = document.createElement('div');
             toolbar.className = 'dp-rte-toolbar';
-            toolbar.innerHTML = `
+
+            // Basic toolbar (Bold and Italic only)
+            const basicToolbar = `
+                <div class="dp-rte-toolbar__group">
+                    <button type="button" class="dp-rte-toolbar__button dp-rte-toolbar__button--bold" data-action="bold" title="Bold (Ctrl+B)">
+                        <strong>B</strong>
+                    </button>
+                    <button type="button" class="dp-rte-toolbar__button dp-rte-toolbar__button--italic" data-action="italic" title="Italic (Ctrl+I)">
+                        <em>I</em>
+                    </button>
+                </div>
+            `;
+
+            // Advanced toolbar (all features)
+            const advancedToolbar = `
                 <div class="dp-rte-toolbar__group">
                     <button type="button" class="dp-rte-toolbar__button dp-rte-toolbar__button--bold" data-action="bold" title="Bold (Ctrl+B)">
                         <strong>B</strong>
@@ -75,19 +91,15 @@
                     <button type="button" class="dp-rte-toolbar__button" data-action="unorderedList" title="Bullet List">
                         • List
                     </button>
-                    <button type="button" class="dp-rte-toolbar__button" data-action="orderedList" title="Numbered List">
-                        1. List
-                    </button>
                 </div>
                 <div class="dp-rte-toolbar__group">
                     <button type="button" class="dp-rte-toolbar__button" data-action="youtube" title="Embed YouTube">
                         YouTube
                     </button>
-                    <button type="button" class="dp-rte-toolbar__button" data-action="twitter" title="Embed X/Twitter">
-                        X
-                    </button>
                 </div>
             `;
+
+            toolbar.innerHTML = this.mode === 'basic' ? basicToolbar : advancedToolbar;
 
             this.textarea.parentNode.insertBefore(toolbar, this.textarea);
             this.toolbar = toolbar;
@@ -345,9 +357,9 @@
         }
     }
 
-    // Initialize RTE on all textareas
+    // Initialize RTE on textareas with 'dp-markdown-editor' class
     function initRichTextEditors() {
-        const textareas = document.querySelectorAll('textarea');
+        const textareas = document.querySelectorAll('textarea.dp-markdown-editor');
         textareas.forEach(textarea => {
             // Skip if already initialized
             if (textarea.classList.contains('dp-rte__textarea')) {

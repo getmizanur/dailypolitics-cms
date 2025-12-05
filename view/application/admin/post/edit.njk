@@ -10,9 +10,10 @@
             {% if isDraft %}
                 <div class="dp-inset-text dp-inset-text--yellow">
                     <p>
-                        You're editing a <strong class="key-term__2">draft post</strong>.
-                        This post is not yet published and will not appear on the live site
-                        until you click <strong class="key-term__2">Publish</strong>.
+                        You’re editing a <strong class="key-term">draft</strong>.
+                        It’s not visible on the
+                        <strong class="key-term">live site</strong> yet —
+                        <strong class="key-term">publish</strong> it when you’re ready to make it live.
                     </p>
                 </div>
             {% else %}
@@ -78,6 +79,7 @@
 
                 <div class="form-group{% if errorDecorator(f.get('excerpt_markdown')) %} dp-form-group--error{% endif %}">
                     {{ formLabel(f.get('excerpt_markdown')) | safe }}
+                    {{ detail(f.get('excerpt_markdown'), "If left empty, we'll use the Excerpt. Ideal length: 140–160 characters. Shown in Google and social previews.") | safe }}
                     {{ formError(f.get('excerpt_markdown')) | safe }}
                     {{ formTextarea(f.get('excerpt_markdown')) | safe }}
                 </div>
@@ -102,6 +104,7 @@
 
                 <div class="form-group{% if errorDecorator(f.get('meta_description')) %} dp-form-group--error{% endif %}">
                     {{ formLabel(f.get('meta_description')) | safe }}
+                    {{ detail(f.get('meta_description'), "If left empty, we'll use the Excerpt. Ideal length: 140–160 characters. Shown in Google and social previews.") | safe }}
                     {{ formError(f.get('meta_description')) | safe }}
                     {{ formTextarea(f.get('meta_description')) | safe }}
                 </div>

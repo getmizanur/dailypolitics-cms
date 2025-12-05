@@ -753,3 +753,73 @@ input[name="review_requested"]:focus {
     color: #003078;
     text-decoration: none;
 }
+
+/* Submit for Delete Button - Red */
+
+.dp-button--exist_this_page,
+button[name="exit_this_page"],
+input[name="exit_this_page"] {
+    background-color: #d4351c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+}
+
+
+.dp-button--exit_this_page:hover,
+button[name="exit_this_page"]:hover,
+input[name="exit_this_page"]:hover {
+    background-color: #6f3331 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 0 #003078 !important;
+}
+
+.dp-button--exist_this_page:active,
+button[name="exit_this_page"]:active,
+input[name="exit_this_page"]:active {
+    background-color: #d4351c  !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    top: 2px;
+    position: relative;
+}
+
+.dp-button--exit_this_page:focus,
+button[name="exit_this_page"]:focus,
+input[name="exit_this_page"]:focus {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: 0 !important;
+    background-color: #d4351c !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 0 #003078 !important;
+}
+
+/* Button Group Dividers */
+.dp-button-group__primary-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dp-button-group__destructive-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-left: 24px;
+    padding-left: 24px;
+    border-left: 2px solid #b1b4b6;
+}
+
+.dp-button-group__secondary-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-left: 24px;
+    padding-left: 24px;
+    border-left: 2px solid #b1b4b6;
+}

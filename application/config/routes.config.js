@@ -28,12 +28,6 @@ module.exports = {
             "controller": "post",
             "action": "list"
         },
-        "adminDashboardView": {
-            "route": "/admin/posts/:slug/preview",
-            "module": "admin",
-            "controller": "post",
-            "action": "view"
-        },
         "adminDashboardEdit": {
             "route": "/admin/posts/:id/edit",
             "module": "admin",
@@ -58,6 +52,14 @@ module.exports = {
             "controller": "post",
             "action": "delete"
         },
+        "adminDashboardPreview": {
+            "route": "/admin/posts/:post_id/preview",
+            "module": "admin",
+            "controller": "post",
+            "action": "view"
+        },
+
+
         "adminLoginLogout": {
             "route": "/admin/logout",
             "module": "admin",
@@ -95,10 +97,16 @@ module.exports = {
             "action": "index"
         },
         "blogIndexView": {
-            "route": "/:category_slug/articles/:slug/index.html",
+            "route": "/articles/:slug/index.html",
             "module": "blog",
             "controller": "index",
             "action": "view"
+        },
+        "blogSitemapSitemap": {
+            "route": "/sitemap.xml",
+            "module": "blog",
+            "controller": "sitemap",
+            "action": "sitemap"
         }
     }
 };

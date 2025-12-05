@@ -21,49 +21,91 @@ class PostService extends AbstractService {
 
     /**
      * Fetch all posts with given statuses (not deleted)
-     * @param {Array<string>} statuses - Array of allowed statuses (e.g. ['draft','published','archived'])
+     * Includes revision draft status and review status in
+     * display_state
+     * @param {Array<string>} statuses - Array of allowed statuses
+     *        (e.g. ['draft','published','archived'])
      * @param {number} limit - Optional limit for results
      * @param {number} offset - Optional offset for pagination
      * @returns {Promise<Array>} Array of posts with allowed statuses
      */
-    async getAllPostsWithStatus(statuses = ['draft', 'published', 'archived'], limit = null, offset = null) {
+    async getAllPostsWithStatus(
+        statuses = ['draft', 'published', 'archived'],
+        limit = null,
+        offset = null) {
         try {
             const select = await this.getSelectQuery();
 
-            // Build query: SELECT posts with joins for category, author, and presentation styles
-            select.from('posts')
-                  .joinLeft('categories', 'posts.category_id = categories.id')
-                  .joinLeft('users', 'posts.author_id = users.id')
-                  .joinLeft('presentation_styles', 'categories.presentation_style_id = presentation_styles.id')
-                  .columns([
-                      'posts.id',
-                      'posts.title',
-                      'posts.slug',
-                      'posts.excerpt_markdown',
-                      'posts.excerpt_html',
-                      'posts.content_markdown',
-                      'posts.content_html',
-                      'posts.hero_image_url',
-                      'posts.presentation_style_id',
-                      'posts.header_color_override',
-                      'posts.is_featured',
-                      'posts.status',
-                      'posts.created_at',
-                      'posts.updated_at',
-                      'posts.published_at',
-                      'categories.name as category_name',
-                      'categories.slug as category_slug',
-                      'users.name as author_name',
-                      'users.email as author_email',
-                      'presentation_styles.name as presentation_style_name',
-                      'presentation_styles.slug as presentation_style_slug',
-                      'presentation_styles.css_classes as presentation_css_classes'
-                  ])
-                  .where('posts.status = ANY(?)', [statuses])
-                  .where('posts.deleted_at IS NULL')
-                  .order('posts.published_at', 'DESC');
+            select
+                // FROM posts AS p
+                .from({ p: 'posts' }, [
+                    'p.id',
+                    'p.slug',
+                    'p.title',
+                    'p.updated_at'
+                ])
 
-            // Apply pagination if provided
+                // Extra columns (category name, updated_by_name,
+                // display_state)
+                .columns({
+                    // Type column in UI (Breaking, Politics, etc.)
+                    type: 'c.name',
+
+                    // "Updated By" — fall back to author when
+                    // updated_by is null
+                    updated_by_name:
+                        'COALESCE(u_updated.name, u_author.name)',
+
+                    // Display state badge
+                    display_state: `
+                        CASE
+                          WHEN pr_draft.id IS NOT NULL
+                               AND p.status = 'published'
+                            THEN 'PUBLISHED - REVISION DRAFT'
+                          WHEN p.review_requested = TRUE
+                               AND p.status = 'draft'
+                            THEN 'DRAFT - IN REVIEW'
+                          WHEN p.status = 'draft'
+                            THEN 'DRAFT'
+                          WHEN p.status = 'published'
+                            THEN 'PUBLISHED'
+                          ELSE UPPER(p.status)
+                        END
+                    `
+                })
+
+                // JOIN categories c ON c.id = p.category_id
+                .join({ c: 'categories' }, 'c.id = p.category_id')
+
+                // LEFT JOIN users u_author ON u_author.id = p.author_id
+                .joinLeft({ u_author: 'users' },
+                    'u_author.id = p.author_id')
+
+                // LEFT JOIN users u_updated ON u_updated.id =
+                // p.updated_by
+                .joinLeft({ u_updated: 'users' },
+                    'u_updated.id = p.updated_by')
+
+                // LEFT JOIN post_revisions pr_draft
+                //   ON pr_draft.post_id = p.id AND
+                //      pr_draft.status = 'draft'
+                .joinLeft(
+                    { pr_draft: 'post_revisions' },
+                    "pr_draft.post_id = p.id AND " +
+                    "pr_draft.status = 'draft'"
+                )
+
+                // WHERE p.deleted_at IS NULL
+                // (exclude archived/soft-deleted)
+                .where('p.deleted_at IS NULL')
+
+                // Filter by status
+                .where('p.status = ANY(?)', [statuses])
+
+                // ORDER BY p.updated_at DESC
+                .order('p.updated_at', 'DESC');
+
+            // LIMIT/OFFSET for pagination
             if (limit !== null) {
                 select.limit(limit);
             }
@@ -74,7 +116,8 @@ class PostService extends AbstractService {
             const result = await select.execute();
             return result.rows || result;
         } catch (error) {
-            console.error('Error fetching posts with status:', statuses, error);
+            console.error('Error fetching posts with status:',
+                statuses, error);
             throw error;
         }
     }
@@ -605,6 +648,8 @@ class PostService extends AbstractService {
      */
     async updatePostById(id, updateData) {
         try {
+            console.log('[PostService.updatePostById] updateData.comments_enabled:', updateData.comments_enabled, 'type:', typeof updateData.comments_enabled);
+
             const adapter = await this.initializeDatabase();
             const Update = require('../../library/db/sql/update');
             const update = new Update(adapter);
@@ -675,42 +720,22 @@ class PostService extends AbstractService {
     }
 
     /**
-     * Generate a unique slug for a post
-     * Uses the opaqueId plugin to generate random slugs and checks for uniqueness
-     * @returns {Promise<string>} Unique slug
-     * @throws {Error} If unable to generate unique slug after 5 attempts
+     * Check if a slug exists in the database
+     * @param {string} slug - Slug to check
+     * @returns {Promise<boolean>} True if slug exists, false otherwise
      */
-    async generateUniqueSlug() {
-        let slug;
-        let exists = true;
-        let attempts = 0;
+    async slugExists(slug) {
+        // Check if slug exists using Select query builder
+        const select = await this.getSelectQuery();
+        select.from('posts')
+              .columns(['1'])
+              .where('slug = ?', slug)
+              .limit(1);
 
-        while (exists) {
-            // Generate slug using opaqueId plugin from ServiceManager
-            const opaqueIdPlugin = this.getServiceManager().get('PluginManager').get('opaqueId');
-            slug = opaqueIdPlugin.generate();
-            attempts += 1;
+        const result = await select.execute();
+        const rows = result.rows || result;
 
-            // Check if slug exists using Select query builder
-            const select = await this.getSelectQuery();
-            select.from('posts')
-                  .columns(['1'])
-                  .where('slug = ?', slug)
-                  .limit(1);
-
-            const result = await select.execute();
-            const rows = result.rows || result;
-
-            exists = rows.length > 0;
-
-            if (!exists) {
-                return slug;
-            }
-
-            if (attempts > 5) {
-                throw new Error('Failed to generate unique slug after 5 attempts');
-            }
-        }
+        return rows.length > 0;
     }
 
     /**

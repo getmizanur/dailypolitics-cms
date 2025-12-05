@@ -31,6 +31,7 @@
 
                 <div class="form-group{% if errorDecorator(f.get('excerpt_markdown')) %} dp-form-group--error{% endif %}">
                     {{ formLabel(f.get('excerpt_markdown')) | safe }}
+                    {{ detail(f.get('excerpt_markdown'), "If left empty, we'll use the Excerpt. Ideal length: 140–160 characters. Shown in Google and social previews.") | safe }}
                     {{ formError(f.get('excerpt_markdown')) | safe }}
                     {{ formTextarea(f.get('excerpt_markdown')) | safe }}
                 </div>
@@ -55,6 +56,7 @@
 
                 <div class="form-group{% if errorDecorator(f.get('meta_description')) %} dp-form-group--error{% endif %}">
                     {{ formLabel(f.get('meta_description')) | safe }}
+                    {{ detail(f.get('meta_description'), "If left empty, we'll use the Excerpt. Ideal length: 140–160 characters. Shown in Google and social previews.") | safe }}
                     {{ formError(f.get('meta_description')) | safe }}
                     {{ formTextarea(f.get('meta_description')) | safe }}
                 </div>
@@ -68,11 +70,17 @@
                 <div class="form-group">
                     <div class="dp-button-group">
                         <div class="dp-button-group__left">
-                            {{ formSubmit(f.get('save')) | safe }}
-                            {{ formSubmit(f.get('publish')) | safe }}
-                        </div>
-                        <div class="dp-button-group__right">
-                            <a href="{{ url('adminDashboardIndex') }}" class="dp-button--cancel">Cancel</a>
+                            <div class="dp-button-group__primary-actions">
+                                {% if f.get('save') %}
+                                    {{ formSubmit(f.get('save')) | safe }}
+                                {% endif %}
+                                {% if f.get('publish') %}
+                                    {{ formSubmit(f.get('publish')) | safe }}
+                                {% endif %}
+                            </div>
+                            <div class="dp-button-group__secondary-actions">
+                                {{ formSubmit(f.get('exit_this_page')) | safe }}
+                            </div>
                         </div>
                     </div>
                 </div>

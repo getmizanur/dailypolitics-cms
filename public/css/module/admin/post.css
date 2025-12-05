@@ -1,13 +1,22 @@
 .dp-tag--published {
   background-color: #CFEDE1 !important;
   color: #005E3A !important;
-  border-radius: 0rem !important;
+  display: inline-block !important;
+  padding: 2px 8px !important;
+  border: 1px 1px #005E3A !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  border-radius: 5rem !important;
 }
 
 .dp-tag--draft {
-  background-color: #D6E4F7 !important;
-  color: #1d70b8 !important;
-  border-radius: 0rem !important;
+  background-color: #FFF2D3 !important;
+  color: #594D00 !important;
+  padding: 2px 6px !important;
+  font-size: 0.875rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  border-radius: 5rem !important;
 }
 
 .dp-tag--small {

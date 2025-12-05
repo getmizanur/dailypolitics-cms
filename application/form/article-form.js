@@ -90,8 +90,9 @@ class ArticleForm extends Form {
         const element = new Textarea(name);
         element.setLabel('Excerpt');
         element.setAttributes({
-            'class': 'dp-input',
-            'id': 'article-excerpt',
+            'class': 'dp-input dp-markdown-editor',
+            'id': 'article-excerpt ',
+            'data-editor-mode' : "basic", // <--- basic rich text editor
             'rows': '4',
             'placeholder': 'Enter a brief excerpt or summary',
             //'maxlength': '500'
@@ -114,8 +115,9 @@ class ArticleForm extends Form {
         const element = new Textarea(name);
         element.setLabel('Content');
         element.setAttributes({
-            'class': 'dp-input',
+            'class': 'dp-input dp-markdown-editor',
             'id': 'article-content',
+            'data-editor-mode' : "advanced", // <--- advanced rich text editor
             'rows': '15',
             'placeholder': 'Enter article content',
             //'required': 'required'
@@ -207,7 +209,7 @@ class ArticleForm extends Form {
     addMetaDescriptionField(name = 'meta_description',
                             additionalAttributes = {}) {
         const element = new Textarea(name);
-        element.setLabel('Meta description');
+        element.setLabel('Meta description (optional)');
         element.setAttributes({
             'class': 'dp-input',
             'id': 'article-meta-description',
@@ -248,30 +250,6 @@ class ArticleForm extends Form {
     }
 
     /**
-     * Add excerpt field (textarea)
-     * @param {string} name
-     * @param {Object} additionalAttributes - Optional additional HTML
-     *                                         attributes
-     * @returns {ArticleForm}
-     */
-    addChangeReasonField(name = 'change_reason',
-                    additionalAttributes = {}) {
-        const element = new Textarea(name);
-        element.setLabel('Reason for change');
-        element.setAttributes({
-            'class': 'dp-input',
-            'id': 'change_reason',
-            'rows': '4',
-            'placeholder': 'Please give a brief reason for this change',
-            //'maxlength': '500'
-            ...additionalAttributes
-        });
-        element.setLabelAttribute('class', 'dp-label');
-        this.add(element);
-        return this;
-    }
-
-    /**
      * Add change reason field (textarea)
      * Used in revision drafts to document the reason for changes
      * Helps track editorial history and provides context for updates
@@ -283,7 +261,7 @@ class ArticleForm extends Form {
     addChangeReasonField(name = 'change_reason',
                     additionalAttributes = {}) {
         const element = new Textarea(name);
-        element.setLabel('Reason For Change');
+        element.setLabel('Reason for change');
         element.setAttributes({
             'class': 'dp-input',
             'id': 'change-reason',

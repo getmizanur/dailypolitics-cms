@@ -77,7 +77,7 @@ class PostRevisionService extends AbstractService {
                   .joinLeft('categories',
                       'post_revisions.category_id = categories.id')
                   .joinLeft('presentation_styles',
-                      'post_revisions.presentation_style_id = ' +
+                      'categories.presentation_style_id = ' +
                       'presentation_styles.id')
                   .columns([
                       'post_revisions.*',
@@ -86,7 +86,10 @@ class PostRevisionService extends AbstractService {
                       'approver.name as approved_by_name',
                       'approver.email as approved_by_email',
                       'categories.name as category_name',
-                      'presentation_styles.name as presentation_style_name'
+                      'categories.slug as category_slug',
+                      'presentation_styles.name as presentation_style_name',
+                      'presentation_styles.slug as presentation_style_slug',
+                      'presentation_styles.css_classes as presentation_css_classes'
                   ])
                   .where('post_revisions.post_id = ?', postId)
                   .where('post_revisions.status = ?', 'draft')
@@ -126,7 +129,7 @@ class PostRevisionService extends AbstractService {
                   .joinLeft('categories',
                       'post_revisions.category_id = categories.id')
                   .joinLeft('presentation_styles',
-                      'post_revisions.presentation_style_id = ' +
+                      'categories.presentation_style_id = ' +
                       'presentation_styles.id')
                   .columns([
                       'post_revisions.*',
@@ -135,7 +138,10 @@ class PostRevisionService extends AbstractService {
                       'approver.name as approved_by_name',
                       'approver.email as approved_by_email',
                       'categories.name as category_name',
-                      'presentation_styles.name as presentation_style_name'
+                      'categories.slug as category_slug',
+                      'presentation_styles.name as presentation_style_name',
+                      'presentation_styles.slug as presentation_style_slug',
+                      'presentation_styles.css_classes as presentation_css_classes'
                   ])
                   .where('post_revisions.post_id = ?', postId)
                   .order('post_revisions.created_at', 'DESC');
@@ -176,7 +182,7 @@ class PostRevisionService extends AbstractService {
                   .joinLeft('categories',
                       'post_revisions.category_id = categories.id')
                   .joinLeft('presentation_styles',
-                      'post_revisions.presentation_style_id = ' +
+                      'categories.presentation_style_id = ' +
                       'presentation_styles.id')
                   .columns([
                       'post_revisions.*',
@@ -185,7 +191,10 @@ class PostRevisionService extends AbstractService {
                       'approver.name as approved_by_name',
                       'approver.email as approved_by_email',
                       'categories.name as category_name',
-                      'presentation_styles.name as presentation_style_name'
+                      'categories.slug as category_slug',
+                      'presentation_styles.name as presentation_style_name',
+                      'presentation_styles.slug as presentation_style_slug',
+                      'presentation_styles.css_classes as presentation_css_classes'
                   ])
                   .where('post_revisions.id = ?', revisionId);
 

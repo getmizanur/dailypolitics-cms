@@ -16,29 +16,35 @@
               <th scope="col" style="width:120px">Type</th>
               <th scope="col">Title</th>
               <th scope="col" style="width: 150px">Updated By</th>
-              <th scope="col" style="width: 120px;">State</th>
+              <th scope="col" style="width: 150px;">State</th>
               <th scope="col" class="text-right" style="width: 60px;">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
             {% for post in posts %}
             <tr>
-              <td><strong>{{ post.category_name }}</strong></td>
+              <td><strong>{{ post.type }}</strong></td>
               <td><a href="{{ url('adminDashboardEdit', { id : post.id }) }}">{{ post.title }}</a></td>
-              <td>{{ post.updated_at | date('yyyy-MM-DD') }}<br>by <strong>{{ post.author_name }}</strong></td>
+              <td>{{ post.updated_at | date('yyyy-MM-DD') }}<br>by <strong>{{ post.updated_by_name }}</strong></td>
               <td>
-                {% if post.status == 'published' %}
-                  <span class="dp-tag dp-tag--published dp-tag--small dp-tag--pill"><strong>Published</strong></span>
-                {% elseif post.status == 'draft' %}
+                {% if post.display_state == 'PUBLISHED - REVISION DRAFT' %}
+                  {% set state = explode(' - ', post.display_state) %}
+                  <span class="dp-tag dp-tag--published dp-tag--small dp-tag--pill"><strong>{{ state[0] }}</strong></span>
+                  <span class="dp-tag dp-tag--draft dp-tag--small dp-tag--pill"><strong>{{ state[1] }}</strong></span>
+                {% elseif post.display_state == 'DRAFT - IN REVIEW' %}
+                  {% set state = explode(' - ', post.display_state) %}
+                  <span class="dp-tag dp-tag--draft dp-tag--small dp-tag--pill"><strong>{{ state[0] }}</strong></span>
+                  <span class="dp-tag dp-tag--review dp-tag--small dp-tag--pill"><strong>{{ state[1] }}</strong></span>
+                {% elseif post.display_state == 'DRAFT' %}
                   <span class="dp-tag dp-tag--draft dp-tag--small dp-tag--pill"><strong>Draft</strong></span>
-                {% elseif post.status == 'archived' %}
-                  <span class="dp-tag dp-tag--orange dp-tag--small dp-tag--pill"><strong>Archived</strong></span>
+                {% elseif post.display_state == 'PUBLISHED' %}
+                  <span class="dp-tag dp-tag--published dp-tag--small dp-tag--pill"><strong>Published</strong></span>
                 {% else %}
-                  <span class="dp-tag dp-tag--muted dp-tag--small dp-tag--pill">{{ post.status|capitalize }}</span>
+                  <span class="dp-tag dp-tag--muted dp-tag--small dp-tag--pill">{{ post.display_state }}</span>
                 {% endif %}
               </td>
               <td class="text-right">
-                <a href="{{ url('adminDashboardView', { slug : post.slug }) }}" class="" target="_blank" rel="noopener noreferrer">View</a>              
+                <a href="{{ url('adminDashboardPreview', { post_id : post.id }) }}" class="" target="_blank" rel="noopener noreferrer">View</a>
               </td>
             </tr>
             {% endfor %}

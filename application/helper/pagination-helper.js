@@ -47,11 +47,13 @@ class PaginationHelper extends AbstractHelper {
 
     /**
      * Render navigation for posts (page-based pagination)
+     * Using GOV.UK pagination component design with dp- prefix
      * @private
      */
     _renderPostsNavigation(options) {
         const {
             totalPages = 1,
+            currentPage = 1,
             hasNext = false,
             hasPrev = false,
             nextPage = 2,
@@ -65,36 +67,42 @@ class PaginationHelper extends AbstractHelper {
         }
 
         let html = `
-        <nav aria-label="Post navigation" class="dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8">
-            <ul class="pagination justify-content-between" style="display: flex;">`;
+        <nav class="dp-pagination dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8" aria-label="Pagination">`;
 
-        // NEWER POSTS button (previous page) - left side
+        // Previous page (newer posts)
         if (hasPrev) {
             const newerUrl = prevPage === 1 ? baseUrl || '/' : `${baseUrl}/page/${prevPage}/index.html`;
             html += `
-                <li class="page-item">
-                    <a class="btn btn-green" href="${newerUrl}" rel="prev" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
-                        ← Newer Posts
-                    </a>
-                </li>`;
-        } else {
-            html += `<li class="page-item" style="visibility: hidden;"><span class="btn">← Newer Posts</span></li>`;
+            <div class="dp-pagination__prev">
+                <a class="dp-pagination__link" href="${newerUrl}" rel="prev">
+                    <svg class="dp-pagination__icon dp-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                    </svg>
+                    <span class="dp-pagination__link-title">
+                        Previous<span class="dp-visually-hidden"> page</span>
+                    </span>
+                    <span class="dp-pagination__link-label">${prevPage} of ${totalPages}</span>
+                </a>
+            </div>`;
         }
 
-        // OLDER POSTS button (next page) - right side
+        // Next page (older posts)
         if (hasNext) {
             html += `
-                <li class="page-item">
-                    <a class="btn btn-green" href="${baseUrl}/page/${nextPage}/index.html" rel="next" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
-                        Older Posts →
-                    </a>
-                </li>`;
-        } else {
-            html += `<li class="page-item" style="visibility: hidden;"><span class="btn">Older Posts →</span></li>`;
+            <div class="dp-pagination__next">
+                <a class="dp-pagination__link" href="${baseUrl}/page/${nextPage}/index.html" rel="next">
+                    <span class="dp-pagination__link-title">
+                        Next<span class="dp-visually-hidden"> page</span>
+                    </span>
+                    <span class="dp-pagination__link-label">${nextPage} of ${totalPages}</span>
+                    <svg class="dp-pagination__icon dp-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                    </svg>
+                </a>
+            </div>`;
         }
 
         html += `
-            </ul>
         </nav>`;
 
         return html;
@@ -102,6 +110,7 @@ class PaginationHelper extends AbstractHelper {
 
     /**
      * Render navigation for articles (prev/next article links)
+     * Using GOV.UK pagination component design with dp- prefix
      * @private
      */
     _renderArticleNavigation(options) {
@@ -116,37 +125,41 @@ class PaginationHelper extends AbstractHelper {
         }
 
         let html = `
-        <nav aria-label="Article navigation" class="dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8">
-            <ul class="pagination justify-content-between" style="display: flex;">`;
+        <nav class="dp-pagination dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8" aria-label="Article navigation">`;
 
-        // NEWER ARTICLE button (previous article) - left side
+        // Previous article link
         if (prevArticle) {
-            const prevUrl = `/${prevArticle.category_slug || 'general'}/articles/${prevArticle.slug}/index.html`;
+            const prevUrl = `/articles/${prevArticle.slug}/index.html`;
             html += `
-                <li class="page-item">
-                    <a class="btn btn-primary green" href="${prevUrl}" rel="prev" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
-                        ← Next Article
-                    </a>
-                </li>`;
-        } else {
-            html += `<li class="page-item" style="visibility: hidden;"><span class="btn">← Next Article</span></li>`;
+            <div class="dp-pagination__prev">
+                <a class="dp-pagination__link" href="${prevUrl}" rel="prev">
+                    <svg class="dp-pagination__icon dp-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                    </svg>
+                    <span class="dp-pagination__link-title">
+                        Previous<span class="dp-visually-hidden"> article</span>
+                    </span>
+                </a>
+            </div>`;
         }
 
-        // OLDER ARTICLE button (next article) - right side
+        // Next article link
         if (nextArticle) {
-            const nextUrl = `/${nextArticle.category_slug || 'general'}/articles/${nextArticle.slug}/index.html`;
+            const nextUrl = `/articles/${nextArticle.slug}/index.html`;
             html += `
-                <li class="page-item">
-                    <a class="btn btn-primary green" href="${nextUrl}" rel="next" style="border-color: #00703C; outline: 2px solid #FFD600; outline-offset: 2px;">
-                        Previous Article →
-                    </a>
-                </li>`;
-        } else {
-            html += `<li class="page-item" style="visibility: hidden;"><span class="btn">Previous Article →</span></li>`;
+            <div class="dp-pagination__next">
+                <a class="dp-pagination__link" href="${nextUrl}" rel="next">
+                    <span class="dp-pagination__link-title">
+                        Next<span class="dp-visually-hidden"> article</span>
+                    </span>
+                    <svg class="dp-pagination__icon dp-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                    </svg>
+                </a>
+            </div>`;
         }
 
         html += `
-            </ul>
         </nav>`;
 
         return html;

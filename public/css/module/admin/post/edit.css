@@ -946,6 +946,14 @@ input[name="revision_draft"]:focus {
   border-radius: 2px;
 }
 
+.key-term__2 {
+  font-weight: 600;
+  background-color: #E5E5E5;
+  color: #0b0c0c;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
 /* Panel implementation */
 .dp-panel {
   box-sizing: border-box;

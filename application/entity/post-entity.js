@@ -1073,6 +1073,8 @@ class PostEntity extends AbstractEntity {
     getDataForDatabase(forUpdate = false) {
         const data = this.getObjectCopy();
 
+        console.log('[PostEntity.getDataForDatabase] BEFORE processing, comments_enabled:', data.comments_enabled, 'type:', typeof data.comments_enabled);
+
         // Remove id for INSERT operations (database auto-generates)
         if (!forUpdate) {
             delete data.id;
@@ -1096,6 +1098,8 @@ class PostEntity extends AbstractEntity {
                 }
             });
         }
+
+        console.log('[PostEntity.getDataForDatabase] AFTER processing, comments_enabled:', data.comments_enabled, 'type:', typeof data.comments_enabled);
 
         // Note: created_at and updated_at are handled by database
         // triggers

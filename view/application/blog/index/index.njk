@@ -19,7 +19,7 @@
                     <div itemscope itemtype="https://schema.org/NewsArticle">
                         {# Apply presentation style CSS classes to the header if available #}
                         <h2 class="dailypolitics-heading-xl {{ post.presentation_css_classes if post.presentation_css_classes else 'green' }}" itemprop="headline">
-                            <a href="/{{ post.category_slug if post.category_slug else 'general' }}/articles/{{ post.slug }}/index.html" target="_blank" rel="noopener noreferrer">{{ post.title }}</a>
+                            <a href="{{ url('blogIndexView', { slug : post.slug }) }}" target="_blank" rel="noopener noreferrer">{{ post.title }}</a>
                         </h2>
 
                         {% if post.hero_image_url %}
