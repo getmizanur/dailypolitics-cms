@@ -46,13 +46,26 @@ function initNunjucks() {
 
     // Load application config to register view helpers
     const appConfig = require(global.applicationPath('/application/config/application.config'));
+    const routesConfig = require(global.applicationPath('/application/config/routes.config'));
     const ViewHelperManager = require(global.applicationPath('/library/mvc/view/view-helper-manager'));
+
+    // Create a mock ServiceManager for static build
+    const mockServiceManager = {
+        get: function(serviceName) {
+            if (serviceName === 'Config') {
+                return {
+                    routes: routesConfig
+                };
+            }
+            return null;
+        }
+    };
 
     const viewHelperManager = new ViewHelperManager();
     const applicationHelpers = appConfig.view_helpers?.invokables || {};
     const allHelpers = viewHelperManager.getAllHelpers(applicationHelpers);
 
-    // Register all view helpers
+    // Register all invokable view helpers
     Object.entries(allHelpers).forEach(([helperName, helperConfig]) => {
         env.addGlobal(helperName, function(...args) {
             const helperPath = typeof helperConfig === 'string' ? helperConfig : helperConfig.class;
@@ -61,6 +74,65 @@ function initNunjucks() {
             return helperInstance.render(...args);
         });
     });
+
+    // Register factory helpers (headTitle, url, etc.)
+    // Factory helpers maintain state, so we need to reset them before each render
+    const frameworkFactories = viewHelperManager.frameworkHelpers.factories || {};
+    const applicationFactories = appConfig.view_helpers?.factories || {};
+
+    // Store factory instances on env so they can be reset
+    env.factoryInstances = {};
+    env.resetFactoryHelpers = function() {
+        this.factoryInstances = {};
+    };
+
+    // Register framework factories (headTitle, url)
+    Object.entries(frameworkFactories).forEach(([helperName, factoryPath]) => {
+        env.addGlobal(helperName, function(...args) {
+            // Create instance if not cached for this render
+            if (!env.factoryInstances[helperName]) {
+                const FactoryClass = require(global.applicationPath(factoryPath));
+                const factory = new FactoryClass();
+                env.factoryInstances[helperName] = factory.createService(mockServiceManager);
+            }
+            return env.factoryInstances[helperName].render(...args);
+        });
+    });
+
+    // Register application factories (navigationLink, etc.)
+    Object.entries(applicationFactories).forEach(([helperName, factoryPath]) => {
+        env.addGlobal(helperName, function(...args) {
+            // Create instance if not cached for this render
+            if (!env.factoryInstances[helperName]) {
+                const FactoryClass = require(global.applicationPath(factoryPath));
+                const factory = new FactoryClass();
+                env.factoryInstances[helperName] = factory.createService(mockServiceManager);
+            }
+            return env.factoryInstances[helperName].render(...args);
+        });
+    });
+
+    // Override onDemandCss helper for static build
+    // This helper needs module/controller/action context which isn't available through normal Nunjucks context
+    let currentModuleName = null;
+    let currentControllerName = null;
+    let currentActionName = null;
+
+    env.addGlobal('onDemandCss', function() {
+        if (!currentModuleName) {
+            return '';
+        }
+        const OnDemandCssHelper = require(global.applicationPath('/application/helper/on-demand-css-helper'));
+        const helper = new OnDemandCssHelper();
+        return helper.cssLinkTag(currentModuleName, currentControllerName, currentActionName);
+    });
+
+    // Add method to set module context before rendering
+    env.setModuleContext = function(moduleName, controllerName, actionName) {
+        currentModuleName = moduleName;
+        currentControllerName = controllerName;
+        currentActionName = actionName;
+    };
 
     return env;
 }
@@ -201,6 +273,7 @@ async function generateHomePages(env, posts, totalPosts, recentPosts) {
 
             // Build pagination data
             const pagination = {
+                currentPage: page,
                 totalPages: totalPages,
                 hasNext: page < totalPages,
                 hasPrev: page > 1,
@@ -208,6 +281,12 @@ async function generateHomePages(env, posts, totalPosts, recentPosts) {
                 prevPage: page - 1,
                 baseUrl: ''
             };
+
+            // Reset factory helpers before render (clears headTitle state, etc.)
+            env.resetFactoryHelpers();
+
+            // Set module context for onDemandCss helper
+            env.setModuleContext('blog', 'index', 'index');
 
             // Render template
             const templateData = {
@@ -252,6 +331,12 @@ async function generateArticlePages(env, posts, recentPosts) {
 
             const categorySlug = post.category_slug || 'general';
 
+            // Reset factory helpers before render (clears headTitle state, etc.)
+            env.resetFactoryHelpers();
+
+            // Set module context for onDemandCss helper
+            env.setModuleContext('blog', 'index', 'view');
+
             // Render template
             const templateData = {
                 pageTitle: post.title,
@@ -260,14 +345,14 @@ async function generateArticlePages(env, posts, recentPosts) {
                 nextArticle: nextArticle,
                 prevArticle: prevArticle,
                 request: {
-                    url: `http://localhost:8080/${categorySlug}/articles/${post.slug}`
+                    url: `http://localhost:8080/articles/${post.slug}`
                 }
             };
 
             const html = env.render('application/blog/index/view.njk', templateData);
 
             // Write file
-            const filePath = `${categorySlug}/articles/${post.slug}/index.html`;
+            const filePath = `articles/${post.slug}/index.html`;
             await writeHtmlFile(filePath, html);
         } catch (error) {
             console.error(`✗ Failed to generate article ${post.slug}:`, error.message);
@@ -299,6 +384,55 @@ async function generateRecentPostsJson(recentPosts) {
         console.log(`✓ Generated: api/recent-posts.json (${jsonPosts.length} posts)`);
     } catch (error) {
         console.error('✗ Failed to generate recent-posts.json:', error.message);
+    }
+}
+
+/**
+ * Generate sitemap.xml
+ */
+async function generateSitemap(posts, baseUrl = 'http://localhost:8080') {
+    console.log('\n📄 Generating sitemap.xml...');
+
+    try {
+        const currentDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
+  <url>
+    <loc>${baseUrl}/</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+`;
+
+        // Add all published posts
+        posts.forEach(post => {
+            const lastmod = post.updated_at || post.published_at;
+            const lastmodDate = new Date(lastmod).toISOString().split('T')[0];
+
+            xml += `  <!-- ${post.title} -->
+  <url>
+    <loc>${baseUrl}/articles/${post.slug}/index.html</loc>
+    <lastmod>${lastmodDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+`;
+        });
+
+        xml += `</urlset>
+`;
+
+        // Write to static-site/sitemap.xml
+        const sitemapPath = path.join(CONFIG.outputDir, 'sitemap.xml');
+        await fs.writeFile(sitemapPath, xml, 'utf8');
+        console.log(`✓ Generated: sitemap.xml (${posts.length + 1} URLs)`);
+    } catch (error) {
+        console.error('✗ Failed to generate sitemap.xml:', error.message);
     }
 }
 
@@ -422,10 +556,13 @@ async function build() {
         // Step 7: Generate recent-posts.json API
         await generateRecentPostsJson(recentPosts);
 
-        // Step 8: Copy static assets
+        // Step 8: Generate sitemap.xml
+        await generateSitemap(posts);
+
+        // Step 9: Copy static assets
         await copyStaticAssets();
 
-        // Step 9: Generate summary
+        // Step 10: Generate summary
         generateSummary(startTime, totalPosts);
 
         process.exit(0);

@@ -160,40 +160,44 @@
     <a href="#main-content" class="sr-only sr-only-focusable" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:1000;background:#fff;color:#00703C;padding:8px 16px;border-radius:4px;outline:2px solid #FFD600;outline-offset:2px;" onfocus="this.style.left='0';this.style.width='auto';this.style.height='auto';this.style.overflow='visible';" onblur="this.style.left='-999px';this.style.width='1px';this.style.height='1px';this.style.overflow='hidden';">Skip to main content</a>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-fixed-top">
-        <div class="container" style="padding-left: 0px; padding-right: 0px;">
-            <h1 class="navbar-brand">
-                <a href="/" class="isDisabled">Daily Politics</a>
-            </h1>
-            <!--<button class="navbar-toggler custom-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://twitter.com/intent/tweet?url={{ request.url | default('http://localhost:8080') | urlencode }}&text=Daily%20Politics" target="_blank" rel="noopener noreferrer">
-                            <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_twitter_circle_294709.png" width="29" height="29" alt="twitter">
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://www.facebook.com/sharer/sharer.php?u={{ request.url | default('http://localhost:8080') | urlencode }}" target="_blank" rel="noopener noreferrer">
-                            <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_facebook_circle_294710.png" width="29" height="29" alt="facebook">
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/feed.xml">
-                            <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_social_style_1_rss_393284.png" alt="rss feed" width="29" height="29">
-                        </a>
-                    </li>
-                </ul>
-            </div>-->
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h1 class="navbar-brand">
+                        <a href="/" class="isDisabled">Daily Politics</a>
+                    </h1>
+                    <!--<button class="navbar-toggler custom-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarResponsive">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://twitter.com/intent/tweet?url={{ request.url | default('http://localhost:8080') | urlencode }}&text=Daily%20Politics" target="_blank" rel="noopener noreferrer">
+                                    <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_twitter_circle_294709.png" width="29" height="29" alt="twitter">
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://www.facebook.com/sharer/sharer.php?u={{ request.url | default('http://localhost:8080') | urlencode }}" target="_blank" rel="noopener noreferrer">
+                                    <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_facebook_circle_294710.png" width="29" height="29" alt="facebook">
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/feed.xml">
+                                    <img src="https://dailypolitics-assets.s3-eu-west-1.amazonaws.com/img/iconfinder_social_style_1_rss_393284.png" alt="rss feed" width="29" height="29">
+                                </a>
+                            </li>
+                        </ul>
+                    </div>-->
+                </div>
+            </div>
         </div>
     </nav>
 
     <!-- Menu Content Area -->
-    <nav class="ng-view menu-content-area">
+    <nav class="ng-view">
         <div class="container">
             <div class="row">
-                <div class="col-sm-12 text-right" style="padding-left: 0px;padding-right: 0px;">
+                <div class="col-sm-12 text-right">
                     <!--<a href="/bookshop" class="btn nav-font-white">BOOKSHOP</a> |-->
                     {% if navigationLink() %}
                         <a href="{{ url('adminLoginLogout') }}" class="btn nav-font-white">LOGOUT</a>
@@ -219,14 +223,14 @@
         <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
             <footer class="footer mt-5 bg-light border-top">
-                <div class="container py-4">
+                <!--<div class="container py-4">
                     <ul class="list-inline mb-2">
                         <li class="list-inline-item"><a href="/">Home</a></li>
                         <li class="list-inline-item"><a href="/page-example">Example page</a></li>
                         <li class="list-inline-item"><a href="/clear-data">Clear</a></li>
                     </ul>
                     <p class="text-muted small mb-0">&copy; Crown copyright</p>
-                </div>
+                </div>-->
             </footer>
     </footer>
   </body>

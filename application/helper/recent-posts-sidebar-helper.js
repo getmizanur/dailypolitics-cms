@@ -1,5 +1,6 @@
 
 const AbstractHelper = require(global.applicationPath('/library/mvc/view/helper/abstract-helper'));
+const UrlHelper = require(global.applicationPath('/library/mvc/view/helper/url'));
 
 class RecentPostsSidebarHelper extends AbstractHelper {
 
@@ -18,6 +19,9 @@ class RecentPostsSidebarHelper extends AbstractHelper {
 
         const postsToRender = posts || defaultPosts;
 
+        // Initialize URL helper
+        const urlHelper = new UrlHelper();
+
         let html = `
         <div class="col-sm-4 col-md-4 hidden-phone">
             <div class="dailypolitics-!-margin-top-8">
@@ -27,9 +31,14 @@ class RecentPostsSidebarHelper extends AbstractHelper {
 
         // Render server-side posts as fallback
         postsToRender.forEach(post => {
+            // Generate URL using URL helper
+            const articleUrl = post.slug
+                ? urlHelper.fromRoute('blogIndexView', { slug: post.slug })
+                : '#';
+
             html += `
                         <li class="list-group-item clearfix odd">
-                            <a href="/${post.category_slug || 'general'}/articles/${post.slug || '#'}/index.html">${post.title}</a>
+                            <a href="${articleUrl}">${post.title}</a>
                         </li>`;
         });
 
@@ -41,7 +50,7 @@ class RecentPostsSidebarHelper extends AbstractHelper {
 
         return html;
     }
-    
+
 }
 
 module.exports = RecentPostsSidebarHelper;

@@ -2,7 +2,7 @@ const AbstractHelper = require(global.applicationPath('/library/mvc/view/helper/
 
 /**
  * FlashBannerHelper
- * Renders GOV.UK style notification banners for flash messages
+ * Renders notification banners for flash messages
  * Usage: {{ flashBanner('success', successMessages) | safe }}
  *        {{ flashBanner('error', errorMessages) | safe }}
  */

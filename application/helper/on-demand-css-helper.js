@@ -76,12 +76,10 @@ class OnDemandCssHelper extends AbstractHelper {
         const actionName = this.getVariable('_actionName');
 
         if (!moduleName) {
-            console.log('[OnDemandCss] No module name, returning empty');
             return '';
         }
 
         const result = this.cssLinkTag(moduleName, controllerName, actionName);
-        console.log('[OnDemandCss] CSS result length:', result.length);
         return result;
     }
 }

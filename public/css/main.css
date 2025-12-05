@@ -65,7 +65,18 @@ body {
 
 .navbar {
   background-color: #003078 !important;
+  height: 78px;
+  min-height: 78px;
+  display: flex;
+  align-items: center;
 }
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 .navbar .navbar-brand {
   color: #ecf0f1;
 }
@@ -200,14 +211,18 @@ body {
 	/*font-family: 'EB Garamond', 'Garamond', serif;*/
 	font-family: 'Anton', 'Anton Fallback','Garamond', serif;
 	font-size: 52px;
-	margin-top: 15px;
-	margin-bottom: 10px;
 	text-align: center;
 	font-weight: normal;
+	margin: 0;
+	padding: 0;
+	line-height: 1;
+	display: flex;
+	align-items: center;
 }
 
 h1.navbar-brand {
-	margin-right: 3px;
+	margin: 0;
+	padding: 0;
 }
 
 .sub-menu {
@@ -223,6 +238,10 @@ h1.navbar-brand {
 .nav-font-white {
     color: #fff !important;
     padding: 0 0 0 0;
+}
+
+.menu-content-area .nav-font-white {
+    margin-right: 20px;
 }
 
 .isDisabled {

@@ -46,8 +46,7 @@ class PaginationHelper extends AbstractHelper {
     }
 
     /**
-     * Render navigation for posts (page-based pagination)
-     * Using GOV.UK pagination component design with dp- prefix
+     * Render Previous/Next pagination for blog posts
      * @private
      */
     _renderPostsNavigation(options) {
@@ -67,37 +66,26 @@ class PaginationHelper extends AbstractHelper {
         }
 
         let html = `
-        <nav class="dp-pagination dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8" aria-label="Pagination">`;
+        <nav class="dp-pagination" aria-label="Pagination">`;
 
-        // Previous page (newer posts)
+        // Previous page link
         if (hasPrev) {
-            const newerUrl = prevPage === 1 ? baseUrl || '/' : `${baseUrl}/page/${prevPage}/index.html`;
+            const prevUrl = prevPage === 1 ? baseUrl || '/' : `${baseUrl}/page/${prevPage}/index.html`;
             html += `
             <div class="dp-pagination__prev">
-                <a class="dp-pagination__link" href="${newerUrl}" rel="prev">
-                    <svg class="dp-pagination__icon dp-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                        <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-                    </svg>
-                    <span class="dp-pagination__link-title">
-                        Previous<span class="dp-visually-hidden"> page</span>
-                    </span>
-                    <span class="dp-pagination__link-label">${prevPage} of ${totalPages}</span>
+                <a class="dp-pagination__link" href="${prevUrl}" rel="prev">
+                    &laquo; Next page
                 </a>
             </div>`;
         }
 
-        // Next page (older posts)
+        // Next page link
         if (hasNext) {
+            const nextUrl = `${baseUrl}/page/${nextPage}/index.html`;
             html += `
             <div class="dp-pagination__next">
-                <a class="dp-pagination__link" href="${baseUrl}/page/${nextPage}/index.html" rel="next">
-                    <span class="dp-pagination__link-title">
-                        Next<span class="dp-visually-hidden"> page</span>
-                    </span>
-                    <span class="dp-pagination__link-label">${nextPage} of ${totalPages}</span>
-                    <svg class="dp-pagination__icon dp-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                        <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
-                    </svg>
+                <a class="dp-pagination__link" href="${nextUrl}" rel="next">
+                    Previous page &raquo;
                 </a>
             </div>`;
         }
@@ -110,7 +98,6 @@ class PaginationHelper extends AbstractHelper {
 
     /**
      * Render navigation for articles (prev/next article links)
-     * Using GOV.UK pagination component design with dp- prefix
      * @private
      */
     _renderArticleNavigation(options) {
@@ -125,7 +112,7 @@ class PaginationHelper extends AbstractHelper {
         }
 
         let html = `
-        <nav class="dp-pagination dailypolitics-!-margin-top-8 dailypolitics-!-margin-bottom-8" aria-label="Article navigation">`;
+        <nav class="dp-pagination" aria-label="Article navigation">`;
 
         // Previous article link
         if (prevArticle) {
@@ -133,12 +120,7 @@ class PaginationHelper extends AbstractHelper {
             html += `
             <div class="dp-pagination__prev">
                 <a class="dp-pagination__link" href="${prevUrl}" rel="prev">
-                    <svg class="dp-pagination__icon dp-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                        <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-                    </svg>
-                    <span class="dp-pagination__link-title">
-                        Previous<span class="dp-visually-hidden"> article</span>
-                    </span>
+                    &laquo; Next article
                 </a>
             </div>`;
         }
@@ -149,12 +131,7 @@ class PaginationHelper extends AbstractHelper {
             html += `
             <div class="dp-pagination__next">
                 <a class="dp-pagination__link" href="${nextUrl}" rel="next">
-                    <span class="dp-pagination__link-title">
-                        Next<span class="dp-visually-hidden"> article</span>
-                    </span>
-                    <svg class="dp-pagination__icon dp-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                        <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
-                    </svg>
+                    Previous article &raquo;
                 </a>
             </div>`;
         }
@@ -165,11 +142,11 @@ class PaginationHelper extends AbstractHelper {
         return html;
     }
 
-     /**
-     * Render numbered pagination for admin dashboard (10 articles per page)
-     * @param {Object} options - { currentPage, totalItems, baseUrl }
-     * @returns {string} - HTML string for numbered pagination
-     */
+    /**
+    * Render numbered pagination for admin dashboard (10 articles per page)
+    * @param {Object} options - { currentPage, totalItems, baseUrl }
+    * @returns {string} - HTML string for numbered pagination
+    */
     _renderAdminNumberedPagination(options = {}) {
         const {
             currentPage = 1,
