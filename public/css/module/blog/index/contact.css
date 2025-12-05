@@ -1,0 +1,664 @@
+/* =========================================
+   CONTACT PAGE STYLES
+   Based on admin form styling patterns
+   Using GOV.UK Design System rem units
+   LAST UPDATED: 2025-12-05 16:45
+   ========================================= */
+
+/* Remove default padding from card */
+.dp-pt-0 {
+    padding-top: 0px !important;
+}
+
+/* Form container spacing */
+.admin-article-form-container {
+    padding: 20px 0;
+}
+
+/* Main heading - GOV.UK heading-xl */
+.dp-heading-xl {
+    font-family: "Roboto", "Roboto Fallback", Arial, sans-serif !important;
+    font-size: 2.25rem !important;
+    /* 2rem = 32px at base 16px */
+    font-weight: 700 !important;
+    line-height: 1.09375 !important;
+    /* line-height: 35px / 32px = 1.09375 */
+    margin-top: 0 !important;
+    margin-bottom: 30px !important;
+    color: #0b0c0c !important;
+    display: block !important;
+}
+
+/* Responsive: Large screens (640px+) */
+@media (min-width: 40.0625em) {
+    .dp-heading-xl {
+        font-size: 2.25rem !important;
+        /* 3rem = 48px at base 16px */
+        line-height: 1.04166667 !important;
+        /* line-height: 50px / 48px = 1.04166667 */
+    }
+}
+
+/* GOV.UK heading-l */
+.dp-heading-l {
+    font-family: "Roboto", "Roboto Fallback", Arial, sans-serif;
+    font-size: 1.6875rem;
+    /* 1.6875rem = 27px at base 16px */
+    font-weight: 700;
+    line-height: 1.11111111;
+    /* line-height: 30px / 27px = 1.11111111 */
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #0b0c0c;
+    display: block;
+}
+
+@media (min-width: 40.0625em) {
+    .dp-heading-l {
+        font-size: 2.25rem;
+        /* 2.25rem = 36px at base 16px */
+        line-height: 1.11111111;
+        /* line-height: 40px / 36px = 1.11111111 */
+    }
+}
+
+/* GOV.UK heading-m */
+.dp-heading-m {
+    font-family: "Roboto", "Roboto Fallback", Arial, sans-serif;
+    font-size: 1.3125rem;
+    /* 1.3125rem = 21px at base 16px */
+    font-weight: 700;
+    line-height: 1.19047619;
+    /* line-height: 25px / 21px = 1.19047619 */
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #0b0c0c;
+    display: block;
+}
+
+@media (min-width: 40.0625em) {
+    .dp-heading-m {
+        font-size: 1.5rem;
+        /* 1.5rem = 24px at base 16px */
+        line-height: 1.25;
+        /* line-height: 30px / 24px = 1.25 */
+    }
+}
+
+/* GOV.UK heading-s */
+.dp-heading-s {
+    font-family: "Roboto", "Roboto Fallback", Arial, sans-serif;
+    font-size: 1.1875rem;
+    /* 1.1875rem = 19px at base 16px */
+    font-weight: 700;
+    line-height: 1.31578947;
+    /* line-height: 25px / 19px = 1.31578947 */
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #0b0c0c;
+    display: block;
+}
+
+/* Success Panel - GOV.UK Confirmation Panel */
+.dp-panel {
+    box-sizing: border-box;
+    border: 5px solid transparent;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.dp-panel--confirmation {
+    background-color: #00703c;
+    color: #ffffff;
+}
+
+.dp-panel__body {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.dp-panel__body .dp-heading-m {
+    margin: 0 0 10px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.dp-panel__body .dp-body {
+    margin: 0;
+    font-size: 1.125rem;
+    color: #ffffff;
+}
+
+/* Error Summary - Based on GOV.UK Error Summary */
+.dp-error-summary {
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 5px solid #d4351c;
+    background-color: #ffffff;
+}
+
+.dp-error-summary:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+}
+
+.dp-error-summary__title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #d4351c;
+}
+
+.dp-error-summary__body {
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.dp-error-summary__list {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.dp-error-summary__list li {
+    margin-bottom: 10px;
+}
+
+.dp-error-summary__list li:last-child {
+    margin-bottom: 0;
+}
+
+.dp-error-summary__list a {
+    font-weight: 700;
+    color: #d4351c;
+    text-decoration: underline;
+}
+
+.dp-error-summary__list a:hover {
+    color: #942514;
+}
+
+.dp-error-summary__list a:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    color: #0b0c0c;
+}
+
+/* Form Group - Standard GOV.UK Pattern */
+.form-group,
+.dp-form-group {
+    margin-bottom: 30px;
+}
+
+.form-group:last-of-type,
+.dp-form-group:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Form Group Error State */
+.dp-form-group--error {
+    padding-left: 15px;
+    border-left: 5px solid #d4351c;
+}
+
+/* Fieldset Styling */
+.dp-fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+
+.dp-fieldset__legend {
+    font-family: "Roboto", "Roboto Fallback", Arial, sans-serif !important;
+    font-size: 1.1875rem !important;
+    /* 1.1875rem = 19px at base 16px */
+    font-weight: 700 !important;
+    line-height: 1.31578947 !important;
+    /* line-height: 25px / 19px = 1.31578947 */
+    margin-top: 0 !important;
+    margin-bottom: 15px !important;
+    display: block !important;
+    color: #0b0c0c !important;
+}
+
+.dp-fieldset__legend--l {
+    font-size: 1.3125rem !important;
+    /* 1.3125rem = 21px at base 16px (mobile) */
+    line-height: 1.19047619 !important;
+    /* line-height: 25px / 21px = 1.19047619 */
+}
+
+@media (min-width: 40.0625em) {
+    .dp-fieldset__legend--l {
+        font-size: 1.5rem !important;
+        /* 1.5rem = 24px at base 16px (desktop) */
+        line-height: 1.25 !important;
+        /* line-height: 30px / 24px = 1.25 */
+    }
+}
+
+/* Radio Buttons Container - GOV.UK Style */
+.dp-radios {
+    margin-bottom: 0;
+}
+
+.dp-radios__item {
+    display: block;
+    position: relative;
+    min-height: 40px;
+    margin-bottom: 10px;
+    padding-left: 48px;
+    clear: left;
+}
+
+.dp-radios__item:last-child {
+    margin-bottom: 0;
+}
+
+.dp-radios__input {
+    cursor: pointer;
+    position: absolute;
+    z-index: 1;
+    top: -2px;
+    left: -2px;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    opacity: 0;
+}
+
+.dp-radios__label {
+    display: inline-block;
+    margin-bottom: 0;
+    padding: 8px 15px 5px;
+    cursor: pointer;
+    touch-action: manipulation;
+    font-size: 19px;
+    line-height: 1.25;
+    color: #0b0c0c;
+}
+
+/* Radio circle (outer ring) */
+.dp-radios__label::before {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #0b0c0c;
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+/* Radio dot (inner circle when selected) */
+.dp-radios__label::after {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 0;
+    height: 0;
+    border: 10px solid #0b0c0c;
+    border-radius: 50%;
+    opacity: 0;
+    background: transparent;
+}
+
+/* Checked state - show inner dot */
+.dp-radios__input:checked + .dp-radios__label::after {
+    opacity: 1;
+}
+
+/* Focus state - thicker border with shadow */
+.dp-radios__input:focus + .dp-radios__label::before {
+    border-width: 4px;
+    box-shadow: 0 0 0 3px #fd0;
+    outline: 3px solid transparent;
+}
+
+/* Hover state - subtle shadow */
+.dp-radios__input:hover + .dp-radios__label::before {
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Disabled state */
+.dp-radios__input:disabled + .dp-radios__label {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.dp-radios__input:disabled + .dp-radios__label::before {
+    cursor: not-allowed;
+}
+
+/* Labels */
+.dp-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #0b0c0c;
+}
+
+/* Hint Text */
+.dp-hint {
+    margin-bottom: 15px;
+    font-size: 19px;
+    line-height: 1.25;
+    color: #505a5f;
+}
+
+/* Error Messages */
+.dp-error-message {
+    display: block;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding: 10px;
+    clear: both;
+    color: #d4351c;
+    font-weight: 700;
+    font-size: 19px;
+    line-height: 1.25;
+}
+
+.dp-error-message::before {
+    content: "!";
+    display: inline-block;
+    margin-right: 5px;
+    padding: 2px 5px;
+    background-color: #d4351c;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 50%;
+}
+
+/* Input Fields */
+.dp-input {
+    font-family: "Roboto", "Roboto Fallback", Arial, sans-serif;
+    font-size: 19px;
+    line-height: 1.25;
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    margin-top: 0;
+    padding: 5px;
+    border: 2px solid #0b0c0c;
+    border-radius: 0;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.dp-input:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px;
+}
+
+.dp-input--error {
+    border-color: #d4351c;
+}
+
+.dp-input--error:focus {
+    border-color: #0b0c0c;
+}
+
+/* Textarea */
+.dp-textarea {
+    font-family: "Roboto", "Roboto Fallback", Arial, sans-serif;
+    font-size: 19px;
+    line-height: 1.25;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 0;
+    padding: 5px;
+    border: 2px solid #0b0c0c;
+    border-radius: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    resize: vertical;
+}
+
+.dp-textarea:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px;
+}
+
+.dp-textarea--error {
+    border-color: #d4351c;
+}
+
+.dp-textarea--error:focus {
+    border-color: #0b0c0c;
+}
+
+/* Checkboxes - GOV.UK Style */
+.dp-checkboxes {
+    margin-bottom: 0;
+}
+
+.dp-checkboxes__item {
+    display: block;
+    position: relative;
+    min-height: 40px;
+    margin-bottom: 10px;
+    padding-left: 48px;
+    clear: left;
+}
+
+.dp-checkboxes__item:last-child {
+    margin-bottom: 0;
+}
+
+.dp-checkboxes__input {
+    cursor: pointer;
+    position: absolute;
+    z-index: 1;
+    top: -2px;
+    left: -2px;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    opacity: 0;
+}
+
+.dp-checkboxes__label {
+    display: inline-block;
+    margin-bottom: 0;
+    padding: 8px 15px 5px;
+    cursor: pointer;
+    touch-action: manipulation;
+    font-size: 19px;
+    line-height: 1.25;
+    color: #0b0c0c;
+}
+
+/* Checkbox box (outer square) */
+.dp-checkboxes__label::before {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #0b0c0c;
+    background: #ffffff;
+}
+
+/* Checkbox tick mark */
+.dp-checkboxes__label::after {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    top: 11px;
+    left: 9px;
+    width: 23px;
+    height: 12px;
+    transform: rotate(-45deg);
+    border: solid #0b0c0c;
+    border-width: 0 0 5px 5px;
+    border-top-color: transparent;
+    opacity: 0;
+    background: transparent;
+}
+
+/* Checked state - show tick mark */
+.dp-checkboxes__input:checked + .dp-checkboxes__label::after {
+    opacity: 1;
+}
+
+/* Focus state - thicker border with shadow */
+.dp-checkboxes__input:focus + .dp-checkboxes__label::before {
+    border-width: 4px;
+    box-shadow: 0 0 0 3px #fd0;
+    outline: 3px solid transparent;
+}
+
+/* Hover state - subtle shadow */
+.dp-checkboxes__input:hover + .dp-checkboxes__label::before {
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Disabled state */
+.dp-checkboxes__input:disabled + .dp-checkboxes__label {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.dp-checkboxes__input:disabled + .dp-checkboxes__label::before {
+    cursor: not-allowed;
+}
+
+/* Button Group for Form Actions */
+.dp-button-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.dp-button-group__left {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dp-button-group__right {
+    display: flex;
+    margin-left: auto;
+}
+
+/* Submit Button - Primary Action */
+.dp-button {
+    display: inline-block;
+    padding: 8px 16px;
+    font-family: "Roboto", "Roboto Fallback", Arial, sans-serif;
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    background-color: #00703c;
+    color: #ffffff !important;
+    border: 2px solid transparent;
+    border-radius: 0;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #002d18;
+    transition: background-color 0.15s ease-in-out;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.dp-button:hover {
+    background-color: #005a30;
+}
+
+.dp-button:active {
+    background-color: #00703c;
+    box-shadow: none;
+    top: 2px;
+    position: relative;
+}
+
+.dp-button:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    box-shadow: 0 2px 0 #0b0c0c;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c;
+}
+
+/* Button disabled state */
+.dp-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.dp-button:disabled:hover {
+    background-color: #00703c;
+}
+
+/* Responsive: Stack form elements on mobile */
+@media (max-width: 640px) {
+    .dp-button-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dp-button-group__left,
+    .dp-button-group__right {
+        width: 100%;
+    }
+
+    .dp-button-group__right {
+        margin-left: 0;
+    }
+
+    .dp-button {
+        width: 100%;
+    }
+
+    .dp-label,
+    .dp-hint,
+    .dp-error-message {
+        font-size: 16px;
+    }
+
+    .dp-input,
+    .dp-textarea,
+    .dp-button {
+        font-size: 16px;
+    }
+}
+
+/* Card Styling */
+.card {
+    background-color: #ffffff;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-dashboard-card {
+    border: none;
+}
+
+/* Ensure proper spacing in centered layout */
+.admin-dashboard-margin-y-8 {
+    margin-top: 40px;
+    margin-bottom: 40px;
+}

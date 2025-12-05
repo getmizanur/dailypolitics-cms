@@ -1,0 +1,107 @@
+{% extends 'layout/master.njk' %}
+
+{% block content %}
+<div class="container admin-dashboard-margin-y-8">
+    <div class="row align-items-center admin-dashboard-fix-row">
+        <div class="col-sm-12 col-md-8 offset-md-0">
+        
+            <h1 class="dp-heading-xl">Contact us (currently unavailable - technical issue)</h1>
+
+            {# Success messages #}
+            {% if success_flash_messages.length > 0 %}
+            <div class="dp-panel dp-panel--confirmation">
+                <div class="dp-panel__body">
+                    {% for message in success_flash_messages %}
+                    <h2 class="dp-heading-m">{{ message.title }}</h2>
+                    <p class="dp-body">{{ message.message }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Error messages #}
+            {% if error_flash_messages.length > 0 %}
+            <div class="dp-error-summary">
+                <h2 class="dp-error-summary__title">There is a problem</h2>
+                <div class="dp-error-summary__body">
+                    <ul class="dp-error-summary__list">
+                        {% for message in error_flash_messages %}
+                        <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            {{ form().openTag(f) }}
+                <fieldset class="dp-fieldset">
+                    {# Category selection #}
+                    <div class="form-group dp-form-group{% if errorDecorator(f.get('whats_it_to_do_with')) %} dp-form-group--error{% endif %}">
+                        <fieldset class="dp-fieldset">
+                            <legend class="dp-fieldset__legend dp-fieldset__legend--l">
+                                {{ f.get('whats_it_to_do_with').getLabel() }}
+                            </legend>
+                            {{ formError(f.get('whats_it_to_do_with')) | safe }}
+                            <div class="dp-radios">
+                                {{ formRadio(f.get('whats_it_to_do_with')) | safe }}
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    {# Message field #}
+                    <div class="form-group{% if errorDecorator(f.get('message')) %} dp-form-group--error{% endif %}">
+                        <legend class="dp-fieldset__legend dp-fieldset__legend--l">
+                                {{ f.get('message').getLabel() }}
+                        </legend>
+                        {{ formError(f.get('message')) | safe }}
+                        {{ formTextarea(f.get('message')) | safe }}
+                        <div class="dp-hint" id="message-hint">
+                            Maximum 200 characters
+                        </div>
+                    </div>
+                </fieldset><br>
+                <fieldset class="dp-fieldset">
+                    <legend class="dp-fieldset__legend dp-fieldset__legend--l">
+                        Do you want a reply?
+                    </legend>
+                    {# Name field #}
+                    <div class="form-group{% if errorDecorator(f.get('name')) %} dp-form-group--error{% endif %}">
+                        {{ formLabel(f.get('name')) | safe }}
+                        {{ formError(f.get('name')) | safe }}
+                        {{ formText(f.get('name')) | safe }}
+                    </div>
+
+                    {# Email field #}
+                    <div class="form-group{% if errorDecorator(f.get('email')) %} dp-form-group--error{% endif %}">
+                        {{ formLabel(f.get('email')) | safe }}
+                        <div class="dp-hint" id="email-hint">
+                            We'll only use this to reply to your message.
+                        </div>
+                        {{ formError(f.get('email')) | safe }}
+                        {{ formText(f.get('email')) | safe }}
+                    </div>
+
+                    {# Reply checkbox #}
+                    <div class="form-group{% if errorDecorator(f.get('want_reply')) %} dp-form-group--error{% endif %}">
+                        <div class="dp-checkboxes">
+                            <div class="dp-checkboxes__item">
+                                {{ formCheckbox(f.get('want_reply')) | safe }}
+                                {{ formLabel(f.get('want_reply')) | safe }}
+                            </div>
+                        </div>
+                        {{ formError(f.get('want_reply')) | safe }}
+                    </div>
+                </fieldset><br>
+
+
+                {# Submit button #}
+                <div class="form-group">
+                    <div class="dp-button-group">
+                        {{ formSubmit(f.get('submit')) | safe }}
+                    </div>
+                </div>
+            {{ form().closeTag() }}
+        </dvi>
+    </div>
+</div>
+{% endblock %}

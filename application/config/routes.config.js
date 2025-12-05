@@ -102,6 +102,12 @@ module.exports = {
             "controller": "index",
             "action": "view"
         },
+         "blogIndexContact": {
+            "route": "/contact.html",
+            "module": "blog",
+            "controller": "index",
+            "action": "contact"
+        },
         "blogSitemapSitemap": {
             "route": "/sitemap.xml",
             "module": "blog",

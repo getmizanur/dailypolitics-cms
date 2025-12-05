@@ -41,42 +41,45 @@ class FormRadio extends AbstractHelper {
     renderOptions(element) {
         let render = "";
 
-        let valueOptions = element.getValueOptions(); 
+        let valueOptions = element.getValueOptions();
         for(let i=0; i<valueOptions.length; i++) {
-            let type = element.getAttribute('type'); 
+            let type = element.getAttribute('type');
             let value = valueOptions[i].value;
             let labelContent = valueOptions[i].label;
             let attributes = valueOptions[i].attributes;
             let labelAttributes = valueOptions[i].label_attributes;
             let name = element.getAttribute('name');
 
-            let id = ((attributes.id) ? attributes.id 
+            let id = ((attributes.id) ? attributes.id
                 : name + "-" + StringUtil.strReplace(' ', '_', value));
             attributes['id'] = id;
 
-            let forAttrib = ((labelAttributes.for) 
+            let forAttrib = ((labelAttributes.for)
                 ? labelAttributes.for : name + "-" + StringUtil.strReplace(' ', '_', value));
             labelAttributes['for'] = forAttrib;
 
             // Check if this radio button should be checked
             const elementValue = element.getValue();
             const isChecked = (elementValue === value);
-            
+
+            // Wrap each radio in dp-radios__item div
+            render += '<div class="dp-radios__item">';
             render += '<input type="' + type + '" name="' + name + '" '
             for(let key in attributes) {
-                render += key + '="' + attributes[key] + '" '; 
+                render += key + '="' + attributes[key] + '" ';
             }
             render += 'value="' + value + '"';
             if (isChecked) {
                 render += ' checked="checked"';
             }
-            render += '/>' 
+            render += '/>'
             render += '<label ';
             for(let key in labelAttributes) {
-                render += key + '="' + labelAttributes[key] + '" ' 
+                render += key + '="' + labelAttributes[key] + '" '
             }
             render += '>';
-            render += labelContent + '</label><br>';
+            render += labelContent + '</label>';
+            render += '</div>';
         }
 
         return render;

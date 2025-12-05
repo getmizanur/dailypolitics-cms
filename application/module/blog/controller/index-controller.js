@@ -92,6 +92,59 @@ class IndexController extends Controller {
         }
     }
 
+    /**
+     * Display contact form and handle submission
+     */
+    async contactAction() {
+        try {
+            // Import ContactForm
+            const ContactForm = require(global.applicationPath('/application/form/contact-form'));
+
+            // Create form instance
+            const form = new ContactForm();
+            form.setAction('/contact.html');
+            form.setMethod('POST');
+
+            // Add form fields
+            form.addWhatsItToDoWithOptionField();
+            form.addMessageField();
+            form.addNameField();
+            form.addEmailField();
+            form.addReplyCheckbox();
+            form.addCsrfField('csrf');
+            form.addSubmitButton();
+
+            // Check if form is submitted
+            const request = this.getRequest();
+            const isPost = request.isPost();
+
+            if (isPost) {
+                const postData = request.getPost();
+
+                // Here you would add validation and processing logic
+                // For now, we'll just show a success message
+
+                this.plugin('flashMessenger').addSuccessMessage({
+                    title: 'Message sent',
+                    message: 'Thank you for contacting us. We\'ll get back to you soon.'
+                });
+
+                // Redirect to avoid form resubmission
+                return this.plugin('redirect').toRoute('blogIndexContact');
+            }
+
+            // Set form in view
+            this.getView()
+                .setVariable('f', form);
+
+            return this.getView();
+
+        } catch (error) {
+            console.error('Error in contactAction:', error);
+            throw error;
+        }
+    }
+
 }
 
 module.exports = IndexController;
